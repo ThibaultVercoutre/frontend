@@ -5,22 +5,31 @@ interface Track {
   subtitle: string
   duration: string
   type: 'epic' | 'celtic' | 'military'
+  filename?: string
 }
 
 const tracks: Track[] = [
-  { id: 1, title: 'La Marche des Braves', subtitle: 'Hymne de guerre', duration: '4:32', type: 'military' },
-  { id: 2, title: 'Forêt Ancestrale', subtitle: 'Chant celtique', duration: '5:17', type: 'celtic' },
-  { id: 3, title: 'L\'Assaut Final', subtitle: 'Bataille épique', duration: '6:45', type: 'epic' },
-  { id: 4, title: 'Les Fils de la Terre', subtitle: 'Marche triomphale', duration: '4:58', type: 'military' },
-  { id: 5, title: 'Brumes d\'Émeraude', subtitle: 'Ballade mystique', duration: '5:23', type: 'celtic' },
-  { id: 6, title: 'Sang et Gloire', subtitle: 'Cri de ralliement', duration: '3:47', type: 'epic' },
-  { id: 7, title: 'Le Serment', subtitle: 'Hymne solennel', duration: '4:12', type: 'military' },
-  { id: 8, title: 'Racines Profondes', subtitle: 'Mélodie ancestrale', duration: '5:56', type: 'celtic' },
+  { id: 1, title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '0:00', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va' },
+  { id: 2, title: 'Forêt Ancestrale', subtitle: 'Chant celtique', duration: '0:00', type: 'celtic' },
+  { id: 3, title: 'L\'Assaut Final', subtitle: 'Bataille épique', duration: '0:00', type: 'epic' },
+  { id: 4, title: 'Les Fils de la Terre', subtitle: 'Marche triomphale', duration: '0:00', type: 'military' },
+  { id: 5, title: 'Brumes d\'Émeraude', subtitle: 'Ballade mystique', duration: '0:00', type: 'celtic' },
+  { id: 6, title: 'Sang et Gloire', subtitle: 'Cri de ralliement', duration: '0:00', type: 'epic' },
+  { id: 7, title: 'Le Serment', subtitle: 'Hymne solennel', duration: '0:00', type: 'military' },
+  { id: 8, title: 'Racines Profondes', subtitle: 'Mélodie ancestrale', duration: '0:00', type: 'celtic' },
 ]
 
 const route = useRoute()
 const trackId = computed(() => Number(route.params.id))
 const track = computed(() => tracks.find(t => t.id === trackId.value))
+
+// Audio source - utilise le filename si disponible
+const audioSrc = computed(() => {
+  if (track.value?.filename) {
+    return `/audio/${track.value.filename}.mp3`
+  }
+  return ''
+})
 
 // Player state
 const isPlaying = ref(false)
@@ -28,6 +37,95 @@ const currentTime = ref(0)
 const duration = ref(0)
 const volume = ref(0.8)
 const audioRef = ref<HTMLAudioElement | null>(null)
+
+// Audio Visualizer
+const BAR_COUNT = 200
+const barHeights = ref<number[]>(new Array(BAR_COUNT).fill(0))
+let audioContext: AudioContext | null = null
+let analyser: AnalyserNode | null = null
+let dataArray: Uint8Array | null = null
+let source: MediaElementAudioSourceNode | null = null
+let animationId: number | null = null
+let isAudioContextInitialized = false
+
+const initAudioContext = () => {
+  if (isAudioContextInitialized || !audioRef.value) return
+
+  try {
+    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+    analyser = audioContext.createAnalyser()
+    analyser.fftSize = 512 // Plus de détail
+    analyser.smoothingTimeConstant = 0.75
+
+    source = audioContext.createMediaElementSource(audioRef.value)
+    source.connect(analyser)
+    analyser.connect(audioContext.destination)
+
+    dataArray = new Uint8Array(analyser.frequencyBinCount)
+    isAudioContextInitialized = true
+    console.log('Audio context initialized successfully')
+  } catch (e) {
+    console.error('Failed to initialize audio context:', e)
+  }
+}
+
+const updateVisualizer = () => {
+  if (!isPlaying.value) {
+    // Fade out smoothly when paused
+    for (let i = 0; i < BAR_COUNT; i++) {
+      barHeights.value[i] = barHeights.value[i] * 0.9
+    }
+    animationId = requestAnimationFrame(updateVisualizer)
+    return
+  }
+
+  if (!analyser || !dataArray) {
+    animationId = requestAnimationFrame(updateVisualizer)
+    return
+  }
+
+  analyser.getByteFrequencyData(dataArray)
+
+  // Map frequency data to bar heights with interpolation
+  const dataLength = dataArray.length
+  for (let i = 0; i < BAR_COUNT; i++) {
+    // Sample from the frequency data
+    const dataIndex = Math.floor((i / BAR_COUNT) * dataLength)
+    const value = dataArray[dataIndex] || 0
+    // Smooth transition
+    const targetHeight = (value / 255) * 100
+    barHeights.value[i] = barHeights.value[i] * 0.3 + targetHeight * 0.7
+  }
+
+  animationId = requestAnimationFrame(updateVisualizer)
+}
+
+const startVisualizer = () => {
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume()
+  }
+  if (!animationId) {
+    animationId = requestAnimationFrame(updateVisualizer)
+  }
+}
+
+const stopVisualizer = () => {
+  // Don't cancel animation - let it fade out
+}
+
+onMounted(() => {
+  // Start animation loop even when not playing (for fade effects)
+  animationId = requestAnimationFrame(updateVisualizer)
+})
+
+onUnmounted(() => {
+  if (animationId) {
+    cancelAnimationFrame(animationId)
+  }
+  if (audioContext) {
+    audioContext.close()
+  }
+})
 
 // Format time in mm:ss
 const formatTime = (seconds: number) => {
@@ -46,10 +144,17 @@ const progress = computed(() => {
 const togglePlay = () => {
   if (!audioRef.value) return
 
+  // Initialize audio context on first play (requires user interaction)
+  if (!isAudioContextInitialized) {
+    initAudioContext()
+  }
+
   if (isPlaying.value) {
     audioRef.value.pause()
+    stopVisualizer()
   } else {
     audioRef.value.play()
+    startVisualizer()
   }
   isPlaying.value = !isPlaying.value
 }
@@ -102,12 +207,14 @@ const getTypeColor = (type: Track['type']) => {
     <!-- Audio element (hidden) -->
     <audio
       ref="audioRef"
+      :src="audioSrc"
+      crossorigin="anonymous"
       @timeupdate="updateTime"
       @loadedmetadata="onLoadedMetadata"
-      @ended="isPlaying = false"
-    >
-      <!-- Source will be added when mp3 files are provided -->
-    </audio>
+      @ended="isPlaying = false; stopVisualizer()"
+      @play="startVisualizer"
+      preload="auto"
+    ></audio>
 
     <!-- Back Button -->
     <div class="absolute top-6 left-6 z-20">
@@ -122,8 +229,30 @@ const getTypeColor = (type: Track['type']) => {
       </NuxtLink>
     </div>
 
+    <!-- Audio Visualizer Background - Centered, grows up and down, full width -->
+    <ClientOnly>
+      <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center">
+        <div class="w-full h-full flex items-center justify-center gap-[2px]">
+          <div
+            v-for="(height, index) in barHeights"
+            :key="index"
+            class="visualizer-bar flex-1"
+            :style="{
+              height: `${Math.max(4, height * 4)}px`,
+              opacity: isPlaying ? 0.8 : 0.1,
+              background: `linear-gradient(180deg,
+                rgba(201, 162, 39, ${0.4 + (height / 100) * 0.6}) 0%,
+                rgba(16, 185, 129, ${0.5 + (height / 100) * 0.5}) 50%,
+                rgba(139, 26, 26, ${0.6 + (height / 100) * 0.4}) 100%)`,
+              boxShadow: isPlaying && height > 15 ? `0 0 ${height / 5}px rgba(16, 185, 129, 0.7)` : 'none'
+            }"
+          ></div>
+        </div>
+      </div>
+    </ClientOnly>
+
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col items-center justify-center px-6 pb-32">
+    <div class="flex-1 flex flex-col items-center justify-center px-6 pb-32 relative z-10">
       <!-- Track Info -->
       <div class="text-center mb-12 animate-fade-in-up">
         <p :class="['text-sm uppercase tracking-widest mb-2', getTypeColor(track?.type || 'epic')]">
@@ -204,13 +333,15 @@ const getTypeColor = (type: Track['type']) => {
     </div>
 
     <!-- Player Bar -->
-    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-zinc-950 via-zinc-900/95 to-zinc-900/90 backdrop-blur-lg border-t border-emerald-800/30">
+    <div class="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-zinc-950 via-zinc-900/95 to-zinc-900/90 backdrop-blur-lg border-t border-emerald-800/30">
       <div class="container mx-auto px-6 py-4">
         <!-- Progress Bar -->
         <div
-          class="w-full h-1 bg-zinc-700 rounded-full cursor-pointer mb-4 group"
+          class="w-full h-2 bg-zinc-700 rounded-full cursor-pointer mb-4 group relative"
           @click="seek"
         >
+          <!-- Extended click area -->
+          <div class="absolute -inset-y-2 inset-x-0"></div>
           <div
             class="h-full bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full relative transition-all"
             :style="{ width: `${progress}%` }"
@@ -321,5 +452,15 @@ const getTypeColor = (type: Track['type']) => {
 .vinyl-record:not(.vinyl-spinning) {
   animation: spin 3s linear infinite;
   animation-play-state: paused;
+}
+
+/* Visualizer bars - centered, grows up and down */
+.visualizer-bar {
+  min-height: 4px;
+  min-width: 1px;
+  border-radius: 2px;
+  transform-origin: center;
+  will-change: height, opacity;
+  transition: height 60ms ease-out;
 }
 </style>
