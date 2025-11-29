@@ -572,19 +572,40 @@ onUnmounted(() => {
 
       <!-- Karaoke Lyrics - Center -->
       <div class="flex-1 flex flex-col items-center justify-center">
-        <div class="text-center space-y-6 max-w-4xl mx-auto">
+        <div class="text-center space-y-6 max-w-4xl mx-auto px-4">
           <!-- Previous line -->
-          <p class="text-2xl md:text-3xl text-emerald-600/50 transition-all duration-300">
-            {{ previousLyric }}
-          </p>
+          <div class="h-12 md:h-14 flex items-center justify-center">
+            <Transition name="lyric-fade">
+              <p
+                :key="'prev-' + currentLyricIndex"
+                class="text-2xl md:text-3xl text-emerald-600/50 absolute"
+              >
+                {{ previousLyric }}
+              </p>
+            </Transition>
+          </div>
           <!-- Current line -->
-          <p class="text-4xl md:text-6xl font-bold text-epic karaoke-current transition-all duration-300">
-            {{ currentLyric }}
-          </p>
+          <div class="h-20 md:h-28 flex items-center justify-center">
+            <Transition name="lyric-current">
+              <p
+                :key="'current-' + currentLyricIndex"
+                class="text-4xl md:text-6xl font-bold text-epic karaoke-current absolute"
+              >
+                {{ currentLyric }}
+              </p>
+            </Transition>
+          </div>
           <!-- Next line -->
-          <p class="text-2xl md:text-3xl text-emerald-600/50 transition-all duration-300">
-            {{ nextLyric }}
-          </p>
+          <div class="h-12 md:h-14 flex items-center justify-center">
+            <Transition name="lyric-fade">
+              <p
+                :key="'next-' + currentLyricIndex"
+                class="text-2xl md:text-3xl text-emerald-600/50 absolute"
+              >
+                {{ nextLyric }}
+              </p>
+            </Transition>
+          </div>
         </div>
       </div>
 
@@ -763,16 +784,30 @@ onUnmounted(() => {
     0 0 60px rgba(201, 162, 39, 0.1);
 }
 
-/* Lyric line transition for smooth changes */
-@keyframes lyricPulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
-  }
+/* Lyric transitions */
+/* Simple fade for prev/next lines */
+.lyric-fade-enter-active,
+.lyric-fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+.lyric-fade-enter-from,
+.lyric-fade-leave-to {
+  opacity: 0;
+}
+
+/* Current lyric - crossfade with subtle scale */
+.lyric-current-enter-active {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.lyric-current-leave-active {
+  transition: all 0.3s ease-out;
+}
+.lyric-current-enter-from {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.lyric-current-leave-to {
+  opacity: 0;
+  transform: scale(1.05);
 }
 </style>
