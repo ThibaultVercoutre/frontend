@@ -334,35 +334,45 @@ onUnmounted(() => {
           class="vinyl-record relative w-72 h-72 md:w-96 md:h-96 rounded-full"
           :class="{ 'vinyl-spinning': isPlaying }"
         >
-          <!-- Outer Ring -->
-          <div class="absolute inset-0 rounded-full bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 shadow-2xl">
-            <!-- Vinyl Grooves -->
-            <div class="absolute inset-4 rounded-full border border-zinc-700/50"></div>
-            <div class="absolute inset-8 rounded-full border border-zinc-700/30"></div>
-            <div class="absolute inset-12 rounded-full border border-zinc-700/50"></div>
-            <div class="absolute inset-16 rounded-full border border-zinc-700/30"></div>
-            <div class="absolute inset-20 rounded-full border border-zinc-700/50"></div>
-            <div class="absolute inset-24 rounded-full border border-zinc-700/30"></div>
+          <!-- Vinyl Disc with Album Art -->
+          <div class="absolute inset-0 rounded-full shadow-2xl overflow-hidden">
+            <!-- Album Art as full background -->
+            <img
+              src="/vynile/Parangon_dune_soldate.jpeg"
+              alt="Album art"
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+
+            <!-- Dark overlay for vinyl effect -->
+            <div class="absolute inset-0 bg-black/40"></div>
+
+            <!-- Vinyl Grooves overlay -->
+            <div class="absolute inset-4 rounded-full border border-white/20"></div>
+            <div class="absolute inset-8 rounded-full border border-black/30"></div>
+            <div class="absolute inset-12 rounded-full border border-white/15"></div>
+            <div class="absolute inset-16 rounded-full border border-black/25"></div>
+            <div class="absolute inset-20 rounded-full border border-white/20"></div>
+            <div class="absolute inset-24 rounded-full border border-black/30"></div>
+            <div class="absolute inset-28 rounded-full border border-white/15"></div>
 
             <!-- Reflective shine -->
-            <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/5 to-transparent"></div>
+            <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/10 to-transparent"></div>
 
             <!-- Center Label -->
             <div class="absolute inset-0 flex items-center justify-center">
-              <div class="w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 flex items-center justify-center shadow-inner border-4 border-emerald-700/50">
+              <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 flex items-center justify-center shadow-inner border-3 border-emerald-700/50 relative">
                 <!-- Label Design -->
                 <div class="text-center">
-                  <svg class="w-8 h-8 md:w-10 md:h-10 mx-auto text-amber-500 mb-1" viewBox="0 0 100 120" fill="currentColor">
+                  <svg class="w-6 h-6 md:w-7 md:h-7 mx-auto text-amber-500 mb-0.5" viewBox="0 0 100 120" fill="currentColor">
                     <path d="M50 5 L95 20 L95 60 Q95 100 50 115 Q5 100 5 60 L5 20 Z" />
                   </svg>
-                  <p class="text-emerald-300 text-xs font-bold tracking-wider">GABRIELLE</p>
+                  <p class="text-emerald-300 text-[10px] font-bold tracking-wider">GABRIELLE</p>
+                </div>
+                <!-- Center Hole -->
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div class="w-3 h-3 md:w-4 md:h-4 rounded-full bg-zinc-900 border border-zinc-600 shadow-inner"></div>
                 </div>
               </div>
-            </div>
-
-            <!-- Center Hole -->
-            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div class="w-3 h-3 md:w-4 md:h-4 rounded-full bg-zinc-900 border-2 border-zinc-700"></div>
             </div>
           </div>
         </div>
