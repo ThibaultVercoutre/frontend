@@ -10,6 +10,11 @@ interface Track {
   filename?: string
 }
 
+interface LyricLine {
+  time: number // in seconds
+  text: string
+}
+
 const tracks: Track[] = [
   { id: 1, title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '0:00', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va' },
   { id: 2, title: "Parangon d'une Soldate", subtitle: 'Hymne héroïque', duration: '0:00', type: 'military', filename: "Parangon_d'une_soldate" },
@@ -19,6 +24,87 @@ const tracks: Track[] = [
   { id: 6, title: 'Sang et Gloire', subtitle: 'Cri de ralliement', duration: '0:00', type: 'epic' },
   { id: 7, title: 'Le Serment', subtitle: 'Hymne solennel', duration: '0:00', type: 'military' },
   { id: 8, title: 'Racines Profondes', subtitle: 'Mélodie ancestrale', duration: '0:00', type: 'celtic' },
+]
+
+// Lyrics with timecodes (placeholder text)
+const lyrics: LyricLine[] = [
+  { time: 0, text: "..." },
+  { time: 15, text: "De nos jours plus rien de va," },
+  { time: 17, text: "Que ce soit ici ou là-bas," },
+  { time: 20, text: "Ils sont ici pour nous faire chier" },
+  { time: 23, text: "Je parle bien sur des étrangers !" },
+  { time: 26, text: "Il y en a de toute sorte," },
+  { time: 28, text: "C’est comme des cartes pokémon," },
+  { time: 31, text: "Mais malheureusement sur leur carte" },
+  { time: 33, text: "Que des statistiques qui déconnent !" },
+  { time: 36, text: "On ne veut aussi pas les collectionner !" },
+  { time: 39, text: "Car un pokédex c’est fait pour être parfait" },
+  { time: 42, text: "La dernière fois que j’en ai vu" },
+  { time: 44, text: "C’était pour leur cracher dessus." },
+
+  { time: 49, text: "Les Arabes c'est dehors !" },
+  { time: 52, text: "On n'en veut plus dans le décor !" },
+  { time: 55, text: "Les maghrébins c'est dehors !" },
+  { time: 57, text: "Impossible qu’ils ne s’améliorent !" },
+  { time: 60, text: "Les bridés c'est dehors !" },
+  { time: 63, text: "Ce ne sont pas des trésor !" },
+  { time: 65, text: "Les négros c'est dehors !" },
+  { time: 68, text: "Ah non pas eux," },
+  { time: 69, text: "On en veut pour nos champs !" },
+  { time: 72, text: "..." },
+
+  { time: 76, text: "Avec la monté de l’extrême droite" },
+  { time: 79, text: "Oh mon dieu qu’elle aubaine" },
+  { time: 81, text: "Depuis maintenant quelques années à droites" },
+  { time: 84, text: "On voit cette magnifique Madame Le Pen" },
+  { time: 87, text: "Ça lui a valu la prison" },
+  { time: 90, text: "Justice imparfaite" },
+  { time: 92, text: "Heureusement, il est bientôt là," },
+  { time: 95, text: "On le verra en 2027" },
+  { time: 97, text: "Je parle bien sûr de ce magnifique Bardella !" },
+  { time: 100, text: "Certains pensent qu'il n'a aucune chance" },
+  { time: 103, text: "Moi je pense qu'il peut se hisser" },
+  { time: 105, text: "Avec sa beauté d'esprit et son intelligence" },
+  { time: 108, text: "Sur le siège le plus haut et le plus prisé de France" },
+
+  { time: 115, text: "Les Arabes c'est dehors !" },
+  { time: 118, text: "On n'en veut plus dans le décor !" },
+  { time: 121, text: "Les maghrébins c'est dehors !" },
+  { time: 123, text: "Impossible qu’ils ne s’améliorent !" },
+  { time: 126, text: "Les bridés c'est dehors !" },
+  { time: 129, text: "Ce ne sont pas des trésor !" },
+  { time: 131, text: "Les négros c'est dehors !" },
+  { time: 134, text: "Ah non pas eux," },
+  { time: 136, text: "On en veut pour nos champs !" },
+  { time: 138, text: "..." },
+
+  { time: 138, text: "On les sent à 10 000" },
+  { time: 139, text: "Et ça remplit nos narines" },
+  { time: 140, text: "Ce n'est pas de la vanille" },
+  { time: 142, text: "Mais je dirais des latrines" },
+  { time: 143, text: "Avec un mélange de poubelles" },
+  { time: 145, text: "Qu'on utilise pour le compost" },
+  { time: 148, text: "Bien pourris au fond d'une ruelle" },
+  { time: 151, text: "Où n'y va même pas la poste" },
+  { time: 153, text: "Ça sent même la marée basse" },
+  { time: 156, text: "Pas étonnant vu qu'ils y meurent" },
+  { time: 159, text: "On leur dit buvez pas la tasse" },
+  { time: 161, text: "Mais ils sont plus cons que des chômeurs" },
+
+  { time: 169, text: "Les Arabes c'est dehors !" },
+  { time: 172, text: "Hey ! Hey ! Hey ! Hey !" },
+  { time: 175, text: "Les Magrébins c'est dehors !" },
+  { time: 177, text: "Hey ! Hey ! Hey ! Hey !" },
+
+  { time: 185, text: "Les Arabes c'est dehors !" },
+  { time: 188, text: "On n'en veut plus dans le décor !" },
+  { time: 191, text: "Les maghrébins c'est dehors !" },
+  { time: 193, text: "Impossible qu’ils ne s’améliorent !" },
+  { time: 196, text: "Les bridés c'est dehors !" },
+  { time: 199, text: "Ce ne sont pas des trésor !" },
+  { time: 202, text: "Les négros c'est dehors !" },
+  { time: 204, text: "Ah non pas eux," },
+  { time: 206, text: "On en veut pour nos champs !" },
 ]
 
 const route = useRoute()
@@ -40,6 +126,41 @@ const duration = ref(0)
 const volume = ref(0.8)
 const audioRef = ref<HTMLAudioElement | null>(null)
 const visualizerRef = ref<HTMLElement | null>(null)
+
+// Karaoke mode
+const isKaraokeMode = ref(false)
+
+// Current lyric index based on time
+const currentLyricIndex = computed(() => {
+  const time = currentTime.value
+  for (let i = lyrics.length - 1; i >= 0; i--) {
+    const lyric = lyrics[i]
+    if (lyric && time >= lyric.time) {
+      return i
+    }
+  }
+  return 0
+})
+
+// Lyrics for display (previous, current, next)
+const previousLyric = computed(() => {
+  const idx = currentLyricIndex.value
+  return idx > 0 ? lyrics[idx - 1]?.text ?? '' : ''
+})
+
+const currentLyric = computed(() => {
+  return lyrics[currentLyricIndex.value]?.text ?? ''
+})
+
+const nextLyric = computed(() => {
+  const idx = currentLyricIndex.value
+  return idx < lyrics.length - 1 ? lyrics[idx + 1]?.text ?? '' : ''
+})
+
+// Toggle karaoke mode
+const toggleKaraokeMode = () => {
+  isKaraokeMode.value = !isKaraokeMode.value
+}
 
 // AudioMotion analyzer instance
 let audioMotion: AudioMotionAnalyzer | null = null
@@ -266,8 +387,11 @@ onUnmounted(() => {
       ></div>
     </ClientOnly>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col items-center justify-center px-6 pb-32 relative z-10">
+    <!-- Main Content - Normal Mode -->
+    <div
+      v-if="!isKaraokeMode"
+      class="flex-1 flex flex-col items-center justify-center px-6 pb-32 relative z-10"
+    >
       <!-- Track Info -->
       <div class="text-center mb-12 animate-fade-in-up">
         <p :class="['text-sm uppercase tracking-widest mb-2', getTypeColor(track?.type || 'epic')]">
@@ -353,6 +477,100 @@ onUnmounted(() => {
               <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
             </svg>
           </div>
+        </button>
+      </div>
+
+      <!-- Mini Lyrics Preview (click to enter karaoke mode) -->
+      <div
+        v-if="trackId === 1"
+        class="mt-8 text-center cursor-pointer group"
+        @click="toggleKaraokeMode"
+      >
+        <div class="space-y-1 p-4 rounded-xl bg-zinc-900/50 backdrop-blur-sm border border-emerald-800/30 hover:border-amber-500/50 transition-all">
+          <p class="text-emerald-600/50 text-sm">{{ previousLyric }}</p>
+          <p class="text-emerald-200 text-lg font-medium">{{ currentLyric }}</p>
+          <p class="text-emerald-600/50 text-sm">{{ nextLyric }}</p>
+        </div>
+        <p class="mt-2 text-emerald-500/40 text-xs uppercase tracking-wider group-hover:text-amber-500/60 transition-colors">
+          Cliquer pour le mode karaoké
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Content - Karaoke Mode -->
+    <div
+      v-else
+      class="flex-1 flex flex-col px-6 pb-32 relative z-10 karaoke-mode"
+    >
+      <!-- Top Bar: Mini Vinyl + Visualizer + Title -->
+      <div class="flex items-center gap-6 pt-20 pb-8">
+        <!-- Mini Vinyl -->
+        <div
+          class="vinyl-record relative w-24 h-24 md:w-32 md:h-32 rounded-full flex-shrink-0 cursor-pointer"
+          :class="{ 'vinyl-spinning': isPlaying }"
+          @click="toggleKaraokeMode"
+        >
+          <div class="absolute inset-0 rounded-full shadow-xl overflow-hidden">
+            <img
+              src="/vynile/Parangon_dune_soldate.jpeg"
+              alt="Album art"
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+            <div class="absolute inset-0 bg-black/40"></div>
+            <div class="absolute inset-2 rounded-full border border-white/20"></div>
+            <div class="absolute inset-4 rounded-full border border-black/30"></div>
+            <div class="absolute inset-6 rounded-full border border-white/15"></div>
+            <!-- Center Label Mini -->
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 flex items-center justify-center shadow-inner border border-emerald-700/50">
+                <svg class="w-3 h-3 md:w-4 md:h-4 text-amber-500" viewBox="0 0 100 120" fill="currentColor">
+                  <path d="M50 5 L95 20 L95 60 Q95 100 50 115 Q5 100 5 60 L5 20 Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right side: Visualizer bar + Title -->
+        <div class="flex-1 min-w-0">
+          <!-- Mini Visualizer Container -->
+          <div class="h-12 md:h-16 w-full rounded-lg overflow-hidden bg-zinc-900/30 mb-2">
+            <!-- This will show a portion of the main visualizer via CSS -->
+            <div class="w-full h-full bg-gradient-to-r from-emerald-500/20 via-amber-500/20 to-red-500/20 animate-pulse"></div>
+          </div>
+          <!-- Track Title -->
+          <h2 class="text-xl md:text-2xl font-medieval text-epic truncate">
+            {{ track?.title }}
+          </h2>
+          <p class="text-emerald-400/60 text-sm">{{ track?.subtitle }}</p>
+        </div>
+      </div>
+
+      <!-- Karaoke Lyrics - Center -->
+      <div class="flex-1 flex flex-col items-center justify-center">
+        <div class="text-center space-y-6 max-w-4xl mx-auto">
+          <!-- Previous line -->
+          <p class="text-2xl md:text-3xl text-emerald-700/40 transition-all duration-300">
+            {{ previousLyric }}
+          </p>
+          <!-- Current line -->
+          <p class="text-4xl md:text-6xl font-bold text-epic karaoke-current transition-all duration-300">
+            {{ currentLyric }}
+          </p>
+          <!-- Next line -->
+          <p class="text-2xl md:text-3xl text-emerald-700/40 transition-all duration-300">
+            {{ nextLyric }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Exit karaoke mode hint -->
+      <div class="text-center pb-4">
+        <button
+          @click="toggleKaraokeMode"
+          class="text-emerald-500/40 text-xs uppercase tracking-wider hover:text-amber-500/60 transition-colors"
+        >
+          Cliquer sur le vinyle pour quitter
         </button>
       </div>
     </div>
@@ -497,5 +715,40 @@ onUnmounted(() => {
 .vinyl-record:not(.vinyl-spinning) {
   animation: spin 3s linear infinite;
   animation-play-state: paused;
+}
+
+/* Karaoke mode styles */
+.karaoke-mode {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Current lyric glow effect */
+.karaoke-current {
+  text-shadow:
+    0 0 20px rgba(201, 162, 39, 0.4),
+    0 0 40px rgba(201, 162, 39, 0.2),
+    0 0 60px rgba(201, 162, 39, 0.1);
+}
+
+/* Lyric line transition for smooth changes */
+@keyframes lyricPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 </style>
