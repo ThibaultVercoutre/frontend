@@ -572,35 +572,35 @@ onUnmounted(() => {
 
       <!-- Karaoke Lyrics - Center -->
       <div class="flex-1 flex flex-col items-center justify-center">
-        <div class="text-center space-y-6 max-w-4xl mx-auto px-4">
+        <div class="text-center space-y-4 max-w-4xl mx-auto px-4">
           <!-- Previous line -->
-          <div class="h-12 md:h-14 flex items-center justify-center">
+          <div class="min-h-16 md:min-h-18 flex items-center justify-center relative py-2">
             <Transition name="lyric-fade">
               <p
                 :key="'prev-' + currentLyricIndex"
-                class="text-2xl md:text-3xl text-emerald-600/50 absolute"
+                class="text-2xl md:text-3xl text-emerald-600/50 leading-relaxed"
               >
                 {{ previousLyric }}
               </p>
             </Transition>
           </div>
           <!-- Current line -->
-          <div class="h-20 md:h-28 flex items-center justify-center">
+          <div class="min-h-24 md:min-h-32 flex items-center justify-center relative py-4">
             <Transition name="lyric-current">
               <p
                 :key="'current-' + currentLyricIndex"
-                class="text-4xl md:text-6xl font-bold text-epic karaoke-current absolute"
+                class="text-4xl md:text-6xl font-bold text-epic karaoke-current leading-normal"
               >
                 {{ currentLyric }}
               </p>
             </Transition>
           </div>
           <!-- Next line -->
-          <div class="h-12 md:h-14 flex items-center justify-center">
+          <div class="min-h-16 md:min-h-18 flex items-center justify-center relative py-2">
             <Transition name="lyric-fade">
               <p
                 :key="'next-' + currentLyricIndex"
-                class="text-2xl md:text-3xl text-emerald-600/50 absolute"
+                class="text-2xl md:text-3xl text-emerald-600/50 leading-relaxed"
               >
                 {{ nextLyric }}
               </p>
@@ -788,11 +788,16 @@ onUnmounted(() => {
 /* Simple fade for prev/next lines */
 .lyric-fade-enter-active,
 .lyric-fade-leave-active {
-  transition: opacity 0.4s ease;
+  transition: opacity 0.35s ease;
 }
 .lyric-fade-enter-from,
 .lyric-fade-leave-to {
   opacity: 0;
+}
+.lyric-fade-leave-active {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* Current lyric - crossfade with subtle scale */
@@ -800,7 +805,10 @@ onUnmounted(() => {
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 .lyric-current-leave-active {
-  transition: all 0.3s ease-out;
+  transition: all 0.25s ease-out;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .lyric-current-enter-from {
   opacity: 0;
@@ -808,6 +816,6 @@ onUnmounted(() => {
 }
 .lyric-current-leave-to {
   opacity: 0;
-  transform: scale(1.05);
+  transform: translateX(-50%) scale(1.02);
 }
 </style>
