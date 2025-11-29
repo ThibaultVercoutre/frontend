@@ -165,6 +165,7 @@ const toggleKaraokeMode = () => {
 // AudioMotion analyzer instance
 let audioMotion: AudioMotionAnalyzer | null = null
 let animationId: number | null = null
+const karaokeVisualizerRef = ref<HTMLElement | null>(null)
 
 const initVisualizer = () => {
   if (audioMotion || !visualizerRef.value || !audioRef.value) return
@@ -208,6 +209,17 @@ const initVisualizer = () => {
     audioMotion.gradient = 'celtic'
   } catch (e) {
     console.error('Failed to initialize AudioMotion:', e)
+  }
+}
+
+// Move the AudioMotion canvas to a different container
+const moveVisualizerTo = (container: HTMLElement) => {
+  if (!audioMotion) return
+  const canvas = audioMotion.canvas
+  if (canvas && canvas.parentElement !== container) {
+    container.appendChild(canvas)
+    // Trigger resize to adapt to new container
+    audioMotion.setCanvasSize(container.clientWidth, container.clientHeight)
   }
 }
 
@@ -331,6 +343,17 @@ const getTypeColor = (type: Track['type']) => {
   }
 }
 
+// Watch for karaoke mode changes to move visualizer canvas
+watch(isKaraokeMode, async (newValue) => {
+  // Wait for next tick so the new container ref is available
+  await nextTick()
+
+  const container = newValue ? karaokeVisualizerRef.value : visualizerRef.value
+  if (container) {
+    moveVisualizerTo(container)
+  }
+})
+
 // Lifecycle hooks (at end to ensure all functions are defined)
 onMounted(() => {
   // Start timeline update loop
@@ -378,12 +401,13 @@ onUnmounted(() => {
       </NuxtLink>
     </div>
 
-    <!-- Audio Visualizer Background - AudioMotion Canvas -->
+    <!-- Audio Visualizer Background - AudioMotion Canvas (hidden in karaoke mode) -->
     <ClientOnly>
       <div
+        v-show="!isKaraokeMode"
         ref="visualizerRef"
         class="fixed inset-0 pointer-events-none z-0 transition-opacity duration-300"
-        :class="isKaraokeMode ? 'opacity-15' : (isPlaying ? 'opacity-70' : 'opacity-20')"
+        :class="isPlaying ? 'opacity-70' : 'opacity-20'"
       ></div>
     </ClientOnly>
 
@@ -533,11 +557,11 @@ onUnmounted(() => {
 
         <!-- Right side: Visualizer bar + Title -->
         <div class="flex-1 min-w-0">
-          <!-- Mini Visualizer Container -->
-          <div class="h-12 md:h-16 w-full rounded-lg overflow-hidden bg-zinc-900/30 mb-2">
-            <!-- This will show a portion of the main visualizer via CSS -->
-            <div class="w-full h-full bg-gradient-to-r from-emerald-500/20 via-amber-500/20 to-red-500/20 animate-pulse"></div>
-          </div>
+          <!-- Mini Visualizer Container - AudioMotion renders here in karaoke mode -->
+          <div
+            ref="karaokeVisualizerRef"
+            class="h-12 md:h-16 w-full rounded-lg overflow-hidden bg-zinc-900/30 mb-2"
+          ></div>
           <!-- Track Title -->
           <h2 class="text-xl md:text-2xl font-medieval text-epic truncate">
             {{ track?.title }}
@@ -548,7 +572,7 @@ onUnmounted(() => {
 
       <!-- Karaoke Lyrics - Center -->
       <div class="flex-1 flex flex-col items-center justify-center">
-        <div class="text-center space-y-6 max-w-4xl mx-auto px-8 py-12 rounded-2xl bg-zinc-950/70 backdrop-blur-sm">
+        <div class="text-center space-y-6 max-w-4xl mx-auto">
           <!-- Previous line -->
           <p class="text-2xl md:text-3xl text-emerald-600/50 transition-all duration-300">
             {{ previousLyric }}
