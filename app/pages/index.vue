@@ -10,7 +10,7 @@ interface Track {
 
 const tracks: Track[] = [
   { id: 1, title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '0:00', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va' },
-  { id: 2, title: 'Forêt Ancestrale', subtitle: 'Chant celtique', duration: '0:00', type: 'celtic' },
+  { id: 2, title: "Parangon d'une Soldate", subtitle: 'Hymne héroïque', duration: '0:00', type: 'military', filename: "Parangon_d'une_soldate" },
   { id: 3, title: 'L\'Assaut Final', subtitle: 'Bataille épique', duration: '0:00', type: 'epic' },
   { id: 4, title: 'Les Fils de la Terre', subtitle: 'Marche triomphale', duration: '0:00', type: 'military' },
   { id: 5, title: 'Brumes d\'Émeraude', subtitle: 'Ballade mystique', duration: '0:00', type: 'celtic' },
@@ -110,8 +110,8 @@ const getTypeIcon = (type: Track['type']) => {
           </svg>
         </div>
 
-        <h1 class="text-6xl md:text-8xl font-black text-epic mb-4 tracking-wider">
-          GABRIELLE
+        <h1 class="text-6xl md:text-8xl font-medieval text-epic mb-4 tracking-wider">
+          Gabrielle
         </h1>
         <div class="flex items-center justify-center gap-4 mb-6">
           <div class="h-px w-20 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
@@ -179,7 +179,7 @@ const getTypeIcon = (type: Track['type']) => {
 
           <!-- Track Info -->
           <div class="mt-6">
-            <h3 class="text-xl font-bold text-emerald-50 group-hover:text-amber-400 transition-colors duration-300 mb-2">
+            <h3 class="text-xl font-medieval text-emerald-50 group-hover:text-amber-400 transition-colors duration-300 mb-2">
               {{ track.title }}
             </h3>
             <p class="text-emerald-400/70 text-sm mb-4">{{ track.subtitle }}</p>

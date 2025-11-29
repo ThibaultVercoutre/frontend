@@ -10,7 +10,7 @@ interface Track {
 
 const tracks: Track[] = [
   { id: 1, title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '0:00', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va' },
-  { id: 2, title: 'Forêt Ancestrale', subtitle: 'Chant celtique', duration: '0:00', type: 'celtic' },
+  { id: 2, title: "Parangon d'une Soldate", subtitle: 'Hymne héroïque', duration: '0:00', type: 'military', filename: "Parangon_d'une_soldate" },
   { id: 3, title: 'L\'Assaut Final', subtitle: 'Bataille épique', duration: '0:00', type: 'epic' },
   { id: 4, title: 'Les Fils de la Terre', subtitle: 'Marche triomphale', duration: '0:00', type: 'military' },
   { id: 5, title: 'Brumes d\'Émeraude', subtitle: 'Ballade mystique', duration: '0:00', type: 'celtic' },
@@ -39,8 +39,15 @@ const volume = ref(0.8)
 const audioRef = ref<HTMLAudioElement | null>(null)
 
 // Audio Visualizer
-const BAR_COUNT = 200
+const BAR_COUNT = 100 // Half count - will be mirrored
 const barHeights = ref<number[]>(new Array(BAR_COUNT).fill(0))
+
+// Mirrored bars: left side (reversed) + right side (normal) = symmetric from center
+const mirroredBarHeights = computed(() => {
+  const reversed = [...barHeights.value].reverse()
+  return [...reversed, ...barHeights.value]
+})
+
 let audioContext: AudioContext | null = null
 let analyser: AnalyserNode | null = null
 let dataArray: Uint8Array | null = null
@@ -70,10 +77,21 @@ const initAudioContext = () => {
 }
 
 const updateVisualizer = () => {
-  if (!isPlaying.value) {
+  // Update timeline at 60fps - check actual audio state, not isPlaying ref
+  const isActuallyPlaying = audioRef.value && !audioRef.value.paused
+
+  if (isActuallyPlaying) {
+    currentTime.value = audioRef.value!.currentTime
+    // Sync isPlaying state if needed
+    if (!isPlaying.value) isPlaying.value = true
+  }
+
+  if (!isActuallyPlaying) {
+    // Sync isPlaying state if needed
+    if (isPlaying.value && audioRef.value) isPlaying.value = false
     // Fade out smoothly when paused
     for (let i = 0; i < BAR_COUNT; i++) {
-      barHeights.value[i] = barHeights.value[i] * 0.9
+      barHeights.value[i] = (barHeights.value[i] ?? 0) * 0.9
     }
     animationId = requestAnimationFrame(updateVisualizer)
     return
@@ -84,6 +102,7 @@ const updateVisualizer = () => {
     return
   }
 
+  // @ts-expect-error - Uint8Array type mismatch with Web Audio API
   analyser.getByteFrequencyData(dataArray)
 
   // Map frequency data to bar heights with interpolation
@@ -94,7 +113,7 @@ const updateVisualizer = () => {
     const value = dataArray[dataIndex] || 0
     // Smooth transition
     const targetHeight = (value / 255) * 100
-    barHeights.value[i] = barHeights.value[i] * 0.3 + targetHeight * 0.7
+    barHeights.value[i] = (barHeights.value[i] ?? 0) * 0.3 + targetHeight * 0.7
   }
 
   animationId = requestAnimationFrame(updateVisualizer)
@@ -113,20 +132,6 @@ const stopVisualizer = () => {
   // Don't cancel animation - let it fade out
 }
 
-onMounted(() => {
-  // Start animation loop even when not playing (for fade effects)
-  animationId = requestAnimationFrame(updateVisualizer)
-})
-
-onUnmounted(() => {
-  if (animationId) {
-    cancelAnimationFrame(animationId)
-  }
-  if (audioContext) {
-    audioContext.close()
-  }
-})
-
 // Format time in mm:ss
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60)
@@ -141,8 +146,11 @@ const progress = computed(() => {
 })
 
 // Toggle play/pause
-const togglePlay = () => {
-  if (!audioRef.value) return
+const togglePlay = async () => {
+  if (!audioRef.value) {
+    console.error('Audio ref not available')
+    return
+  }
 
   // Initialize audio context on first play (requires user interaction)
   if (!isAudioContextInitialized) {
@@ -152,20 +160,30 @@ const togglePlay = () => {
   if (isPlaying.value) {
     audioRef.value.pause()
     stopVisualizer()
+    isPlaying.value = false
   } else {
-    audioRef.value.play()
-    startVisualizer()
+    try {
+      await audioRef.value.play()
+      startVisualizer()
+      isPlaying.value = true
+    } catch (error) {
+      console.error('Error playing audio:', error)
+    }
   }
-  isPlaying.value = !isPlaying.value
 }
 
-// Seek
-const seek = (event: MouseEvent) => {
-  if (!audioRef.value) return
-  const bar = event.currentTarget as HTMLElement
-  const rect = bar.getBoundingClientRect()
-  const percent = (event.clientX - rect.left) / rect.width
-  audioRef.value.currentTime = percent * duration.value
+// Volume bar ref and drag state
+const volumeBarRef = ref<HTMLElement | null>(null)
+const isDraggingVolume = ref(false)
+
+// Seek using native range input
+const onSeek = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const newTime = parseFloat(target.value)
+  currentTime.value = newTime
+  if (audioRef.value) {
+    audioRef.value.currentTime = newTime
+  }
 }
 
 // Update time
@@ -182,14 +200,34 @@ const onLoadedMetadata = () => {
   }
 }
 
-// Update volume
-const updateVolume = (event: MouseEvent) => {
-  const bar = event.currentTarget as HTMLElement
-  const rect = bar.getBoundingClientRect()
-  volume.value = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width))
+// Volume control (used for both click and drag)
+const setVolumeFromPosition = (clientX: number) => {
+  if (!volumeBarRef.value) return
+  const rect = volumeBarRef.value.getBoundingClientRect()
+  volume.value = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
   if (audioRef.value) {
     audioRef.value.volume = volume.value
   }
+}
+
+// Volume drag handlers
+const startVolumeDrag = (event: MouseEvent) => {
+  isDraggingVolume.value = true
+  setVolumeFromPosition(event.clientX)
+  document.addEventListener('mousemove', onVolumeDrag)
+  document.addEventListener('mouseup', stopVolumeDrag)
+}
+
+const onVolumeDrag = (event: MouseEvent) => {
+  if (isDraggingVolume.value) {
+    setVolumeFromPosition(event.clientX)
+  }
+}
+
+const stopVolumeDrag = () => {
+  isDraggingVolume.value = false
+  document.removeEventListener('mousemove', onVolumeDrag)
+  document.removeEventListener('mouseup', stopVolumeDrag)
 }
 
 // Get type color
@@ -200,6 +238,24 @@ const getTypeColor = (type: Track['type']) => {
     case 'military': return 'text-amber-400'
   }
 }
+
+// Lifecycle hooks (at end to ensure all functions are defined)
+onMounted(() => {
+  // Start animation loop even when not playing (for fade effects)
+  animationId = requestAnimationFrame(updateVisualizer)
+})
+
+onUnmounted(() => {
+  if (animationId) {
+    cancelAnimationFrame(animationId)
+  }
+  if (audioContext) {
+    audioContext.close()
+  }
+  // Cleanup volume drag event listeners
+  document.removeEventListener('mousemove', onVolumeDrag)
+  document.removeEventListener('mouseup', stopVolumeDrag)
+})
 </script>
 
 <template>
@@ -212,7 +268,8 @@ const getTypeColor = (type: Track['type']) => {
       @timeupdate="updateTime"
       @loadedmetadata="onLoadedMetadata"
       @ended="isPlaying = false; stopVisualizer()"
-      @play="startVisualizer"
+      @play="isPlaying = true; startVisualizer()"
+      @pause="isPlaying = false"
       preload="auto"
     ></audio>
 
@@ -229,12 +286,12 @@ const getTypeColor = (type: Track['type']) => {
       </NuxtLink>
     </div>
 
-    <!-- Audio Visualizer Background - Centered, grows up and down, full width -->
+    <!-- Audio Visualizer Background - Mirrored from center, full width -->
     <ClientOnly>
       <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center">
         <div class="w-full h-full flex items-center justify-center gap-[2px]">
           <div
-            v-for="(height, index) in barHeights"
+            v-for="(height, index) in mirroredBarHeights"
             :key="index"
             class="visualizer-bar flex-1"
             :style="{
@@ -258,7 +315,7 @@ const getTypeColor = (type: Track['type']) => {
         <p :class="['text-sm uppercase tracking-widest mb-2', getTypeColor(track?.type || 'epic')]">
           {{ track?.type }}
         </p>
-        <h1 class="text-4xl md:text-6xl font-black text-epic mb-3">
+        <h1 class="text-4xl md:text-6xl font-medieval text-epic mb-3">
           {{ track?.title }}
         </h1>
         <p class="text-emerald-400/60 text-lg">{{ track?.subtitle }}</p>
@@ -335,19 +392,31 @@ const getTypeColor = (type: Track['type']) => {
     <!-- Player Bar -->
     <div class="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-zinc-950 via-zinc-900/95 to-zinc-900/90 backdrop-blur-lg border-t border-emerald-800/30">
       <div class="container mx-auto px-6 py-4">
-        <!-- Progress Bar -->
-        <div
-          class="w-full h-2 bg-zinc-700 rounded-full cursor-pointer mb-4 group relative"
-          @click="seek"
-        >
-          <!-- Extended click area -->
-          <div class="absolute -inset-y-2 inset-x-0"></div>
-          <div
-            class="h-full bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full relative transition-all"
-            :style="{ width: `${progress}%` }"
-          >
-            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-amber-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"></div>
+        <!-- Progress Bar - Native range input -->
+        <div class="relative w-full h-6 mb-2 group">
+          <!-- Background track -->
+          <div class="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 bg-zinc-700 rounded-full overflow-hidden">
+            <!-- Progress fill - GPU accelerated with scaleX -->
+            <div
+              class="absolute inset-0 h-full bg-gradient-to-r from-emerald-500 to-amber-500 origin-left will-change-transform"
+              :style="{ transform: `scaleX(${progress / 100})` }"
+            ></div>
           </div>
+          <!-- Native range input -->
+          <input
+            type="range"
+            min="0"
+            :max="duration || 100"
+            :value="currentTime"
+            step="0.1"
+            class="progress-slider absolute inset-0 w-full h-full cursor-pointer opacity-0 z-10"
+            @input="onSeek"
+          />
+          <!-- Custom thumb -->
+          <div
+            class="absolute top-1/2 w-4 h-4 bg-amber-400 rounded-full shadow-lg pointer-events-none will-change-transform transition-transform duration-75 group-hover:scale-110"
+            :style="{ left: `${progress}%`, transform: 'translate(-50%, -50%)' }"
+          ></div>
         </div>
 
         <div class="flex items-center justify-between">
@@ -395,18 +464,26 @@ const getTypeColor = (type: Track['type']) => {
           </div>
 
           <!-- Volume -->
-          <div class="flex items-center gap-2 w-24 justify-end">
+          <div class="flex items-center gap-2 w-28 justify-end">
             <svg class="w-5 h-5 text-emerald-400/60" fill="currentColor" viewBox="0 0 24 24">
               <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
             </svg>
             <div
-              class="w-16 h-1 bg-zinc-700 rounded-full cursor-pointer group"
-              @click="updateVolume"
+              ref="volumeBarRef"
+              class="w-20 h-1.5 bg-zinc-700 rounded-full cursor-pointer group relative select-none"
+              @mousedown="startVolumeDrag"
             >
               <div
-                class="h-full bg-emerald-500 rounded-full"
+                class="h-full bg-emerald-500 rounded-full relative"
+                :class="{ 'transition-all': !isDraggingVolume }"
                 :style="{ width: `${volume * 100}%` }"
-              ></div>
+              >
+                <!-- Draggable thumb -->
+                <div
+                  class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-emerald-400 rounded-full shadow-lg transition-transform"
+                  :class="[isDraggingVolume ? 'scale-125 opacity-100' : 'opacity-0 group-hover:opacity-100']"
+                ></div>
+              </div>
             </div>
           </div>
         </div>

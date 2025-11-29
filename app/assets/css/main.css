@@ -158,6 +158,10 @@ body {
 }
 
 /* Text Styles */
+.font-medieval {
+  font-family: 'Old English Text MT', 'UnifrakturMaguntia', 'Luminari', fantasy;
+}
+
 .text-epic {
   background: linear-gradient(135deg, var(--gold-accent) 0%, #e8d48b 50%, var(--gold-accent) 100%);
   background-size: 200% auto;
