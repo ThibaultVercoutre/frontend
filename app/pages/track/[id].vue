@@ -570,37 +570,37 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Karaoke Lyrics - Center -->
-      <div class="flex-1 flex flex-col items-center justify-center">
-        <div class="text-center space-y-4 max-w-4xl mx-auto px-4">
-          <!-- Previous line -->
-          <div class="min-h-16 md:min-h-18 flex items-center justify-center relative py-2">
-            <Transition name="lyric-fade">
+      <!-- Karaoke Lyrics - Center (Carousel style) -->
+      <div class="flex-1 flex flex-col items-center justify-center overflow-hidden">
+        <div class="text-center max-w-5xl mx-auto px-4 karaoke-carousel overflow-hidden">
+          <!-- Previous line (top - fading out) -->
+          <div class="lyric-line-container lyric-prev-container relative">
+            <Transition name="lyric-up-out">
               <p
                 :key="'prev-' + currentLyricIndex"
-                class="text-2xl md:text-3xl text-emerald-600/50 leading-relaxed"
+                class="text-xl md:text-2xl text-emerald-600/30 leading-relaxed py-2"
               >
                 {{ previousLyric }}
               </p>
             </Transition>
           </div>
-          <!-- Current line -->
-          <div class="min-h-24 md:min-h-32 flex items-center justify-center relative py-4">
-            <Transition name="lyric-current">
+          <!-- Current line (center - main) -->
+          <div class="lyric-line-container lyric-main-container relative">
+            <Transition name="lyric-up-main">
               <p
                 :key="'current-' + currentLyricIndex"
-                class="text-4xl md:text-6xl font-bold text-epic karaoke-current leading-normal"
+                class="text-4xl md:text-6xl font-bold text-epic karaoke-current leading-normal py-4"
               >
                 {{ currentLyric }}
               </p>
             </Transition>
           </div>
-          <!-- Next line -->
-          <div class="min-h-16 md:min-h-18 flex items-center justify-center relative py-2">
-            <Transition name="lyric-fade">
+          <!-- Next line (bottom - coming up) -->
+          <div class="lyric-line-container lyric-next-container relative">
+            <Transition name="lyric-up-in">
               <p
                 :key="'next-' + currentLyricIndex"
-                class="text-2xl md:text-3xl text-emerald-600/50 leading-relaxed"
+                class="text-xl md:text-2xl text-emerald-600/40 leading-relaxed py-2"
               >
                 {{ nextLyric }}
               </p>
@@ -784,38 +784,41 @@ onUnmounted(() => {
     0 0 60px rgba(201, 162, 39, 0.1);
 }
 
-/* Lyric transitions */
-/* Simple fade for prev/next lines */
-.lyric-fade-enter-active,
-.lyric-fade-leave-active {
-  transition: opacity 0.35s ease;
-}
-.lyric-fade-enter-from,
-.lyric-fade-leave-to {
-  opacity: 0;
-}
-.lyric-fade-leave-active {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+/* Line containers */
+.lyric-line-container {
+  overflow: hidden;
 }
 
-/* Current lyric - crossfade with subtle scale */
-.lyric-current-enter-active {
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+/* Simple fade transition for all lines */
+.lyric-up-out-enter-active,
+.lyric-up-out-leave-active,
+.lyric-up-main-enter-active,
+.lyric-up-main-leave-active,
+.lyric-up-in-enter-active,
+.lyric-up-in-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.lyric-current-leave-active {
-  transition: all 0.25s ease-out;
+
+.lyric-up-out-leave-active,
+.lyric-up-main-leave-active,
+.lyric-up-in-leave-active {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
 }
-.lyric-current-enter-from {
+
+/* Enter from below, leave to above */
+.lyric-up-out-enter-from,
+.lyric-up-main-enter-from,
+.lyric-up-in-enter-from {
   opacity: 0;
-  transform: scale(0.95);
+  transform: translateY(20px);
 }
-.lyric-current-leave-to {
+
+.lyric-up-out-leave-to,
+.lyric-up-main-leave-to,
+.lyric-up-in-leave-to {
   opacity: 0;
-  transform: translateX(-50%) scale(1.02);
+  transform: translateY(-20px);
 }
 </style>
