@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AudioMotionAnalyzer from 'audiomotion-analyzer'
+
 interface Track {
   id: number
   title: string
@@ -37,99 +39,69 @@ const currentTime = ref(0)
 const duration = ref(0)
 const volume = ref(0.8)
 const audioRef = ref<HTMLAudioElement | null>(null)
+const visualizerRef = ref<HTMLElement | null>(null)
 
-// Audio Visualizer
-const BAR_COUNT = 100 // Half count - will be mirrored
-const barHeights = ref<number[]>(new Array(BAR_COUNT).fill(0))
-
-// Mirrored bars: left side (reversed) + right side (normal) = symmetric from center
-const mirroredBarHeights = computed(() => {
-  const reversed = [...barHeights.value].reverse()
-  return [...reversed, ...barHeights.value]
-})
-
-let audioContext: AudioContext | null = null
-let analyser: AnalyserNode | null = null
-let dataArray: Uint8Array | null = null
-let source: MediaElementAudioSourceNode | null = null
+// AudioMotion analyzer instance
+let audioMotion: AudioMotionAnalyzer | null = null
 let animationId: number | null = null
-let isAudioContextInitialized = false
 
-const initAudioContext = () => {
-  if (isAudioContextInitialized || !audioRef.value) return
+const initVisualizer = () => {
+  if (audioMotion || !visualizerRef.value || !audioRef.value) return
 
   try {
-    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-    analyser = audioContext.createAnalyser()
-    analyser.fftSize = 512 // Plus de détail
-    analyser.smoothingTimeConstant = 0.75
+    audioMotion = new AudioMotionAnalyzer(visualizerRef.value, {
+      source: audioRef.value,
+      mode: 3, // 1/8th octave bands (80 bars)
+      barSpace: 0.25,
+      bgAlpha: 0,
+      gradient: 'prism',
+      ledBars: false,
+      lumiBars: false,
+      mirror: 1, // Mirror from center
+      radial: false,
+      reflexAlpha: 0.25,
+      reflexRatio: 0.35,
+      reflexBright: 1,
+      reflexFit: true,
+      roundBars: true,
+      showBgColor: false,
+      showPeaks: true,
+      peakFadeTime: 500,
+      peakHoldTime: 100,
+      showScaleX: false,
+      showScaleY: false,
+      smoothing: 0.7,
+      overlay: true,
+      maxDecibels: -25,
+      minDecibels: -85,
+    })
 
-    source = audioContext.createMediaElementSource(audioRef.value)
-    source.connect(analyser)
-    analyser.connect(audioContext.destination)
-
-    dataArray = new Uint8Array(analyser.frequencyBinCount)
-    isAudioContextInitialized = true
-    console.log('Audio context initialized successfully')
+    // Custom gradient matching our theme
+    audioMotion.registerGradient('celtic', {
+      colorStops: [
+        { color: '#8b1a1a', pos: 0 },    // blood-red
+        { color: '#10b981', pos: 0.5 },   // emerald
+        { color: '#c9a227', pos: 1 },     // gold
+      ]
+    })
+    audioMotion.gradient = 'celtic'
   } catch (e) {
-    console.error('Failed to initialize audio context:', e)
+    console.error('Failed to initialize AudioMotion:', e)
   }
 }
 
-const updateVisualizer = () => {
-  // Update timeline at 60fps - check actual audio state, not isPlaying ref
-  const isActuallyPlaying = audioRef.value && !audioRef.value.paused
-
-  if (isActuallyPlaying) {
-    currentTime.value = audioRef.value!.currentTime
-    // Sync isPlaying state if needed
-    if (!isPlaying.value) isPlaying.value = true
+// Timeline update loop (séparé du visualizer)
+const updateTimeline = () => {
+  if (audioRef.value && !audioRef.value.paused) {
+    currentTime.value = audioRef.value.currentTime
   }
-
-  if (!isActuallyPlaying) {
-    // Sync isPlaying state if needed
-    if (isPlaying.value && audioRef.value) isPlaying.value = false
-    // Fade out smoothly when paused
-    for (let i = 0; i < BAR_COUNT; i++) {
-      barHeights.value[i] = (barHeights.value[i] ?? 0) * 0.9
-    }
-    animationId = requestAnimationFrame(updateVisualizer)
-    return
-  }
-
-  if (!analyser || !dataArray) {
-    animationId = requestAnimationFrame(updateVisualizer)
-    return
-  }
-
-  // @ts-expect-error - Uint8Array type mismatch with Web Audio API
-  analyser.getByteFrequencyData(dataArray)
-
-  // Map frequency data to bar heights with interpolation
-  const dataLength = dataArray.length
-  for (let i = 0; i < BAR_COUNT; i++) {
-    // Sample from the frequency data
-    const dataIndex = Math.floor((i / BAR_COUNT) * dataLength)
-    const value = dataArray[dataIndex] || 0
-    // Smooth transition
-    const targetHeight = (value / 255) * 100
-    barHeights.value[i] = (barHeights.value[i] ?? 0) * 0.3 + targetHeight * 0.7
-  }
-
-  animationId = requestAnimationFrame(updateVisualizer)
+  animationId = requestAnimationFrame(updateTimeline)
 }
 
 const startVisualizer = () => {
-  if (audioContext && audioContext.state === 'suspended') {
-    audioContext.resume()
+  if (audioMotion?.audioCtx?.state === 'suspended') {
+    audioMotion.audioCtx.resume()
   }
-  if (!animationId) {
-    animationId = requestAnimationFrame(updateVisualizer)
-  }
-}
-
-const stopVisualizer = () => {
-  // Don't cancel animation - let it fade out
 }
 
 // Format time in mm:ss
@@ -152,14 +124,13 @@ const togglePlay = async () => {
     return
   }
 
-  // Initialize audio context on first play (requires user interaction)
-  if (!isAudioContextInitialized) {
-    initAudioContext()
+  // Initialize visualizer on first play (requires user interaction)
+  if (!audioMotion) {
+    initVisualizer()
   }
 
   if (isPlaying.value) {
     audioRef.value.pause()
-    stopVisualizer()
     isPlaying.value = false
   } else {
     try {
@@ -241,16 +212,16 @@ const getTypeColor = (type: Track['type']) => {
 
 // Lifecycle hooks (at end to ensure all functions are defined)
 onMounted(() => {
-  // Start animation loop even when not playing (for fade effects)
-  animationId = requestAnimationFrame(updateVisualizer)
+  // Start timeline update loop
+  animationId = requestAnimationFrame(updateTimeline)
 })
 
 onUnmounted(() => {
   if (animationId) {
     cancelAnimationFrame(animationId)
   }
-  if (audioContext) {
-    audioContext.close()
+  if (audioMotion) {
+    audioMotion.destroy()
   }
   // Cleanup volume drag event listeners
   document.removeEventListener('mousemove', onVolumeDrag)
@@ -267,7 +238,7 @@ onUnmounted(() => {
       crossorigin="anonymous"
       @timeupdate="updateTime"
       @loadedmetadata="onLoadedMetadata"
-      @ended="isPlaying = false; stopVisualizer()"
+      @ended="isPlaying = false"
       @play="isPlaying = true; startVisualizer()"
       @pause="isPlaying = false"
       preload="auto"
@@ -286,26 +257,13 @@ onUnmounted(() => {
       </NuxtLink>
     </div>
 
-    <!-- Audio Visualizer Background - Mirrored from center, full width -->
+    <!-- Audio Visualizer Background - AudioMotion Canvas -->
     <ClientOnly>
-      <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center">
-        <div class="w-full h-full flex items-center justify-center gap-[2px]">
-          <div
-            v-for="(height, index) in mirroredBarHeights"
-            :key="index"
-            class="visualizer-bar flex-1"
-            :style="{
-              height: `${Math.max(4, height * 4)}px`,
-              opacity: isPlaying ? 0.8 : 0.1,
-              background: `linear-gradient(180deg,
-                rgba(201, 162, 39, ${0.4 + (height / 100) * 0.6}) 0%,
-                rgba(16, 185, 129, ${0.5 + (height / 100) * 0.5}) 50%,
-                rgba(139, 26, 26, ${0.6 + (height / 100) * 0.4}) 100%)`,
-              boxShadow: isPlaying && height > 15 ? `0 0 ${height / 5}px rgba(16, 185, 129, 0.7)` : 'none'
-            }"
-          ></div>
-        </div>
-      </div>
+      <div
+        ref="visualizerRef"
+        class="fixed inset-0 pointer-events-none z-0 transition-opacity duration-300"
+        :class="isPlaying ? 'opacity-70' : 'opacity-20'"
+      ></div>
     </ClientOnly>
 
     <!-- Main Content -->
@@ -539,15 +497,5 @@ onUnmounted(() => {
 .vinyl-record:not(.vinyl-spinning) {
   animation: spin 3s linear infinite;
   animation-play-state: paused;
-}
-
-/* Visualizer bars - centered, grows up and down */
-.visualizer-bar {
-  min-height: 4px;
-  min-width: 1px;
-  border-radius: 2px;
-  transform-origin: center;
-  will-change: height, opacity;
-  transition: height 60ms ease-out;
 }
 </style>
