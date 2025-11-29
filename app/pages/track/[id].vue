@@ -383,7 +383,7 @@ onUnmounted(() => {
       <div
         ref="visualizerRef"
         class="fixed inset-0 pointer-events-none z-0 transition-opacity duration-300"
-        :class="isPlaying ? 'opacity-70' : 'opacity-20'"
+        :class="isKaraokeMode ? 'opacity-15' : (isPlaying ? 'opacity-70' : 'opacity-20')"
       ></div>
     </ClientOnly>
 
@@ -548,9 +548,9 @@ onUnmounted(() => {
 
       <!-- Karaoke Lyrics - Center -->
       <div class="flex-1 flex flex-col items-center justify-center">
-        <div class="text-center space-y-6 max-w-4xl mx-auto">
+        <div class="text-center space-y-6 max-w-4xl mx-auto px-8 py-12 rounded-2xl bg-zinc-950/70 backdrop-blur-sm">
           <!-- Previous line -->
-          <p class="text-2xl md:text-3xl text-emerald-700/40 transition-all duration-300">
+          <p class="text-2xl md:text-3xl text-emerald-600/50 transition-all duration-300">
             {{ previousLyric }}
           </p>
           <!-- Current line -->
@@ -558,7 +558,7 @@ onUnmounted(() => {
             {{ currentLyric }}
           </p>
           <!-- Next line -->
-          <p class="text-2xl md:text-3xl text-emerald-700/40 transition-all duration-300">
+          <p class="text-2xl md:text-3xl text-emerald-600/50 transition-all duration-300">
             {{ nextLyric }}
           </p>
         </div>
