@@ -4,7 +4,7 @@ import type { Track, TrackType } from '~/types'
 const localTracks: Track[] = [
   // Album: Gabrielle
   { id: 1, albumId: 'gabrielle', title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '3:45', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va' },
-  { id: 2, albumId: 'gabrielle', title: "Parangon d'une Soldate", subtitle: 'Hymne héroïque', duration: '4:12', type: 'military', filename: "Parangon_d'une_soldate" },
+  { id: 2, albumId: 'gabrielle', title: "Parangon d'une Soldate", subtitle: 'Hymne héroïque', duration: '4:12', type: 'military', filename: "Parangon_d'une_soldate", cover: 'Parangon_dune_soldate' },
   { id: 3, albumId: 'gabrielle', title: 'L\'Assaut Final', subtitle: 'Bataille épique', duration: '0:00', type: 'epic' },
   { id: 4, albumId: 'gabrielle', title: 'Les Fils de la Terre', subtitle: 'Marche triomphale', duration: '0:00', type: 'military' },
   { id: 5, albumId: 'gabrielle', title: 'Brumes d\'Émeraude', subtitle: 'Ballade mystique', duration: '0:00', type: 'celtic' },
@@ -13,12 +13,12 @@ const localTracks: Track[] = [
   { id: 8, albumId: 'gabrielle', title: 'Racines Profondes', subtitle: 'Mélodie ancestrale', duration: '0:00', type: 'celtic' },
 
   // Album: Noël 2024
-  { id: 101, albumId: 'noel-2024', title: "C'est la belle nuit de Noël", subtitle: 'Cantique traditionnel', duration: '0:00', type: 'festive', filename: 'Cest_la_belle_nuit_de_Noel' },
-  { id: 102, albumId: 'noel-2024', title: 'Douce nuit, sainte nuit', subtitle: 'Classique de Noël', duration: '0:00', type: 'festive', filename: 'Douce_nuit_sainte_nuit' },
-  { id: 103, albumId: 'noel-2024', title: 'Il est levé le divin soldat', subtitle: 'Chant patriotique', duration: '0:00', type: 'festive', filename: 'Il_est_levé_le_divin_soldat' },
-  { id: 104, albumId: 'noel-2024', title: 'Mon beau gros sapin, roi adoré', subtitle: 'Parodie festive', duration: '0:00', type: 'parody', filename: 'Mon_beau_gros_sexe_roi_adoré' },
-  { id: 105, albumId: 'noel-2024', title: 'Pour notre dernière chanson', subtitle: 'Ballade hivernale', duration: '0:00', type: 'festive', filename: 'Pour_notre_dernière_chanson' },
-  { id: 106, albumId: 'noel-2024', title: 'Vive Chicoute, vive Chicoute !', subtitle: 'Parodie québécoise', duration: '0:00', type: 'parody', filename: 'Vive_Chicoute_vive_Chicoute' },
+  { id: 101, albumId: 'noel-2024', title: "C'est la belle nuit de Noël", subtitle: 'Cantique traditionnel', duration: '0:00', type: 'festive', filename: 'Cest_la_belle_nuit_de_Noel', cover: 'Cest_la_belle_nuit_de_noel' },
+  { id: 102, albumId: 'noel-2024', title: 'Douce nuit, sainte nuit', subtitle: 'Classique de Noël', duration: '0:00', type: 'festive', filename: 'Douce_nuit_sainte_nuit', cover: 'Douce_nuit_sainte_nuit' },
+  { id: 103, albumId: 'noel-2024', title: 'Il est levé le divin soldat', subtitle: 'Chant patriotique', duration: '0:00', type: 'festive', filename: 'Il_est_levé_le_divin_soldat', cover: 'Il_est_leve_le_divin_soldat' },
+  { id: 104, albumId: 'noel-2024', title: 'Mon beau gros sapin, roi adoré', subtitle: 'Parodie festive', duration: '0:00', type: 'parody', filename: 'Mon_beau_gros_sexe_roi_adoré', cover: 'Mon_beau_gros_sexe_roi_adore' },
+  { id: 105, albumId: 'noel-2024', title: 'Pour notre dernière chanson', subtitle: 'Ballade hivernale', duration: '0:00', type: 'festive', filename: 'Pour_notre_dernière_chanson', cover: 'Pour_notre_derniere_chanson' },
+  { id: 106, albumId: 'noel-2024', title: 'Vive Chicoute, vive Chicoute !', subtitle: 'Parodie québécoise', duration: '0:00', type: 'parody', filename: 'Vive_Chicoute_vive_Chicoute', cover: 'Vive_chicout_vive_chicout' },
 
   // Album: Noël 2025
   // (pas encore de pistes)
@@ -80,8 +80,11 @@ export function useTracks() {
 
   // Get cover image URL for a track
   const getCoverSrc = (track: Track | undefined): string => {
-    if (!track?.filename) return '/covers/default.jpeg'
-    return `/covers/${track.albumId}/${track.filename.replace(/'/g, '')}.jpeg`
+    if (!track) return '/covers/default.jpeg'
+    // Use cover property if available, otherwise fallback to filename
+    const coverName = track.cover || track.filename
+    if (!coverName) return '/covers/default.jpeg'
+    return `/covers/${track.albumId}/${coverName.replace(/'/g, '')}.jpeg`
   }
 
   // Type styling helpers

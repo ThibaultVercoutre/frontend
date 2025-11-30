@@ -2,7 +2,7 @@ import AudioMotionAnalyzer from 'audiomotion-analyzer'
 import type { VisualizerOptions } from '~/types'
 
 const defaultOptions: VisualizerOptions = {
-  mode: 3,
+  mode: 2,
   barSpace: 0.25,
   gradient: 'celtic',
   mirror: 1,

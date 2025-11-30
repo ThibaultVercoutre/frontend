@@ -109,11 +109,9 @@ const currentTheme = computed(() => {
     <div class="winter-border-top"></div>
 
     <!-- Snowfall -->
-    <ClientOnly>
-      <Snowfall />
-      <!-- Cabin glow effect -->
-      <div class="cabin-glow"></div>
-    </ClientOnly>
+    <Snowfall />
+    <!-- Cabin glow effect -->
+    <div class="cabin-glow"></div>
 
     <!-- Back Button -->
     <div class="absolute top-6 left-6 z-20">

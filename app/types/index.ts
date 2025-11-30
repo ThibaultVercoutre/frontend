@@ -20,6 +20,7 @@ export interface Track {
   duration: string
   type: TrackType
   filename?: string
+  cover?: string
 }
 
 export type TrackType = 'epic' | 'celtic' | 'military' | 'festive' | 'parody'

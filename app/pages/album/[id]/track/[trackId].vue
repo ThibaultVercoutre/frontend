@@ -254,10 +254,10 @@ onUnmounted(() => {
     ]"
   >
     <!-- Winter Snowfall -->
-    <ClientOnly v-if="isFestive">
+    <template v-if="isFestive">
       <Snowfall />
       <div class="cabin-glow"></div>
-    </ClientOnly>
+    </template>
 
     <!-- Audio element (hidden, client-only to avoid SSR hydration issues) -->
     <ClientOnly>
