@@ -245,16 +245,7 @@ onUnmounted(() => {
   >
     <!-- Winter Snowfall -->
     <ClientOnly v-if="isFestive">
-      <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div v-for="i in 15" :key="`slow-${i}`" class="absolute text-white/30 text-2xl animate-snow-slow" :style="{
-          left: `${(i * 7) % 100}%`,
-          animationDelay: `${i * 0.8}s`,
-        }">❄</div>
-        <div v-for="i in 25" :key="`fast-${i}`" class="absolute text-sky-200/20 text-sm animate-snow-fast" :style="{
-          left: `${(i * 4 + 2) % 100}%`,
-          animationDelay: `${i * 0.3}s`,
-        }">•</div>
-      </div>
+      <Snowfall />
       <div class="cabin-glow"></div>
     </ClientOnly>
 
