@@ -316,6 +316,7 @@ onUnmounted(() => {
           :cover-src="coverSrc"
           size="lg"
           :theme="currentTheme"
+          :progress="progress"
         >
           <template #overlay>
             <!-- Play Button Overlay -->
