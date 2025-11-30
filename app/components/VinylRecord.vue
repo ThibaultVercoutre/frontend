@@ -167,9 +167,15 @@ const labelName = computed(() => {
       <!-- Vinyl Disc with Album Art -->
       <div class="absolute inset-0 rounded-full shadow-2xl overflow-hidden">
         <!-- Album Art as full background -->
-        <img
+        <NuxtImg
           :src="coverSrc"
           alt="Album art"
+          :width="size === 'lg' ? 384 : size === 'md' ? 256 : 128"
+          :height="size === 'lg' ? 384 : size === 'md' ? 256 : 128"
+          format="webp"
+          quality="80"
+          :loading="size === 'lg' ? 'eager' : 'lazy'"
+          :fetchpriority="size === 'lg' ? 'high' : undefined"
           class="absolute inset-0 w-full h-full object-cover"
         />
 
