@@ -13,7 +13,12 @@ const localTracks: Track[] = [
   { id: 8, albumId: 'gabrielle', title: 'Racines Profondes', subtitle: 'Mélodie ancestrale', duration: '0:00', type: 'celtic' },
 
   // Album: Noël 2024
-  // (pas encore de pistes)
+  { id: 101, albumId: 'noel-2024', title: "C'est la belle nuit de Noël", subtitle: 'Cantique traditionnel', duration: '0:00', type: 'festive', filename: 'Cest_la_belle_nuit_de_Noel' },
+  { id: 102, albumId: 'noel-2024', title: 'Douce nuit, sainte nuit', subtitle: 'Classique de Noël', duration: '0:00', type: 'festive', filename: 'Douce_nuit_sainte_nuit' },
+  { id: 103, albumId: 'noel-2024', title: 'Il est levé le divin soldat', subtitle: 'Chant patriotique', duration: '0:00', type: 'festive', filename: 'Il_est_levé_le_divin_soldat' },
+  { id: 104, albumId: 'noel-2024', title: 'Mon beau gros sapin, roi adoré', subtitle: 'Parodie festive', duration: '0:00', type: 'parody', filename: 'Mon_beau_gros_sexe_roi_adoré' },
+  { id: 105, albumId: 'noel-2024', title: 'Pour notre dernière chanson', subtitle: 'Ballade hivernale', duration: '0:00', type: 'festive', filename: 'Pour_notre_dernière_chanson' },
+  { id: 106, albumId: 'noel-2024', title: 'Vive Chicoute, vive Chicoute !', subtitle: 'Parodie québécoise', duration: '0:00', type: 'parody', filename: 'Vive_Chicoute_vive_Chicoute' },
 
   // Album: Noël 2025
   // (pas encore de pistes)

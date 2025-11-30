@@ -23,11 +23,15 @@ const isCeltic = computed(() => props.album.id === 'gabrielle')
   >
     <!-- Album Cover Background -->
     <div class="absolute inset-0">
-      <img
+      <NuxtImg
         :src="getAlbumCover(album)"
         :alt="album.title"
+        width="400"
+        height="400"
+        format="webp"
+        quality="80"
+        loading="lazy"
         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-        @error="($event.target as HTMLImageElement).src = '/albums/default.jpeg'"
       />
       <!-- Overlay gradient -->
       <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"></div>
@@ -53,13 +57,13 @@ const isCeltic = computed(() => props.album.id === 'gabrielle')
         :class="[
           'text-2xl mb-1 transition-colors duration-300',
           isCeltic ? 'font-medieval text-epic group-hover:text-amber-400' : '',
-          isFestive ? 'font-bold text-festive group-hover:text-yellow-400' : '',
+          isFestive ? 'font-winter text-winter group-hover:text-amber-400' : '',
           !isCeltic && !isFestive ? 'font-bold text-white group-hover:text-purple-400' : ''
         ]"
       >
         {{ album.title }}
       </h3>
-      <p class="text-zinc-400 text-sm mb-3">{{ album.subtitle }}</p>
+      <p :class="['text-sm mb-3', isFestive ? 'text-sky-300/70' : 'text-zinc-400']">{{ album.subtitle }}</p>
 
       <!-- Track count -->
       <div class="flex items-center justify-between">
@@ -77,7 +81,7 @@ const isCeltic = computed(() => props.album.id === 'gabrielle')
           :class="[
             'flex items-center gap-2 transition-colors',
             isCeltic ? 'text-emerald-500/60 group-hover:text-amber-400' : '',
-            isFestive ? 'text-red-400/60 group-hover:text-yellow-400' : '',
+            isFestive ? 'text-sky-400/60 group-hover:text-amber-400' : '',
             !isCeltic && !isFestive ? 'text-zinc-500 group-hover:text-purple-400' : ''
           ]"
         >

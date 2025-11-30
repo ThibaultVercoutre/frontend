@@ -17,7 +17,7 @@ const localAlbums: Album[] = [
     subtitle: 'Édition spéciale fêtes',
     year: 2024,
     coverImage: '/albums/noel-2024.jpeg',
-    trackCount: 0,
+    trackCount: 6,
     type: 'special',
   },
   {

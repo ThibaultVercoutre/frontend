@@ -37,9 +37,15 @@ const isCeltic = computed(() => albumId.value === 'gabrielle')
       <div class="flex flex-col md:flex-row items-center gap-8 mb-12 pt-8">
         <!-- Album Cover -->
         <div class="relative w-64 h-64 md:w-80 md:h-80 flex-shrink-0">
-          <img
+          <NuxtImg
             :src="getAlbumCover(album)"
-            :alt="album?.title"
+            :alt="album?.title || 'Album cover'"
+            width="320"
+            height="320"
+            format="webp"
+            quality="80"
+            loading="eager"
+            fetchpriority="high"
             class="w-full h-full object-cover rounded-2xl shadow-2xl"
           />
           <div class="absolute -inset-4 rounded-3xl bg-gradient-to-br from-amber-500/20 to-emerald-500/20 blur-2xl -z-10"></div>
@@ -92,17 +98,27 @@ const isCeltic = computed(() => albumId.value === 'gabrielle')
     </div>
   </div>
 
-  <!-- Festive Theme (Noel) -->
-  <div v-else-if="isFestive" class="min-h-screen bg-festive bg-festive-pattern relative overflow-hidden">
-    <!-- Snowflakes -->
+  <!-- Winter Theme (Noël 2024) - Canadian Wilderness -->
+  <div v-else-if="isFestive" class="min-h-screen bg-winter bg-winter-pattern relative overflow-hidden">
+    <!-- Pine tree border -->
+    <div class="winter-border-top"></div>
+
+    <!-- Snowfall -->
     <ClientOnly>
       <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div v-for="i in 20" :key="i" class="absolute text-white/20 animate-snowfall" :style="{
-          left: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 10}s`,
-          animationDuration: `${8 + Math.random() * 6}s`
+        <!-- Large slow snowflakes -->
+        <div v-for="i in 15" :key="`slow-${i}`" class="absolute text-white/30 text-2xl animate-snow-slow" :style="{
+          left: `${(i * 7) % 100}%`,
+          animationDelay: `${i * 0.8}s`,
         }">❄</div>
+        <!-- Small fast snowflakes -->
+        <div v-for="i in 25" :key="`fast-${i}`" class="absolute text-sky-200/20 text-sm animate-snow-fast" :style="{
+          left: `${(i * 4 + 2) % 100}%`,
+          animationDelay: `${i * 0.3}s`,
+        }">•</div>
       </div>
+      <!-- Cabin glow effect -->
+      <div class="cabin-glow"></div>
     </ClientOnly>
 
     <!-- Back Button -->
@@ -113,50 +129,58 @@ const isCeltic = computed(() => albumId.value === 'gabrielle')
     <!-- Main Content -->
     <div class="relative z-10 container mx-auto px-6 py-12">
       <!-- Album Header -->
-      <div class="flex flex-col md:flex-row items-center gap-8 mb-12 pt-8">
+      <div class="flex flex-col md:flex-row items-center gap-8 mb-12 pt-12">
         <!-- Album Cover -->
         <div class="relative w-64 h-64 md:w-80 md:h-80 flex-shrink-0">
-          <img
+          <NuxtImg
             :src="getAlbumCover(album)"
-            :alt="album?.title"
-            class="w-full h-full object-cover rounded-2xl shadow-2xl"
-            @error="($event.target as HTMLImageElement).src = '/albums/default.jpeg'"
+            :alt="album?.title || 'Album cover'"
+            width="320"
+            height="320"
+            format="webp"
+            quality="80"
+            loading="eager"
+            fetchpriority="high"
+            class="w-full h-full object-cover rounded-2xl shadow-2xl border-2 border-sky-300/20"
           />
-          <div class="absolute -inset-4 rounded-3xl bg-gradient-to-br from-red-500/20 to-green-500/20 blur-2xl -z-10"></div>
+          <div class="absolute -inset-4 rounded-3xl bg-gradient-to-br from-sky-400/20 to-amber-500/20 blur-2xl -z-10"></div>
         </div>
 
         <!-- Album Info -->
         <div class="text-center md:text-left">
           <span
             v-if="album"
-            :class="['inline-block px-4 py-1 rounded-full text-sm font-semibold uppercase tracking-wider mb-4', getAlbumTypeColor(album.type)]"
+            class="inline-block px-4 py-1 rounded-full text-sm font-semibold uppercase tracking-wider mb-4 bg-sky-500/20 text-sky-300 border border-sky-500/30"
           >
-            {{ getAlbumTypeIcon(album.type) }} {{ album.type }}
+            🏔️ {{ album.type }}
           </span>
 
-          <h1 class="text-4xl md:text-6xl font-bold text-festive mb-2">
+          <h1 class="text-4xl md:text-6xl font-winter text-winter mb-2">
             {{ album?.title }}
           </h1>
-          <p class="text-red-400/70 text-xl mb-4">{{ album?.subtitle }}</p>
+          <p class="text-sky-300/70 text-xl mb-4">{{ album?.subtitle }}</p>
 
-          <div class="flex items-center justify-center md:justify-start gap-4 text-red-500/60">
+          <div class="flex items-center justify-center md:justify-start gap-4 text-sky-400/60">
             <span>{{ album?.year }}</span>
-            <span>•</span>
+            <span class="text-amber-400">•</span>
             <span>{{ tracks.length }} {{ tracks.length > 1 ? 'pistes' : 'piste' }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Divider -->
+      <!-- Divider - Mountain silhouette style -->
       <div class="flex items-center justify-center gap-4 mb-12">
-        <div class="h-px w-24 bg-gradient-to-r from-transparent to-red-500/30"></div>
-        <span class="text-2xl">🎄</span>
-        <div class="h-px w-24 bg-gradient-to-l from-transparent to-green-500/30"></div>
+        <div class="h-px w-20 bg-gradient-to-r from-transparent to-sky-500/30"></div>
+        <svg class="w-8 h-8 text-amber-500/60" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L2 22h20L12 2zm0 4l6.5 14h-13L12 6z" opacity="0.5"/>
+          <path d="M12 6l4 8H8l4-8z"/>
+        </svg>
+        <div class="h-px w-20 bg-gradient-to-l from-transparent to-pine-500/30"></div>
       </div>
 
       <!-- Tracks List -->
       <div v-if="tracks.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <TrackCard
+        <TrackCardWinter
           v-for="(track, index) in tracks"
           :key="track.id"
           :track="track"
@@ -166,17 +190,17 @@ const isCeltic = computed(() => albumId.value === 'gabrielle')
 
       <!-- Empty state -->
       <div v-else class="text-center py-20">
-        <span class="text-6xl mb-6 block">🎁</span>
-        <p class="text-red-400/50 text-xl">Bientôt disponible...</p>
-        <p class="text-red-500/30 text-sm mt-2">Les chants de Noël arrivent prochainement</p>
+        <span class="text-6xl mb-6 block">🏔️</span>
+        <p class="text-sky-400/50 text-xl">Bientôt disponible...</p>
+        <p class="text-sky-500/30 text-sm mt-2">Les chants d'hiver arrivent prochainement</p>
       </div>
 
       <!-- Footer -->
-      <footer class="mt-20 text-center py-8 border-t border-red-800/30">
-        <div class="flex items-center justify-center gap-2 text-red-600/40 text-sm">
-          <span>🎄</span>
+      <footer class="mt-20 text-center py-8 border-t border-sky-800/30">
+        <div class="flex items-center justify-center gap-2 text-sky-600/40 text-sm">
+          <span>🌲</span>
           <span>TAG &copy; {{ new Date().getFullYear() }}</span>
-          <span>🎄</span>
+          <span>🏔️</span>
         </div>
       </footer>
     </div>
@@ -194,9 +218,15 @@ const isCeltic = computed(() => albumId.value === 'gabrielle')
       <!-- Album Header -->
       <div class="flex flex-col md:flex-row items-center gap-8 mb-12 pt-8">
         <div class="relative w-64 h-64 md:w-80 md:h-80 flex-shrink-0">
-          <img
+          <NuxtImg
             :src="getAlbumCover(album)"
-            :alt="album?.title"
+            :alt="album?.title || 'Album cover'"
+            width="320"
+            height="320"
+            format="webp"
+            quality="80"
+            loading="eager"
+            fetchpriority="high"
             class="w-full h-full object-cover rounded-2xl shadow-2xl"
           />
           <div class="absolute -inset-4 rounded-3xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 blur-2xl -z-10"></div>

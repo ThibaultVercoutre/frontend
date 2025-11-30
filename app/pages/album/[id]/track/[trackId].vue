@@ -14,6 +14,10 @@ const track = computed(() => getTrackById(trackId.value))
 const albumTracks = computed(() => getTracksByAlbum(albumId.value))
 const trackIndexInAlbum = computed(() => getTrackIndexInAlbum(track.value))
 
+// Theme detection based on album
+const isFestive = computed(() => albumId.value.includes('noel'))
+const isCeltic = computed(() => albumId.value === 'gabrielle')
+
 // Audio source
 const audioSrc = computed(() => getAudioSrc(track.value))
 const coverSrc = computed(() => getCoverSrc(track.value))
@@ -47,8 +51,16 @@ const {
   init: initVisualizer,
   moveTo: moveVisualizerTo,
   resume: resumeVisualizer,
+  setGradient: setVisualizerGradient,
   destroy: destroyVisualizer,
 } = useAudioVisualizer()
+
+// Visualizer gradient based on theme
+const visualizerGradient = computed(() => {
+  if (isCeltic.value) return 'celtic'
+  if (isFestive.value) return 'winter'
+  return 'default'
+})
 
 // Lyrics
 const {
@@ -95,6 +107,7 @@ const toggleKaraokeMode = () => {
 const handleTogglePlay = async () => {
   if (!isVisualizerInitialized.value && visualizerRef.value && audioRef.value) {
     initVisualizer(visualizerRef.value, audioRef.value)
+    setVisualizerGradient(visualizerGradient.value)
   }
 
   const isNowPlaying = await togglePlay()
@@ -132,6 +145,13 @@ watch(isKaraokeMode, async (newValue) => {
   }
 })
 
+// Update visualizer gradient when theme changes
+watch(visualizerGradient, (newGradient) => {
+  if (isVisualizerInitialized.value) {
+    setVisualizerGradient(newGradient)
+  }
+})
+
 // Lifecycle
 onMounted(() => {
   startLoop()
@@ -145,7 +165,29 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-pattern relative overflow-hidden flex flex-col">
+  <div
+    :class="[
+      'min-h-screen relative overflow-hidden flex flex-col',
+      isCeltic ? 'bg-pattern' : '',
+      isFestive ? 'bg-winter bg-winter-pattern' : '',
+      !isCeltic && !isFestive ? 'bg-neutral bg-neutral-pattern' : ''
+    ]"
+  >
+    <!-- Winter Snowfall -->
+    <ClientOnly v-if="isFestive">
+      <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div v-for="i in 15" :key="`slow-${i}`" class="absolute text-white/30 text-2xl animate-snow-slow" :style="{
+          left: `${(i * 7) % 100}%`,
+          animationDelay: `${i * 0.8}s`,
+        }">❄</div>
+        <div v-for="i in 25" :key="`fast-${i}`" class="absolute text-sky-200/20 text-sm animate-snow-fast" :style="{
+          left: `${(i * 4 + 2) % 100}%`,
+          animationDelay: `${i * 0.3}s`,
+        }">•</div>
+      </div>
+      <div class="cabin-glow"></div>
+    </ClientOnly>
+
     <!-- Audio element (hidden) -->
     <audio
       ref="audioRef"
@@ -187,7 +229,12 @@ onUnmounted(() => {
         <!-- Vinyl Glow -->
         <div
           class="absolute inset-0 rounded-full blur-3xl transition-opacity duration-500"
-          :class="isPlaying ? 'opacity-30 bg-amber-500' : 'opacity-10 bg-emerald-500'"
+          :class="[
+            isPlaying ? 'opacity-30' : 'opacity-10',
+            isCeltic ? (isPlaying ? 'bg-amber-500' : 'bg-emerald-500') : '',
+            isFestive ? (isPlaying ? 'bg-amber-500' : 'bg-sky-500') : '',
+            !isCeltic && !isFestive ? (isPlaying ? 'bg-pink-500' : 'bg-purple-500') : ''
+          ]"
         ></div>
 
         <!-- Vinyl Record -->
@@ -203,15 +250,19 @@ onUnmounted(() => {
               @click="handleTogglePlay"
             >
               <div
-                class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-emerald-900/80 backdrop-blur-sm flex items-center justify-center
-                       border-2 border-emerald-500/30 group-hover:border-amber-500/50 group-hover:bg-emerald-800/80
-                       transition-all duration-300 group-hover:scale-110 shadow-xl"
-                :class="{ 'opacity-0 group-hover:opacity-100': isPlaying }"
+                :class="[
+                  'w-20 h-20 md:w-24 md:h-24 rounded-full backdrop-blur-sm flex items-center justify-center',
+                  'border-2 transition-all duration-300 group-hover:scale-110 shadow-xl',
+                  { 'opacity-0 group-hover:opacity-100': isPlaying },
+                  isCeltic ? 'bg-emerald-900/80 border-emerald-500/30 group-hover:border-amber-500/50 group-hover:bg-emerald-800/80' : '',
+                  isFestive ? 'bg-sky-900/80 border-sky-500/30 group-hover:border-amber-500/50 group-hover:bg-sky-800/80' : '',
+                  !isCeltic && !isFestive ? 'bg-purple-900/80 border-purple-500/30 group-hover:border-pink-500/50 group-hover:bg-purple-800/80' : ''
+                ]"
               >
-                <svg v-if="!isPlaying" class="w-10 h-10 md:w-12 md:h-12 text-emerald-100 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                <svg v-if="!isPlaying" class="w-10 h-10 md:w-12 md:h-12 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
-                <svg v-else class="w-10 h-10 md:w-12 md:h-12 text-emerald-100" fill="currentColor" viewBox="0 0 24 24">
+                <svg v-else class="w-10 h-10 md:w-12 md:h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                 </svg>
               </div>
@@ -256,7 +307,12 @@ onUnmounted(() => {
       <!-- Exit karaoke mode hint -->
       <div class="text-center pb-4">
         <button
-          class="text-emerald-500/40 text-xs uppercase tracking-wider hover:text-amber-500/60 transition-colors"
+          :class="[
+            'text-xs uppercase tracking-wider transition-colors',
+            isCeltic ? 'text-emerald-500/40 hover:text-amber-500/60' : '',
+            isFestive ? 'text-sky-500/40 hover:text-amber-500/60' : '',
+            !isCeltic && !isFestive ? 'text-purple-500/40 hover:text-pink-500/60' : ''
+          ]"
           @click="toggleKaraokeMode"
         >
           Cliquer sur le vinyle pour quitter
@@ -265,13 +321,25 @@ onUnmounted(() => {
     </div>
 
     <!-- Player Bar with album-aware navigation -->
-    <div class="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-zinc-950 via-zinc-900/95 to-zinc-900/90 backdrop-blur-lg border-t border-emerald-800/30">
+    <div
+      :class="[
+        'fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-zinc-950 via-zinc-900/95 to-zinc-900/90 backdrop-blur-lg border-t',
+        isCeltic ? 'border-emerald-800/30' : '',
+        isFestive ? 'border-sky-800/30' : '',
+        !isCeltic && !isFestive ? 'border-purple-800/30' : ''
+      ]"
+    >
       <div class="container mx-auto px-6 py-4">
         <!-- Progress Bar -->
         <div class="relative w-full h-6 mb-2 group">
           <div class="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 bg-zinc-700 rounded-full overflow-hidden">
             <div
-              class="absolute inset-0 h-full bg-gradient-to-r from-emerald-500 to-amber-500 origin-left will-change-transform"
+              :class="[
+                'absolute inset-0 h-full origin-left will-change-transform bg-gradient-to-r',
+                isCeltic ? 'from-emerald-500 to-amber-500' : '',
+                isFestive ? 'from-sky-500 to-amber-500' : '',
+                !isCeltic && !isFestive ? 'from-purple-500 to-pink-500' : ''
+              ]"
               :style="{ transform: `scaleX(${progress / 100})` }"
             ></div>
           </div>
@@ -285,14 +353,24 @@ onUnmounted(() => {
             @input="(e) => handleSeek(parseFloat((e.target as HTMLInputElement).value))"
           />
           <div
-            class="absolute top-1/2 w-4 h-4 bg-amber-400 rounded-full shadow-lg pointer-events-none will-change-transform transition-transform duration-75 group-hover:scale-110"
+            :class="[
+              'absolute top-1/2 w-4 h-4 rounded-full shadow-lg pointer-events-none will-change-transform transition-transform duration-75 group-hover:scale-110',
+              isFestive ? 'bg-amber-400' : 'bg-amber-400'
+            ]"
             :style="{ left: `${progress}%`, transform: 'translate(-50%, -50%)' }"
           ></div>
         </div>
 
         <div class="flex items-center justify-between">
           <!-- Time -->
-          <div class="text-emerald-400/60 text-sm font-mono w-24">
+          <div
+            :class="[
+              'text-sm font-mono w-24',
+              isCeltic ? 'text-emerald-400/60' : '',
+              isFestive ? 'text-sky-400/60' : '',
+              !isCeltic && !isFestive ? 'text-purple-400/60' : ''
+            ]"
+          >
             {{ formattedCurrentTime }} / {{ formattedDuration }}
           </div>
 
@@ -301,7 +379,10 @@ onUnmounted(() => {
             <!-- Previous -->
             <NuxtLink
               :to="prevTrackUrl"
-              :class="['p-2 transition-colors', prevTrack ? 'text-emerald-400/70 hover:text-amber-400' : 'text-zinc-600 cursor-not-allowed pointer-events-none']"
+              :class="[
+                'p-2 transition-colors',
+                prevTrack ? (isCeltic ? 'text-emerald-400/70 hover:text-amber-400' : isFestive ? 'text-sky-400/70 hover:text-amber-400' : 'text-purple-400/70 hover:text-pink-400') : 'text-zinc-600 cursor-not-allowed pointer-events-none'
+              ]"
             >
               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
@@ -310,9 +391,12 @@ onUnmounted(() => {
 
             <!-- Play/Pause -->
             <button
-              class="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center
-                     hover:from-amber-600 hover:to-amber-800 transition-all duration-300 shadow-lg hover:scale-105
-                     border-2 border-emerald-500/30 hover:border-amber-500/30"
+              :class="[
+                'w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:scale-105 border-2 bg-gradient-to-br',
+                isCeltic ? 'from-emerald-600 to-emerald-800 border-emerald-500/30 hover:from-amber-600 hover:to-amber-800 hover:border-amber-500/30' : '',
+                isFestive ? 'from-sky-600 to-sky-800 border-sky-500/30 hover:from-amber-600 hover:to-amber-800 hover:border-amber-500/30' : '',
+                !isCeltic && !isFestive ? 'from-purple-600 to-purple-800 border-purple-500/30 hover:from-pink-600 hover:to-pink-800 hover:border-pink-500/30' : ''
+              ]"
               @click="handleTogglePlay"
             >
               <svg v-if="!isPlaying" class="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
@@ -326,7 +410,10 @@ onUnmounted(() => {
             <!-- Next -->
             <NuxtLink
               :to="nextTrackUrl"
-              :class="['p-2 transition-colors', nextTrack ? 'text-emerald-400/70 hover:text-amber-400' : 'text-zinc-600 cursor-not-allowed pointer-events-none']"
+              :class="[
+                'p-2 transition-colors',
+                nextTrack ? (isCeltic ? 'text-emerald-400/70 hover:text-amber-400' : isFestive ? 'text-sky-400/70 hover:text-amber-400' : 'text-purple-400/70 hover:text-pink-400') : 'text-zinc-600 cursor-not-allowed pointer-events-none'
+              ]"
             >
               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
@@ -339,7 +426,12 @@ onUnmounted(() => {
             <!-- Volume Control -->
             <div class="flex items-center gap-2 group">
               <button
-                class="text-emerald-400/60 hover:text-amber-400 transition-colors"
+                :class="[
+                  'transition-colors',
+                  isCeltic ? 'text-emerald-400/60 hover:text-amber-400' : '',
+                  isFestive ? 'text-sky-400/60 hover:text-amber-400' : '',
+                  !isCeltic && !isFestive ? 'text-purple-400/60 hover:text-pink-400' : ''
+                ]"
                 @click="setVolume(volume > 0 ? 0 : 1)"
               >
                 <svg v-if="volume === 0" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -364,7 +456,12 @@ onUnmounted(() => {
                 />
                 <div class="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1 bg-zinc-700 rounded-full overflow-hidden">
                   <div
-                    class="h-full bg-emerald-500 group-hover:bg-amber-500 transition-colors"
+                    :class="[
+                      'h-full transition-colors',
+                      isCeltic ? 'bg-emerald-500 group-hover:bg-amber-500' : '',
+                      isFestive ? 'bg-sky-500 group-hover:bg-amber-500' : '',
+                      !isCeltic && !isFestive ? 'bg-purple-500 group-hover:bg-pink-500' : ''
+                    ]"
                     :style="{ width: `${volume * 100}%` }"
                   ></div>
                 </div>
@@ -372,7 +469,14 @@ onUnmounted(() => {
             </div>
 
             <!-- Track info -->
-            <div class="text-emerald-500/60 text-sm w-16 text-right">
+            <div
+              :class="[
+                'text-sm w-16 text-right',
+                isCeltic ? 'text-emerald-500/60' : '',
+                isFestive ? 'text-sky-500/60' : '',
+                !isCeltic && !isFestive ? 'text-purple-500/60' : ''
+              ]"
+            >
               {{ trackIndexInAlbum }} / {{ albumTracks.length }}
             </div>
           </div>
@@ -380,8 +484,8 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Floating decorations -->
-    <FloatingDecorations />
+    <!-- Floating decorations (Celtic theme only) -->
+    <FloatingDecorations v-if="isCeltic" />
   </div>
 </template>
 

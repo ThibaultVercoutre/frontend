@@ -52,14 +52,31 @@ export function useAudioVisualizer() {
         minDecibels: -85,
       })
 
-      // Register custom celtic gradient
+      // Register custom gradients for each theme
       audioMotion.registerGradient('celtic', {
         colorStops: [
-          { color: '#8b1a1a', pos: 0 },
-          { color: '#10b981', pos: 0.5 },
-          { color: '#c9a227', pos: 1 },
+          { color: '#8b1a1a', pos: 0 },    // blood red
+          { color: '#10b981', pos: 0.5 },  // emerald
+          { color: '#c9a227', pos: 1 },    // gold
         ],
       })
+
+      audioMotion.registerGradient('winter', {
+        colorStops: [
+          { color: '#0c4a6e', pos: 0 },    // dark sky
+          { color: '#7dd3fc', pos: 0.5 },  // ice blue
+          { color: '#f59e0b', pos: 1 },    // cabin amber
+        ],
+      })
+
+      audioMotion.registerGradient('default', {
+        colorStops: [
+          { color: '#581c87', pos: 0 },    // purple dark
+          { color: '#a855f7', pos: 0.5 },  // purple
+          { color: '#ec4899', pos: 1 },    // pink
+        ],
+      })
+
       audioMotion.gradient = 'celtic'
 
       isInitialized.value = true
