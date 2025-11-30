@@ -2,18 +2,30 @@
 interface Props {
   to?: string
   label?: string
+  theme?: 'celtic' | 'winter' | 'default'
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   to: '/',
   label: 'Retour',
+  theme: 'celtic',
+})
+
+const colorClasses = computed(() => {
+  if (props.theme === 'winter') {
+    return 'text-sky-400/70 hover:text-amber-400'
+  }
+  if (props.theme === 'celtic') {
+    return 'text-emerald-400/70 hover:text-amber-400'
+  }
+  return 'text-purple-400/70 hover:text-pink-400'
 })
 </script>
 
 <template>
   <NuxtLink
     :to="to"
-    class="flex items-center gap-2 text-emerald-400/70 hover:text-amber-400 transition-colors group"
+    :class="['flex items-center gap-2 transition-colors group', colorClasses]"
   >
     <svg
       class="w-6 h-6 transform group-hover:-translate-x-1 transition-transform"

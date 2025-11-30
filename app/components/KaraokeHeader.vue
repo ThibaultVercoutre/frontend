@@ -5,9 +5,12 @@ interface Props {
   track: Track | undefined
   isPlaying: boolean
   coverSrc: string
+  theme?: 'celtic' | 'winter' | 'default'
 }
 
-defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  theme: 'celtic',
+})
 
 const emit = defineEmits<{
   exitKaraoke: []
@@ -28,6 +31,7 @@ defineExpose({
       :cover-src="coverSrc"
       size="sm"
       :show-play-button="false"
+      :theme="props.theme"
       class="flex-shrink-0 cursor-pointer"
       @click="emit('exitKaraoke')"
     />
@@ -40,7 +44,7 @@ defineExpose({
         class="h-12 md:h-16 w-full rounded-lg overflow-hidden bg-zinc-900/30 mb-2"
       ></div>
       <!-- Track Info -->
-      <TrackInfo :track="track" size="sm" />
+      <TrackInfo :track="track" size="sm" :theme="props.theme" />
     </div>
   </div>
 </template>

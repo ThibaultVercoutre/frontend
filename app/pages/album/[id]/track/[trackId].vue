@@ -1,8 +1,18 @@
 <script setup lang="ts">
 // Composables
 const route = useRoute()
+const router = useRouter()
 const { getAlbumById } = useAlbums()
 const { getTrackById, getTracksByAlbum, getAudioSrc, getCoverSrc, getTrackIndexInAlbum } = useTracks()
+const {
+  isAutoPlay,
+  isShuffleMode,
+  toggleAutoPlay,
+  toggleShuffleMode,
+  initializeQueue,
+  getNextTrack,
+  goToNextTrack,
+} = usePlayerQueue()
 
 // Route params
 const albumId = computed(() => route.params.id as string)
@@ -17,6 +27,11 @@ const trackIndexInAlbum = computed(() => getTrackIndexInAlbum(track.value))
 // Theme detection based on album
 const isFestive = computed(() => albumId.value.includes('noel'))
 const isCeltic = computed(() => albumId.value === 'gabrielle')
+const currentTheme = computed(() => {
+  if (isCeltic.value) return 'celtic'
+  if (isFestive.value) return 'winter'
+  return 'default'
+})
 
 // Audio source
 const audioSrc = computed(() => getAudioSrc(track.value))
@@ -86,17 +101,44 @@ const prevTrack = computed(() => {
 })
 
 const nextTrack = computed(() => {
+  if (isShuffleMode.value) {
+    return getNextTrack(albumTracks.value, trackId.value)
+  }
   const idx = albumTracks.value.findIndex(t => t.id === trackId.value)
   return idx < albumTracks.value.length - 1 ? albumTracks.value[idx + 1] : null
+})
+
+// Check if there's a next track available (for UI state)
+const hasNextTrack = computed(() => {
+  if (isShuffleMode.value || isAutoPlay.value) return true
+  const idx = albumTracks.value.findIndex(t => t.id === trackId.value)
+  return idx < albumTracks.value.length - 1
 })
 
 const prevTrackUrl = computed(() =>
   prevTrack.value ? `/album/${albumId.value}/track/${prevTrack.value.id}` : undefined
 )
 
-const nextTrackUrl = computed(() =>
-  nextTrack.value ? `/album/${albumId.value}/track/${nextTrack.value.id}` : undefined
-)
+const nextTrackUrl = computed(() => {
+  const next = nextTrack.value
+  return next ? `/album/${albumId.value}/track/${next.id}` : undefined
+})
+
+// Handle track end - autoplay next
+const handleTrackEnded = () => {
+  onEnded()
+  if (isAutoPlay.value || isShuffleMode.value) {
+    const nextUrl = goToNextTrack(albumId.value, albumTracks.value, trackId.value)
+    if (nextUrl) {
+      router.push(nextUrl)
+    }
+  }
+}
+
+// Toggle shuffle with current context
+const handleToggleShuffle = () => {
+  toggleShuffleMode(albumTracks.value, trackId.value)
+}
 
 // Toggle karaoke mode
 const toggleKaraokeMode = () => {
@@ -152,9 +194,37 @@ watch(visualizerGradient, (newGradient) => {
   }
 })
 
+// Auto-start playback when autoplay/shuffle is active
+const autoStartPlayback = async () => {
+  if ((isAutoPlay.value || isShuffleMode.value) && audioRef.value) {
+    // Initialize visualizer if needed
+    if (!isVisualizerInitialized.value && visualizerRef.value) {
+      initVisualizer(visualizerRef.value, audioRef.value)
+      setVisualizerGradient(visualizerGradient.value)
+    }
+
+    try {
+      await audioRef.value.play()
+      resumeVisualizer()
+    } catch (e) {
+      // Autoplay might be blocked by browser, user will need to click
+      console.warn('Autoplay blocked by browser:', e)
+    }
+  }
+}
+
+// Watch for audio ready to auto-start
+const handleLoadedMetadata = () => {
+  onLoadedMetadata()
+  // Auto-start if autoplay/shuffle is enabled
+  autoStartPlayback()
+}
+
 // Lifecycle
 onMounted(() => {
   startLoop()
+  // Initialize shuffle queue if shuffle mode is active
+  initializeQueue(albumTracks.value, trackId.value)
 })
 
 onUnmounted(() => {
@@ -195,15 +265,15 @@ onUnmounted(() => {
       crossorigin="anonymous"
       preload="auto"
       @timeupdate="onTimeUpdate"
-      @loadedmetadata="onLoadedMetadata"
-      @ended="onEnded"
+      @loadedmetadata="handleLoadedMetadata"
+      @ended="handleTrackEnded"
       @play="onPlay(); resumeVisualizer()"
       @pause="onPause"
     ></audio>
 
     <!-- Back Button - goes to album -->
     <div class="absolute top-6 left-6 z-20">
-      <BackButton :to="`/album/${albumId}`" :label="album?.title || 'Album'" />
+      <BackButton :to="`/album/${albumId}`" :label="album?.title || 'Album'" :theme="currentTheme" />
     </div>
 
     <!-- Audio Visualizer Background (hidden in karaoke mode) -->
@@ -222,7 +292,7 @@ onUnmounted(() => {
       class="flex-1 flex flex-col items-center justify-center px-6 pb-32 relative z-10"
     >
       <!-- Track Info -->
-      <TrackInfo :track="track" size="lg" />
+      <TrackInfo :track="track" size="lg" :theme="currentTheme" />
 
       <!-- Vinyl Container -->
       <div class="relative">
@@ -242,6 +312,7 @@ onUnmounted(() => {
           :is-spinning="isPlaying"
           :cover-src="coverSrc"
           size="lg"
+          :theme="currentTheme"
         >
           <template #overlay>
             <!-- Play Button Overlay -->
@@ -293,6 +364,7 @@ onUnmounted(() => {
         :track="track"
         :is-playing="isPlaying"
         :cover-src="coverSrc"
+        :theme="currentTheme"
         @exit-karaoke="toggleKaraokeMode"
       />
 
@@ -375,7 +447,24 @@ onUnmounted(() => {
           </div>
 
           <!-- Center Controls -->
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 sm:gap-4">
+            <!-- Shuffle -->
+            <button
+              :class="[
+                'p-2 transition-colors relative',
+                isShuffleMode
+                  ? (isCeltic ? 'text-amber-400' : isFestive ? 'text-amber-400' : 'text-pink-400')
+                  : (isCeltic ? 'text-emerald-400/50 hover:text-emerald-400' : isFestive ? 'text-sky-400/50 hover:text-sky-400' : 'text-purple-400/50 hover:text-purple-400')
+              ]"
+              title="Lecture aléatoire"
+              @click="handleToggleShuffle"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
+              </svg>
+              <span v-if="isShuffleMode" class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-current"></span>
+            </button>
+
             <!-- Previous -->
             <NuxtLink
               :to="prevTrackUrl"
@@ -412,13 +501,30 @@ onUnmounted(() => {
               :to="nextTrackUrl"
               :class="[
                 'p-2 transition-colors',
-                nextTrack ? (isCeltic ? 'text-emerald-400/70 hover:text-amber-400' : isFestive ? 'text-sky-400/70 hover:text-amber-400' : 'text-purple-400/70 hover:text-pink-400') : 'text-zinc-600 cursor-not-allowed pointer-events-none'
+                hasNextTrack ? (isCeltic ? 'text-emerald-400/70 hover:text-amber-400' : isFestive ? 'text-sky-400/70 hover:text-amber-400' : 'text-purple-400/70 hover:text-pink-400') : 'text-zinc-600 cursor-not-allowed pointer-events-none'
               ]"
             >
               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
               </svg>
             </NuxtLink>
+
+            <!-- Auto-play -->
+            <button
+              :class="[
+                'p-2 transition-colors relative',
+                isAutoPlay
+                  ? (isCeltic ? 'text-amber-400' : isFestive ? 'text-amber-400' : 'text-pink-400')
+                  : (isCeltic ? 'text-emerald-400/50 hover:text-emerald-400' : isFestive ? 'text-sky-400/50 hover:text-sky-400' : 'text-purple-400/50 hover:text-purple-400')
+              ]"
+              title="Lecture automatique"
+              @click="toggleAutoPlay"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+              </svg>
+              <span v-if="isAutoPlay" class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-current"></span>
+            </button>
           </div>
 
           <!-- Volume + Track info -->

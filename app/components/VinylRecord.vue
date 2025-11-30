@@ -4,6 +4,7 @@ interface Props {
   coverSrc?: string
   size?: 'sm' | 'md' | 'lg'
   showPlayButton?: boolean
+  theme?: 'celtic' | 'winter' | 'default'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -11,6 +12,7 @@ const props = withDefaults(defineProps<Props>(), {
   coverSrc: '/vynile/Parangon_dune_soldate.jpeg',
   size: 'lg',
   showPlayButton: true,
+  theme: 'celtic',
 })
 
 const emit = defineEmits<{
@@ -42,6 +44,34 @@ const iconSizeClasses = computed(() => {
     lg: 'w-6 h-6 md:w-7 md:h-7',
   }
   return sizes[props.size]
+})
+
+// Theme-based label styling
+const labelGradientClasses = computed(() => {
+  if (props.theme === 'winter') {
+    return 'from-sky-900 via-sky-800 to-sky-950 border-sky-600/50'
+  }
+  if (props.theme === 'celtic') {
+    return 'from-emerald-900 via-emerald-800 to-emerald-950 border-emerald-700/50'
+  }
+  return 'from-purple-900 via-purple-800 to-purple-950 border-purple-700/50'
+})
+
+const labelTextClasses = computed(() => {
+  if (props.theme === 'winter') {
+    return 'text-sky-200'
+  }
+  if (props.theme === 'celtic') {
+    return 'text-emerald-300'
+  }
+  return 'text-purple-300'
+})
+
+const labelName = computed(() => {
+  if (props.theme === 'winter') {
+    return 'NOËL 2024'
+  }
+  return 'GABRIELLE'
 })
 </script>
 
@@ -85,16 +115,38 @@ const iconSizeClasses = computed(() => {
       <!-- Center Label -->
       <div class="absolute inset-0 flex items-center justify-center">
         <div
-          class="rounded-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 flex items-center justify-center shadow-inner border border-emerald-700/50 relative"
-          :class="[labelSizeClasses, size === 'lg' ? 'border-3' : 'border']"
+          :class="[
+            'rounded-full bg-gradient-to-br flex items-center justify-center shadow-inner border relative',
+            labelGradientClasses,
+            labelSizeClasses,
+            size === 'lg' ? 'border-3' : 'border'
+          ]"
         >
-          <!-- Label Design -->
-          <div class="text-center">
+          <!-- Label Design - Celtic (Shield) -->
+          <div v-if="theme === 'celtic'" class="text-center">
             <svg :class="['mx-auto text-amber-500 mb-0.5', iconSizeClasses]" viewBox="0 0 100 120" fill="currentColor">
               <path d="M50 5 L95 20 L95 60 Q95 100 50 115 Q5 100 5 60 L5 20 Z" />
             </svg>
-            <p v-if="size === 'lg'" class="text-emerald-300 text-[10px] font-bold tracking-wider">GABRIELLE</p>
+            <p v-if="size === 'lg'" :class="[labelTextClasses, 'text-[10px] font-bold tracking-wider']">{{ labelName }}</p>
           </div>
+
+          <!-- Label Design - Winter (Pine Tree) -->
+          <div v-else-if="theme === 'winter'" class="text-center">
+            <svg :class="['mx-auto text-sky-300 mb-0.5', iconSizeClasses]" viewBox="0 0 24 24" fill="currentColor">
+              <!-- Pine tree -->
+              <path d="M12 2L6 10h2l-3 6h3l-4 6h16l-4-6h3l-3-6h2L12 2z" />
+            </svg>
+            <p v-if="size === 'lg'" :class="[labelTextClasses, 'text-[8px] font-bold tracking-wider']">{{ labelName }}</p>
+          </div>
+
+          <!-- Label Design - Default -->
+          <div v-else class="text-center">
+            <svg :class="['mx-auto text-pink-400 mb-0.5', iconSizeClasses]" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            <p v-if="size === 'lg'" :class="[labelTextClasses, 'text-[10px] font-bold tracking-wider']">{{ labelName }}</p>
+          </div>
+
           <!-- Center Hole -->
           <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div

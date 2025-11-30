@@ -4,13 +4,36 @@ import type { Track } from '~/types'
 interface Props {
   track: Track | undefined
   size?: 'sm' | 'lg'
+  theme?: 'celtic' | 'winter' | 'default'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   size: 'lg',
+  theme: 'celtic',
 })
 
 const { getTypeTextColor } = useTracks()
+
+// Theme-based classes
+const titleClasses = computed(() => {
+  if (props.theme === 'winter') {
+    return 'font-winter text-winter'
+  }
+  if (props.theme === 'celtic') {
+    return 'font-medieval text-epic'
+  }
+  return 'font-bold text-tag'
+})
+
+const subtitleClasses = computed(() => {
+  if (props.theme === 'winter') {
+    return 'text-sky-300/70'
+  }
+  if (props.theme === 'celtic') {
+    return 'text-emerald-400/60'
+  }
+  return 'text-purple-400/60'
+})
 </script>
 
 <template>
@@ -23,17 +46,17 @@ const { getTypeTextColor } = useTracks()
     </p>
     <h1
       v-if="size === 'lg'"
-      class="text-4xl md:text-6xl font-medieval text-epic mb-3"
+      :class="['text-4xl md:text-6xl mb-3', titleClasses]"
     >
       {{ track?.title }}
     </h1>
     <h2
       v-else
-      class="text-xl md:text-2xl font-medieval text-epic truncate"
+      :class="['text-xl md:text-2xl truncate', titleClasses]"
     >
       {{ track?.title }}
     </h2>
-    <p class="text-emerald-400/60" :class="size === 'lg' ? 'text-lg' : 'text-sm'">
+    <p :class="[subtitleClasses, size === 'lg' ? 'text-lg' : 'text-sm']">
       {{ track?.subtitle }}
     </p>
   </div>
