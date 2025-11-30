@@ -10,6 +10,11 @@ const tracks = computed(() => getTracksByAlbum(albumId.value))
 // Theme detection
 const isFestive = computed(() => albumId.value.includes('noel'))
 const isCeltic = computed(() => albumId.value === 'gabrielle')
+const currentTheme = computed(() => {
+  if (isCeltic.value) return 'celtic'
+  if (isFestive.value) return 'winter'
+  return 'default'
+})
 </script>
 
 <template>
@@ -28,7 +33,7 @@ const isCeltic = computed(() => albumId.value === 'gabrielle')
 
     <!-- Back Button -->
     <div class="absolute top-6 left-6 z-20">
-      <BackButton label="Albums" />
+      <BackButton label="Albums" :theme="currentTheme" />
     </div>
 
     <!-- Main Content -->
@@ -123,7 +128,7 @@ const isCeltic = computed(() => albumId.value === 'gabrielle')
 
     <!-- Back Button -->
     <div class="absolute top-6 left-6 z-20">
-      <BackButton label="Albums" />
+      <BackButton label="Albums" :theme="currentTheme" />
     </div>
 
     <!-- Main Content -->
@@ -210,7 +215,7 @@ const isCeltic = computed(() => albumId.value === 'gabrielle')
   <div v-else class="min-h-screen bg-neutral bg-neutral-pattern relative overflow-hidden">
     <!-- Back Button -->
     <div class="absolute top-6 left-6 z-20">
-      <BackButton label="Albums" />
+      <BackButton label="Albums" :theme="currentTheme" />
     </div>
 
     <!-- Main Content -->

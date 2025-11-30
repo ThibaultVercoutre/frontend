@@ -273,7 +273,7 @@ onUnmounted(() => {
 
     <!-- Back Button - goes to album -->
     <div class="absolute top-6 left-6 z-20">
-      <BackButton :to="`/album/${albumId}`" :label="album?.title || 'Album'" :theme="currentTheme" />
+      <BackButton :label="album?.title || 'Album'" :theme="currentTheme" />
     </div>
 
     <!-- Audio Visualizer Background (hidden in karaoke mode) -->
