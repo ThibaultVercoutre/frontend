@@ -1,6 +1,20 @@
+// Album types
+export interface Album {
+  id: string
+  title: string
+  subtitle: string
+  year: number
+  coverImage: string
+  trackCount: number
+  type: AlbumType
+}
+
+export type AlbumType = 'album' | 'ep' | 'single' | 'special'
+
 // Track types
 export interface Track {
   id: number
+  albumId: string
   title: string
   subtitle: string
   duration: string
@@ -8,7 +22,7 @@ export interface Track {
   filename?: string
 }
 
-export type TrackType = 'epic' | 'celtic' | 'military'
+export type TrackType = 'epic' | 'celtic' | 'military' | 'festive' | 'parody'
 
 // Lyrics types
 export interface LyricLine {

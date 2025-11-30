@@ -1,6 +1,6 @@
 <script setup lang="ts">
 interface Props {
-  trackCount: number
+  albumCount: number
 }
 
 defineProps<Props>()
@@ -14,13 +14,13 @@ defineProps<Props>()
         <path d="M50 5 L95 20 L95 60 Q95 100 50 115 Q5 100 5 60 L5 20 Z" />
         <!-- Inner design -->
         <path d="M50 20 L75 30 L75 55 Q75 85 50 95 Q25 85 25 55 L25 30 Z" fill="currentColor" opacity="0.3" />
-        <text x="50" y="65" text-anchor="middle" class="text-2xl font-bold fill-emerald-950">G</text>
+        <text x="50" y="65" text-anchor="middle" class="text-2xl font-bold fill-emerald-950">T</text>
       </svg>
     </div>
 
     <!-- Title -->
     <h1 class="text-5xl md:text-7xl font-medieval text-epic mb-4">
-      Gabrielle
+      TAG
     </h1>
 
     <!-- Subtitle -->
@@ -28,9 +28,9 @@ defineProps<Props>()
       Chants de Guerre & Légendes
     </p>
 
-    <!-- Track count -->
+    <!-- Album count -->
     <p class="text-emerald-600/50 text-sm mt-4 uppercase tracking-widest">
-      {{ trackCount }} Pistes Légendaires
+      {{ albumCount }} {{ albumCount > 1 ? 'Albums' : 'Album' }}
     </p>
   </div>
 </template>

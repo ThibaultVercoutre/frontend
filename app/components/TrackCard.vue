@@ -9,11 +9,14 @@ interface Props {
 const props = defineProps<Props>()
 
 const { getTypeColor, getTypeIcon } = useTracks()
+
+// Track number within the album (1-based)
+const trackNumber = computed(() => props.index + 1)
 </script>
 
 <template>
   <NuxtLink
-    :to="`/track/${track.id}`"
+    :to="`/album/${track.albumId}/track/${track.id}`"
     class="track-card relative rounded-2xl p-6 group cursor-pointer overflow-hidden block"
     :style="{ animationDelay: `${index * 100}ms` }"
   >
@@ -24,7 +27,7 @@ const { getTypeColor, getTypeIcon } = useTracks()
           <path d="M50 5 L95 20 L95 60 Q95 100 50 115 Q5 100 5 60 L5 20 Z" />
         </svg>
         <span class="absolute inset-0 flex items-center justify-center text-emerald-200 font-bold text-sm">
-          {{ String(track.id).padStart(2, '0') }}
+          {{ String(trackNumber).padStart(2, '0') }}
         </span>
       </div>
     </div>
