@@ -1,12 +1,12 @@
 <script setup lang="ts">
-const router = useRouter()
-
 interface Props {
+  to?: string
   label?: string
   theme?: 'celtic' | 'winter' | 'default'
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  to: '/',
   label: 'Retour',
   theme: 'celtic',
 })
@@ -20,17 +20,12 @@ const colorClasses = computed(() => {
   }
   return 'text-purple-400/70 hover:text-pink-400'
 })
-
-const goBack = () => {
-  router.back()
-}
 </script>
 
 <template>
-  <button
-    type="button"
-    :class="['flex items-center gap-2 transition-colors group cursor-pointer', colorClasses]"
-    @click="goBack"
+  <NuxtLink
+    :to="to"
+    :class="['flex items-center gap-2 transition-colors group', colorClasses]"
   >
     <svg
       class="w-6 h-6 transform group-hover:-translate-x-1 transition-transform"
@@ -41,5 +36,5 @@ const goBack = () => {
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
     </svg>
     <span class="text-sm uppercase tracking-wider">{{ label }}</span>
-  </button>
+  </NuxtLink>
 </template>

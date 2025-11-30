@@ -33,7 +33,7 @@ const currentTheme = computed(() => {
 
     <!-- Back Button -->
     <div class="absolute top-6 left-6 z-20">
-      <BackButton label="Albums" :theme="currentTheme" />
+      <BackButton to="/" label="Albums" :theme="currentTheme" />
     </div>
 
     <!-- Main Content -->
@@ -117,7 +117,7 @@ const currentTheme = computed(() => {
 
     <!-- Back Button -->
     <div class="absolute top-6 left-6 z-20">
-      <BackButton label="Albums" :theme="currentTheme" />
+      <BackButton to="/" label="Albums" :theme="currentTheme" />
     </div>
 
     <!-- Main Content -->
@@ -204,7 +204,7 @@ const currentTheme = computed(() => {
   <div v-else class="min-h-screen bg-neutral bg-neutral-pattern relative overflow-hidden">
     <!-- Back Button -->
     <div class="absolute top-6 left-6 z-20">
-      <BackButton label="Albums" :theme="currentTheme" />
+      <BackButton to="/" label="Albums" :theme="currentTheme" />
     </div>
 
     <!-- Main Content -->

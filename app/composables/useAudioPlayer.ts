@@ -112,16 +112,18 @@ export function useAudioPlayer() {
     }
   }
 
-  // Event handlers
-  const onTimeUpdate = () => {
-    if (audioRef.value) {
-      currentTime.value = audioRef.value.currentTime
+  // Event handlers - use event target for reliability after page refresh
+  const onTimeUpdate = (event?: Event) => {
+    const audio = (event?.target as HTMLAudioElement) || audioRef.value
+    if (audio) {
+      currentTime.value = audio.currentTime
     }
   }
 
-  const onLoadedMetadata = () => {
-    if (audioRef.value) {
-      duration.value = audioRef.value.duration
+  const onLoadedMetadata = (event?: Event) => {
+    const audio = (event?.target as HTMLAudioElement) || audioRef.value
+    if (audio) {
+      duration.value = audio.duration
     }
   }
 

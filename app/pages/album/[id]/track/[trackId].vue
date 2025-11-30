@@ -37,9 +37,11 @@ const currentTheme = computed(() => {
 const audioSrc = computed(() => getAudioSrc(track.value))
 const coverSrc = computed(() => getCoverSrc(track.value))
 
+// Template ref for audio element (defined here for proper SSR hydration)
+const audioRef = useTemplateRef<HTMLAudioElement>('audioElement')
+
 // Audio player
 const {
-  audioRef,
   isPlaying,
   currentTime,
   duration,
@@ -50,6 +52,7 @@ const {
   togglePlay,
   seek,
   setVolume,
+  initAudio,
   onTimeUpdate,
   onLoadedMetadata,
   onEnded,
@@ -214,11 +217,18 @@ const autoStartPlayback = async () => {
 }
 
 // Watch for audio ready to auto-start
-const handleLoadedMetadata = () => {
-  onLoadedMetadata()
+const handleLoadedMetadata = (event: Event) => {
+  onLoadedMetadata(event)
   // Auto-start if autoplay/shuffle is enabled
   autoStartPlayback()
 }
+
+// Watch for audio element to become available (handles SSR hydration)
+watch(audioRef, (audio) => {
+  if (audio) {
+    initAudio(audio)
+  }
+}, { immediate: true })
 
 // Lifecycle
 onMounted(() => {
@@ -249,22 +259,24 @@ onUnmounted(() => {
       <div class="cabin-glow"></div>
     </ClientOnly>
 
-    <!-- Audio element (hidden) -->
-    <audio
-      ref="audioRef"
-      :src="audioSrc"
-      crossorigin="anonymous"
-      preload="auto"
-      @timeupdate="onTimeUpdate"
-      @loadedmetadata="handleLoadedMetadata"
-      @ended="handleTrackEnded"
-      @play="onPlay(); resumeVisualizer()"
-      @pause="onPause"
-    ></audio>
+    <!-- Audio element (hidden, client-only to avoid SSR hydration issues) -->
+    <ClientOnly>
+      <audio
+        ref="audioElement"
+        :src="audioSrc"
+        crossorigin="anonymous"
+        preload="auto"
+        @timeupdate="onTimeUpdate($event)"
+        @loadedmetadata="handleLoadedMetadata($event)"
+        @ended="handleTrackEnded"
+        @play="onPlay(); resumeVisualizer()"
+        @pause="onPause"
+      ></audio>
+    </ClientOnly>
 
     <!-- Back Button - goes to album -->
     <div class="absolute top-6 left-6 z-20">
-      <BackButton :label="album?.title || 'Album'" :theme="currentTheme" />
+      <BackButton :to="`/album/${albumId}`" :label="album?.title || 'Album'" :theme="currentTheme" />
     </div>
 
     <!-- Audio Visualizer Background (hidden in karaoke mode) -->
