@@ -3,7 +3,7 @@ export function useAudioPlayer() {
   const isPlaying = ref(false)
   const currentTime = ref(0)
   const duration = ref(0)
-  const volume = ref(0.8)
+  const volume = ref(0.5)
   const isMuted = ref(false)
 
   let animationId: number | null = null
