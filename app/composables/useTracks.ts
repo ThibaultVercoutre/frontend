@@ -3,7 +3,7 @@ import type { Track, TrackType } from '~/types'
 // Local data - will be replaced by API calls later
 const localTracks: Track[] = [
   // Album: Gabrielle
-  { id: 1, albumId: 'gabrielle', title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '3:45', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va' },
+  { id: 1, albumId: 'gabrielle', title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '3:45', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va', cover: 'De_nos_jour_plus_rien_ne_va.png' },
   { id: 2, albumId: 'gabrielle', title: "Parangon d'une Soldate", subtitle: 'Hymne héroïque', duration: '4:12', type: 'military', filename: "Parangon_d'une_soldate", cover: 'Parangon_dune_soldate' },
   { id: 3, albumId: 'gabrielle', title: 'L\'Assaut Final', subtitle: 'Bataille épique', duration: '0:00', type: 'epic' },
   { id: 4, albumId: 'gabrielle', title: 'Les Fils de la Terre', subtitle: 'Marche triomphale', duration: '0:00', type: 'military' },
@@ -84,7 +84,10 @@ export function useTracks() {
     // Use cover property if available, otherwise fallback to filename
     const coverName = track.cover || track.filename
     if (!coverName) return '/covers/default.jpeg'
-    return `/covers/${track.albumId}/${coverName.replace(/'/g, '')}.jpeg`
+    // Check if cover already has an extension
+    const hasExtension = /\.(png|jpg|jpeg|webp)$/i.test(coverName)
+    const cleanName = coverName.replace(/'/g, '')
+    return `/covers/${track.albumId}/${cleanName}${hasExtension ? '' : '.jpeg'}`
   }
 
   // Type styling helpers

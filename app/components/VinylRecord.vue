@@ -24,12 +24,12 @@ const props = withDefaults(defineProps<Props>(), {
 // When playing: tonearm starts at center (25deg) and moves to outer edge (5deg)
 const tonearmRotation = computed(() => {
   if (!props.isSpinning) {
-    return -15 // Lifted position
+    return -30 // Lifted position
   }
   // Map progress (0-100) to angle
   // Start at center (25deg), end at outer edge (5deg)
   // As progress increases, angle decreases (moves toward outer edge)
-  return 25 - (props.progress / 100) * 20
+  return 15 - (props.progress / 100) * 30
 })
 
 const tonearmTransform = computed(() => {
