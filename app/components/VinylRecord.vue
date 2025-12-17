@@ -212,29 +212,28 @@ const labelName = computed(() => {
             ]"
           >
             <!-- Label Design - Celtic (Shield) -->
-            <div v-if="theme === 'celtic'" class="text-center">
-              <svg :class="['mx-auto text-amber-500 mb-0.5', iconSizeClasses]" viewBox="0 0 100 120" fill="currentColor">
+            <template v-if="theme === 'celtic'">
+              <svg :class="['text-amber-500', iconSizeClasses]" viewBox="0 0 100 120" fill="currentColor">
                 <path d="M50 5 L95 20 L95 60 Q95 100 50 115 Q5 100 5 60 L5 20 Z" />
               </svg>
-              <p v-if="size === 'lg'" :class="[labelTextClasses, 'text-[10px] font-bold tracking-wider']">{{ labelName }}</p>
-            </div>
+              <p v-if="size === 'lg'" :class="[labelTextClasses, 'absolute bottom-1.5 left-0 right-0 text-center text-[10px] font-bold tracking-wider']">{{ labelName }}</p>
+            </template>
 
             <!-- Label Design - Winter (Pine Tree) -->
-            <div v-else-if="theme === 'winter'" class="text-center">
-              <svg :class="['mx-auto text-sky-300 mb-0.5', iconSizeClasses]" viewBox="0 0 24 24" fill="currentColor">
-                <!-- Pine tree -->
+            <template v-else-if="theme === 'winter'">
+              <svg :class="['text-sky-300', iconSizeClasses]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2L6 10h2l-3 6h3l-4 6h16l-4-6h3l-3-6h2L12 2z" />
               </svg>
-              <p v-if="size === 'lg'" :class="[labelTextClasses, 'text-[8px] font-bold tracking-wider']">{{ labelName }}</p>
-            </div>
+              <p v-if="size === 'lg'" :class="[labelTextClasses, 'absolute bottom-1.5 left-0 right-0 text-center text-[8px] font-bold tracking-wider']">{{ labelName }}</p>
+            </template>
 
             <!-- Label Design - Default -->
-            <div v-else class="text-center">
-              <svg :class="['mx-auto text-pink-400 mb-0.5', iconSizeClasses]" viewBox="0 0 24 24" fill="currentColor">
+            <template v-else>
+              <svg :class="['text-pink-400', iconSizeClasses]" viewBox="0 0 24 24" fill="currentColor">
                 <circle cx="12" cy="12" r="10" />
               </svg>
-              <p v-if="size === 'lg'" :class="[labelTextClasses, 'text-[10px] font-bold tracking-wider']">{{ labelName }}</p>
-            </div>
+              <p v-if="size === 'lg'" :class="[labelTextClasses, 'absolute bottom-1.5 left-0 right-0 text-center text-[10px] font-bold tracking-wider']">{{ labelName }}</p>
+            </template>
 
             <!-- Center Hole -->
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
