@@ -298,3 +298,23 @@ const toggleMute = () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Hide native range input thumb so it doesn't block clicks */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+</style>
