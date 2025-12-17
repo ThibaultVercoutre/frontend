@@ -317,6 +317,7 @@ onUnmounted(() => {
           size="lg"
           :theme="currentTheme"
           :progress="progress"
+          :current-time="currentTime"
         >
           <template #overlay>
             <!-- Play Button Overlay -->

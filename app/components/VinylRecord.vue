@@ -6,6 +6,7 @@ interface Props {
   showPlayButton?: boolean
   theme?: 'celtic' | 'winter' | 'default'
   progress?: number // 0-100, track progress percentage
+  currentTime?: number // Current playback time in seconds (for vinyl rotation sync)
   showTonearm?: boolean
 }
 
@@ -16,7 +17,22 @@ const props = withDefaults(defineProps<Props>(), {
   showPlayButton: true,
   theme: 'celtic',
   progress: 0,
+  currentTime: 0,
   showTonearm: true,
+})
+
+// Vinyl rotation synced with playback
+// 33⅓ RPM = 33.33/60 rotations per second = 0.555 rotations/sec = 200° per second
+const DEGREES_PER_SECOND = 200
+const vinylRotation = computed(() => {
+  if (!props.isSpinning && props.currentTime === 0) {
+    return 0
+  }
+  return props.currentTime * DEGREES_PER_SECOND
+})
+
+const vinylTransform = computed(() => {
+  return `rotate(${vinylRotation.value}deg)`
 })
 
 // Tonearm rotation based on playback state and progress
@@ -161,7 +177,8 @@ const labelName = computed(() => {
     <!-- Vinyl Record -->
     <div
       class="vinyl-record relative rounded-full"
-      :class="[sizeClasses, { 'vinyl-spinning': isSpinning }]"
+      :class="[sizeClasses]"
+      :style="{ transform: vinylTransform }"
       @click="emit('click')"
     >
       <!-- Vinyl Disc with Album Art -->
@@ -253,15 +270,6 @@ const labelName = computed(() => {
 </template>
 
 <style scoped>
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes glow-pulse {
   0%, 100% {
     opacity: 0.4;
@@ -274,19 +282,6 @@ const labelName = computed(() => {
 .vinyl-container {
   padding-right: 2.5rem;
   padding-top: 1rem;
-}
-
-.vinyl-record {
-  transition: transform 0.3s ease-out;
-}
-
-.vinyl-spinning {
-  animation: spin 3s linear infinite;
-}
-
-.vinyl-record:not(.vinyl-spinning) {
-  animation: spin 3s linear infinite;
-  animation-play-state: paused;
 }
 
 /* Tonearm styles */
