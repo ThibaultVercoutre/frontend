@@ -5,12 +5,7 @@ const localTracks: Track[] = [
   // Album: Gabrielle
   { id: 1, albumId: 'gabrielle', title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '3:45', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va', cover: 'De_nos_jour_plus_rien_ne_va.png' },
   { id: 2, albumId: 'gabrielle', title: "Parangon d'une Soldate", subtitle: 'Hymne héroïque', duration: '4:12', type: 'military', filename: "Parangon_d'une_soldate", cover: 'Parangon_dune_soldate' },
-  { id: 3, albumId: 'gabrielle', title: 'L\'Assaut Final', subtitle: 'Bataille épique', duration: '0:00', type: 'epic' },
-  { id: 4, albumId: 'gabrielle', title: 'Les Fils de la Terre', subtitle: 'Marche triomphale', duration: '0:00', type: 'military' },
-  { id: 5, albumId: 'gabrielle', title: 'Brumes d\'Émeraude', subtitle: 'Ballade mystique', duration: '0:00', type: 'celtic' },
-  { id: 6, albumId: 'gabrielle', title: 'Sang et Gloire', subtitle: 'Cri de ralliement', duration: '0:00', type: 'epic' },
-  { id: 7, albumId: 'gabrielle', title: 'Le Serment', subtitle: 'Hymne solennel', duration: '0:00', type: 'military' },
-  { id: 8, albumId: 'gabrielle', title: 'Racines Profondes', subtitle: 'Mélodie ancestrale', duration: '0:00', type: 'celtic' },
+  { id: 3, albumId: 'gabrielle', title: 'Majorité de Minorité', subtitle: 'Chant contestataire', duration: '3:30', type: 'epic', filename: 'Majorite_de_minorite', cover: 'Majorite_de_minorite.png' },
 
   // Album: Noël 2024
   { id: 101, albumId: 'noel-2024', title: "C'est la belle nuit de Noël", subtitle: 'Cantique traditionnel', duration: '0:00', type: 'festive', filename: 'Cest_la_belle_nuit_de_Noel', cover: 'Cest_la_belle_nuit_de_noel' },

@@ -30,7 +30,9 @@ const isCeltic = computed(() => props.album.id === 'gabrielle')
         height="400"
         format="webp"
         quality="80"
-        loading="lazy"
+        :loading="index === 0 ? 'eager' : 'lazy'"
+        :fetchpriority="index === 0 ? 'high' : undefined"
+        :preload="index === 0"
         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
       />
       <!-- Overlay gradient -->
