@@ -124,6 +124,8 @@ export function useAudioPlayer() {
     const audio = (event?.target as HTMLAudioElement) || audioRef.value
     if (audio) {
       duration.value = audio.duration
+      // Reset currentTime when new audio is loaded (important for track navigation)
+      currentTime.value = audio.currentTime
     }
   }
 

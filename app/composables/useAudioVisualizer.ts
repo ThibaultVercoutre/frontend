@@ -95,6 +95,15 @@ const gradientColors: Record<string, Array<{ color: string, pos: number }>> = {
     { color: '#fbbf24', pos: 0.66 },
     { color: '#fef08a', pos: 1 },
   ],
+  // Pride flag gradient for "Majorité de Minorité" refrain
+  'section-refrain-pride': [
+    { color: '#9333EA', pos: 0 },      // Purple
+    { color: '#3B82F6', pos: 0.2 },    // Blue
+    { color: '#22C55E', pos: 0.4 },    // Green
+    { color: '#FACC15', pos: 0.6 },    // Yellow
+    { color: '#F97316', pos: 0.8 },    // Orange
+    { color: '#EF4444', pos: 1 },      // Red
+  ],
   'section-chorus': [
     { color: '#be123c', pos: 0 },
     { color: '#f43f5e', pos: 0.33 },
@@ -217,6 +226,18 @@ export function useAudioVisualizer() {
           { color: '#f97316', pos: 0.3 },  // orange
           { color: '#fbbf24', pos: 0.6 },  // amber
           { color: '#fef08a', pos: 1 },    // yellow
+        ],
+      })
+
+      // Pride flag gradient for "Majorité de Minorité" refrain
+      audioMotion.registerGradient('section-refrain-pride', {
+        colorStops: [
+          { color: '#9333EA', pos: 0 },    // Purple
+          { color: '#3B82F6', pos: 0.2 },  // Blue
+          { color: '#22C55E', pos: 0.4 },  // Green
+          { color: '#FACC15', pos: 0.6 },  // Yellow
+          { color: '#F97316', pos: 0.8 },  // Orange
+          { color: '#EF4444', pos: 1 },    // Red
         ],
       })
 
@@ -353,13 +374,20 @@ export function useAudioVisualizer() {
   }
 
   // Set section style with smooth color transition
-  const setSectionStyle = (sectionType: SectionType, _sectionNumber: number) => {
+  // trackId is optional and used for track-specific color overrides
+  const setSectionStyle = (sectionType: SectionType, _sectionNumber: number, trackId?: number) => {
     if (!audioMotion) return
 
     const preset = sectionPresets[sectionType]
     if (!preset) return
 
-    const targetGradientName = preset.gradient
+    // Check for track-specific gradient overrides
+    let targetGradientName = preset.gradient
+
+    // "Majorité de Minorité" (track 3) - Pride flag colors for REFRAIN
+    if (trackId === 3 && sectionType === 'REFRAIN') {
+      targetGradientName = 'section-refrain-pride'
+    }
     if (targetGradientName === currentGradientName) return
 
     const targetColors = gradientColors[targetGradientName]

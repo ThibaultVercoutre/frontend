@@ -77,7 +77,7 @@ const localLyricsData: Record<number, LyricLine[]> = {
   ],
   2: [
     { time: 0, text: '...', type: 'INSTRUMENTAL', number: 1 },
-    { time: 0, text: 'Cette soldate dont nous avons parlé', type: 'COUPLET', number: 1 },
+    { time: 10, text: 'Cette soldate dont nous avons parlé', type: 'COUPLET', number: 1 },
     { time: 13, text: 'Ses grands exploits, nous les avons comptés', type: 'COUPLET', number: 1 },
     { time: 18, text: 'Mais à présent, il nous faut esquisser', type: 'COUPLET', number: 1 },
     { time: 23, text: 'Son corps mythique à la noble beauté', type: 'COUPLET', number: 1 },
@@ -246,8 +246,8 @@ const localLyricsData: Record<number, LyricLine[]> = {
   101: [
     { time: 0, text: '...', type: 'INSTRUMENTAL', number: 1 },
     { time: 7, text: 'C\'est la belle nuit de Noël', type: 'COUPLET', number: 1 },
-    { time: 7, text: 'Ma lance est dans son manteau blanc', type: 'COUPLET', number: 1 },
-    { time: 10, text: 'Et mon gland levé vers le ciel', type: 'COUPLET', number: 1 },
+    { time: 10, text: 'Ma lance est dans son manteau blanc', type: 'COUPLET', number: 1 },
+    { time: 15, text: 'Et mon gland levé vers le ciel', type: 'COUPLET', number: 1 },
     { time: 18, text: 'A genoux les demandant', type: 'COUPLET', number: 1 },
     { time: 22, text: 'Avant de fermer les paupières', type: 'COUPLET', number: 1 },
     { time: 26, text: 'Buvons une dernière bière', type: 'COUPLET', number: 1 },
@@ -568,8 +568,9 @@ export function useLyrics(trackId: Ref<number>) {
     currentTime.value = time
   }
 
-  // Watch for track changes
+  // Watch for track changes - reset time and reload lyrics
   watch(trackId, () => {
+    currentTime.value = 0  // Reset time when track changes
     fetchLyrics()
   }, { immediate: true })
 

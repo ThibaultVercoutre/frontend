@@ -21,6 +21,7 @@ interface Props {
   trackIndex: number
   totalTracks: number
   sectionType?: SectionType
+  trackId?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -30,7 +31,11 @@ const props = withDefaults(defineProps<Props>(), {
   hasPrevTrack: false,
   hasNextTrack: false,
   sectionType: 'INSTRUMENTAL',
+  trackId: 0,
 })
+
+// Check if we should use pride colors (track 3 "Majorité de Minorité" during REFRAIN)
+const usePrideColors = computed(() => props.trackId === 3 && props.sectionType === 'REFRAIN')
 
 const emit = defineEmits<{
   togglePlay: []
@@ -40,8 +45,16 @@ const emit = defineEmits<{
   toggleAutoPlay: []
 }>()
 
+// Pride flag gradient (for "Majorité de Minorité" REFRAIN)
+const prideGradient = 'linear-gradient(to right, #9333EA, #3B82F6, #22C55E, #FACC15, #F97316, #EF4444)'
+
 // Section-based progress bar gradient (CSS style)
 const sectionGradientStyle = computed(() => {
+  // Use pride colors for track 3 REFRAIN
+  if (usePrideColors.value) {
+    return prideGradient
+  }
+
   const gradients: Record<SectionType, string> = {
     INTRO: 'linear-gradient(to right, #2563eb, #60a5fa)',
     COUPLET: 'linear-gradient(to right, #16a34a, #4ade80)',
@@ -57,6 +70,11 @@ const sectionGradientStyle = computed(() => {
 
 // Section-based thumb color
 const sectionThumbColor = computed(() => {
+  // Pride: use a rainbow gradient background for the thumb
+  if (usePrideColors.value) {
+    return 'bg-gradient-to-r from-purple-500 via-green-500 to-red-500'
+  }
+
   const colors: Record<SectionType, string> = {
     INTRO: 'bg-blue-400',
     COUPLET: 'bg-green-400',
@@ -72,6 +90,11 @@ const sectionThumbColor = computed(() => {
 
 // Section-based play button gradient
 const sectionPlayButton = computed(() => {
+  // Pride: rainbow gradient for play button
+  if (usePrideColors.value) {
+    return 'from-purple-600 via-green-500 to-red-600 border-pink-400/30 hover:from-purple-500 hover:via-green-400 hover:to-red-500'
+  }
+
   const gradients: Record<SectionType, string> = {
     INTRO: 'from-blue-600 to-blue-800 border-blue-500/30 hover:from-blue-500 hover:to-blue-700',
     COUPLET: 'from-green-600 to-green-800 border-green-500/30 hover:from-green-500 hover:to-green-700',
@@ -87,6 +110,8 @@ const sectionPlayButton = computed(() => {
 
 // Section-based text color for secondary elements
 const sectionTextColor = computed(() => {
+  if (usePrideColors.value) return 'text-pink-400'
+
   const colors: Record<SectionType, string> = {
     INTRO: 'text-blue-400',
     COUPLET: 'text-green-400',
@@ -102,6 +127,8 @@ const sectionTextColor = computed(() => {
 
 // Section-based muted text color
 const sectionTextMuted = computed(() => {
+  if (usePrideColors.value) return 'text-pink-400/60'
+
   const colors: Record<SectionType, string> = {
     INTRO: 'text-blue-400/60',
     COUPLET: 'text-green-400/60',
@@ -117,6 +144,8 @@ const sectionTextMuted = computed(() => {
 
 // Section-based hover text color
 const sectionTextHover = computed(() => {
+  if (usePrideColors.value) return 'hover:text-purple-300'
+
   const colors: Record<SectionType, string> = {
     INTRO: 'hover:text-blue-300',
     COUPLET: 'hover:text-green-300',
@@ -132,6 +161,8 @@ const sectionTextHover = computed(() => {
 
 // Section-based border color
 const sectionBorder = computed(() => {
+  if (usePrideColors.value) return 'border-pink-600/30'
+
   const colors: Record<SectionType, string> = {
     INTRO: 'border-blue-800/30',
     COUPLET: 'border-green-800/30',
@@ -147,6 +178,8 @@ const sectionBorder = computed(() => {
 
 // Section-based volume bar color
 const sectionVolumeBar = computed(() => {
+  if (usePrideColors.value) return 'bg-gradient-to-r from-purple-500 via-green-500 to-red-500'
+
   const colors: Record<SectionType, string> = {
     INTRO: 'bg-blue-500',
     COUPLET: 'bg-green-500',
@@ -162,6 +195,8 @@ const sectionVolumeBar = computed(() => {
 
 // Section-based active button color (for shuffle/autoplay when active)
 const sectionActiveColor = computed(() => {
+  if (usePrideColors.value) return 'text-pink-300'
+
   const colors: Record<SectionType, string> = {
     INTRO: 'text-blue-300',
     COUPLET: 'text-green-300',

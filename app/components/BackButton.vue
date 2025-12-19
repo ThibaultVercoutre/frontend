@@ -8,6 +8,7 @@ interface Props {
   label?: string
   theme?: 'celtic' | 'winter' | 'default'
   sectionType?: SectionType
+  trackId?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -15,11 +16,21 @@ const props = withDefaults(defineProps<Props>(), {
   label: 'Retour',
   theme: 'celtic',
   sectionType: undefined,
+  trackId: 0,
 })
+
+// Check if we should use pride colors (track 3 "Majorité de Minorité" during REFRAIN)
+const usePrideColors = computed(() => props.trackId === 3 && props.sectionType === 'REFRAIN')
 
 // Section-based color classes
 const sectionColorClasses = computed(() => {
   if (!props.sectionType) return null
+
+  // Pride colors for "Majorité de Minorité" REFRAIN
+  if (usePrideColors.value) {
+    return 'text-pink-400/70 hover:text-purple-300'
+  }
+
   const colors: Record<SectionType, string> = {
     INTRO: 'text-blue-400/70 hover:text-blue-300',
     COUPLET: 'text-green-400/70 hover:text-green-300',

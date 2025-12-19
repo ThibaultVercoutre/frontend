@@ -82,8 +82,28 @@ const visualizerGradient = computed(() => {
   return 'default'
 })
 
+// Lyrics - MUST be called before computed properties that use currentSectionType
+const {
+  previousLyric,
+  currentLyric,
+  nextLyric,
+  currentLyricIndex,
+  currentSectionType,
+  currentSectionNumber,
+  hasLyrics,
+  updateTime: updateLyricsTime,
+} = useLyrics(trackId)
+
+// Check if we should use pride colors (track 3 "Majorité de Minorité" during REFRAIN)
+const usePrideColors = computed(() => trackId.value === 3 && currentSectionType.value === 'REFRAIN')
+
 // Section-based glow colors for vinyl
 const sectionGlowClass = computed(() => {
+  // Pride: multi-color glow
+  if (usePrideColors.value) {
+    return { playing: 'bg-pink-500', idle: 'bg-purple-500' }
+  }
+
   const sectionType = currentSectionType.value
   const defaultColors = { playing: 'bg-amber-500', idle: 'bg-cyan-500' }
   const colors: Record<string, { playing: string, idle: string }> = {
@@ -101,6 +121,11 @@ const sectionGlowClass = computed(() => {
 
 // Section-based play button colors
 const sectionPlayButtonClass = computed(() => {
+  // Pride: rainbow gradient button
+  if (usePrideColors.value) {
+    return 'bg-gradient-to-br from-purple-800/80 via-green-700/80 to-red-800/80 border-pink-400/30 group-hover:border-purple-400/50 group-hover:from-purple-700/80 group-hover:via-green-600/80 group-hover:to-red-700/80'
+  }
+
   const sectionType = currentSectionType.value
   const defaultClass = 'bg-amber-900/80 border-amber-500/30 group-hover:border-cyan-400/50 group-hover:bg-amber-800/80'
   const colors: Record<string, string> = {
@@ -118,6 +143,10 @@ const sectionPlayButtonClass = computed(() => {
 
 // Section-based muted text color for hints
 const sectionTextMutedClass = computed(() => {
+  if (usePrideColors.value) {
+    return 'text-pink-500/40 hover:text-purple-400/60'
+  }
+
   const sectionType = currentSectionType.value
   const defaultClass = 'text-amber-500/40 hover:text-cyan-500/60'
   const colors: Record<string, string> = {
@@ -132,18 +161,6 @@ const sectionTextMutedClass = computed(() => {
   }
   return colors[sectionType] ?? defaultClass
 })
-
-// Lyrics
-const {
-  previousLyric,
-  currentLyric,
-  nextLyric,
-  currentLyricIndex,
-  currentSectionType,
-  currentSectionNumber,
-  hasLyrics,
-  updateTime: updateLyricsTime,
-} = useLyrics(trackId)
 
 // Refs
 const visualizerRef = ref<HTMLElement | null>(null)
@@ -209,7 +226,7 @@ const handleTogglePlay = async () => {
     initVisualizer(visualizerRef.value, audioRef.value)
     // Set initial section style if lyrics are available
     if (hasLyrics.value) {
-      setVisualizerSectionStyle(currentSectionType.value, currentSectionNumber.value)
+      setVisualizerSectionStyle(currentSectionType.value, currentSectionNumber.value, trackId.value)
     } else {
       setVisualizerGradient(visualizerGradient.value)
     }
@@ -260,7 +277,7 @@ watch(visualizerGradient, (newGradient) => {
 // Update visualizer style when lyric section changes
 watch([currentSectionType, currentSectionNumber], ([sectionType, sectionNumber]) => {
   if (isVisualizerInitialized.value && hasLyrics.value) {
-    setVisualizerSectionStyle(sectionType, sectionNumber)
+    setVisualizerSectionStyle(sectionType, sectionNumber, trackId.value)
   }
 })
 
@@ -272,7 +289,7 @@ const autoStartPlayback = async () => {
       initVisualizer(visualizerRef.value, audioRef.value)
       // Set initial section style if lyrics are available
       if (hasLyrics.value) {
-        setVisualizerSectionStyle(currentSectionType.value, currentSectionNumber.value)
+        setVisualizerSectionStyle(currentSectionType.value, currentSectionNumber.value, trackId.value)
       } else {
         setVisualizerGradient(visualizerGradient.value)
       }
@@ -299,6 +316,12 @@ const handleLoadedMetadata = (event: Event) => {
 watch(audioRef, (audio) => {
   if (audio) {
     initAudio(audio)
+    // If audio already has metadata loaded (browser cache), sync duration/time immediately
+    if (audio.readyState >= 1) {
+      onLoadedMetadata()
+      // Also sync lyrics time
+      updateLyricsTime(currentTime.value)
+    }
   }
 }, { immediate: true })
 
@@ -307,6 +330,9 @@ onMounted(() => {
   startLoop()
   // Initialize shuffle queue if shuffle mode is active
   initializeQueue(albumTracks.value, trackId.value)
+
+  // Initial sync of lyrics time (handles SSR hydration)
+  updateLyricsTime(currentTime.value)
 })
 
 onUnmounted(() => {
@@ -376,7 +402,7 @@ onUnmounted(() => {
 
     <!-- Back Button - goes to album -->
     <div class="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
-      <BackButton :to="`/album/${albumId}`" :label="album?.title || 'Album'" :theme="currentTheme" :section-type="currentSectionType" />
+      <BackButton :to="`/album/${albumId}`" :label="album?.title || 'Album'" :theme="currentTheme" :section-type="currentSectionType" :track-id="trackId" />
     </div>
 
     <!-- Audio Visualizer Background (hidden in karaoke mode) -->
@@ -510,6 +536,7 @@ onUnmounted(() => {
       :track-index="trackIndexInAlbum"
       :total-tracks="albumTracks.length"
       :section-type="currentSectionType"
+      :track-id="trackId"
       @toggle-play="handleTogglePlay"
       @seek="handleSeek"
       @volume-change="handleVolumeChange"
