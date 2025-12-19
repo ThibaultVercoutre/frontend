@@ -1,5 +1,12 @@
 <script setup lang="ts">
 const { albums } = useAlbums()
+
+useHead({
+  title: 'TAG - Groupe musical indépendant',
+  meta: [
+    { name: 'description', content: 'Découvrez les albums du groupe musical indépendant TAG' }
+  ]
+})
 </script>
 
 <template>

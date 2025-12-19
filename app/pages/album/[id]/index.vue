@@ -15,6 +15,14 @@ const currentTheme = computed(() => {
   if (isFestive.value) return 'winter'
   return 'default'
 })
+
+// Page title
+useHead({
+  title: computed(() => album.value ? `${album.value.title} - TAG` : 'Album - TAG'),
+  meta: [
+    { name: 'description', content: computed(() => album.value?.subtitle || 'Album musical TAG') }
+  ]
+})
 </script>
 
 <template>

@@ -47,6 +47,16 @@ const track = computed(() => getTrackById(trackId.value))
 const albumTracks = computed(() => getTracksByAlbum(albumId.value))
 const trackIndexInAlbum = computed(() => getTrackIndexInAlbum(track.value))
 
+// Page title with track and album name
+useHead({
+  title: computed(() => {
+    if (track.value && album.value) {
+      return `${track.value.title} - ${album.value.title} | TAG`
+    }
+    return 'Lecture - TAG'
+  })
+})
+
 // Theme detection based on album
 const isFestive = computed(() => albumId.value.includes('noel'))
 const isCeltic = computed(() => albumId.value === 'gabrielle')
