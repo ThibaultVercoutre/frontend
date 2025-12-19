@@ -549,6 +549,15 @@ export function useLyrics(trackId: Ref<number>) {
     return idx < lyrics.value.length - 1 ? lyrics.value[idx + 1]?.text ?? '' : ''
   })
 
+  // Current section type and number (for visualizer effects)
+  const currentSectionType = computed(() => {
+    return lyrics.value[currentLyricIndex.value]?.type ?? 'INSTRUMENTAL'
+  })
+
+  const currentSectionNumber = computed(() => {
+    return lyrics.value[currentLyricIndex.value]?.number ?? 1
+  })
+
   // Check if track has lyrics
   const hasLyrics = computed(() => {
     return trackId.value in localLyricsData
@@ -572,6 +581,8 @@ export function useLyrics(trackId: Ref<number>) {
     previousLyric,
     currentLyric,
     nextLyric,
+    currentSectionType,
+    currentSectionNumber,
     hasLyrics,
 
     // Methods

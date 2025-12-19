@@ -71,6 +71,7 @@ const {
   moveTo: moveVisualizerTo,
   resume: resumeVisualizer,
   setGradient: setVisualizerGradient,
+  setSectionStyle: setVisualizerSectionStyle,
   destroy: destroyVisualizer,
 } = useAudioVisualizer()
 
@@ -87,6 +88,8 @@ const {
   currentLyric,
   nextLyric,
   currentLyricIndex,
+  currentSectionType,
+  currentSectionNumber,
   hasLyrics,
   updateTime: updateLyricsTime,
 } = useLyrics(trackId)
@@ -195,6 +198,13 @@ watch(isKaraokeMode, async (newValue) => {
 watch(visualizerGradient, (newGradient) => {
   if (isVisualizerInitialized.value) {
     setVisualizerGradient(newGradient)
+  }
+})
+
+// Update visualizer style when lyric section changes
+watch([currentSectionType, currentSectionNumber], ([sectionType, sectionNumber]) => {
+  if (isVisualizerInitialized.value && hasLyrics.value) {
+    setVisualizerSectionStyle(sectionType, sectionNumber)
   }
 })
 
