@@ -274,8 +274,8 @@ onUnmounted(() => {
       <!-- Pattern overlay (fleur-de-lys etc.) -->
       <div
         :class="[
-          'absolute inset-0 opacity-30',
-          isCeltic ? 'bg-pattern' : '',
+          'absolute inset-0',
+          isCeltic ? 'bg-pattern-overlay' : '',
           isFestive ? 'bg-winter-pattern' : '',
           !isCeltic && !isFestive ? 'bg-neutral-pattern' : ''
         ]"
