@@ -46,7 +46,7 @@ const emit = defineEmits<{
 }>()
 
 // Pride flag gradient (for "Majorité de Minorité" REFRAIN)
-const prideGradient = 'linear-gradient(to right, #9333EA, #3B82F6, #22C55E, #FACC15, #F97316, #EF4444)'
+const prideGradient = 'linear-gradient(to right, #EF4444, #F97316, #FACC15, #22C55E, #3B82F6, #9333EA)'
 
 // Section-based progress bar gradient (CSS style)
 const sectionGradientStyle = computed(() => {
@@ -72,7 +72,7 @@ const sectionGradientStyle = computed(() => {
 const sectionThumbColor = computed(() => {
   // Pride: use a rainbow gradient background for the thumb
   if (usePrideColors.value) {
-    return 'bg-gradient-to-r from-purple-500 via-green-500 to-red-500'
+    return 'bg-gradient-to-r from-red-500 via-green-500 to-purple-500'
   }
 
   const colors: Record<SectionType, string> = {
@@ -92,7 +92,7 @@ const sectionThumbColor = computed(() => {
 const sectionPlayButton = computed(() => {
   // Pride: rainbow gradient for play button
   if (usePrideColors.value) {
-    return 'from-purple-600 via-green-500 to-red-600 border-pink-400/30 hover:from-purple-500 hover:via-green-400 hover:to-red-500'
+    return 'from-red-600 via-green-500 to-purple-600 border-pink-400/30 hover:from-red-500 hover:via-green-400 hover:to-purple-500'
   }
 
   const gradients: Record<SectionType, string> = {
@@ -178,7 +178,7 @@ const sectionBorder = computed(() => {
 
 // Section-based volume bar color
 const sectionVolumeBar = computed(() => {
-  if (usePrideColors.value) return 'bg-gradient-to-r from-purple-500 via-green-500 to-red-500'
+  if (usePrideColors.value) return 'bg-gradient-to-r from-red-500 via-green-500 to-purple-500'
 
   const colors: Record<SectionType, string> = {
     INTRO: 'bg-blue-500',

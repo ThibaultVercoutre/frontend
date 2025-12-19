@@ -123,7 +123,7 @@ const sectionGlowClass = computed(() => {
 const sectionPlayButtonClass = computed(() => {
   // Pride: rainbow gradient button
   if (usePrideColors.value) {
-    return 'bg-gradient-to-br from-purple-800/80 via-green-700/80 to-red-800/80 border-pink-400/30 group-hover:border-purple-400/50 group-hover:from-purple-700/80 group-hover:via-green-600/80 group-hover:to-red-700/80'
+    return 'bg-gradient-to-br from-red-800/80 via-green-700/80 to-purple-800/80 border-pink-400/30 group-hover:border-red-400/50 group-hover:from-red-700/80 group-hover:via-green-600/80 group-hover:to-purple-700/80'
   }
 
   const sectionType = currentSectionType.value

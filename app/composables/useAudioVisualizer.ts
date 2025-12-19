@@ -97,12 +97,12 @@ const gradientColors: Record<string, Array<{ color: string, pos: number }>> = {
   ],
   // Pride flag gradient for "Majorité de Minorité" refrain
   'section-refrain-pride': [
-    { color: '#9333EA', pos: 0 },      // Purple
-    { color: '#3B82F6', pos: 0.2 },    // Blue
-    { color: '#22C55E', pos: 0.4 },    // Green
-    { color: '#FACC15', pos: 0.6 },    // Yellow
-    { color: '#F97316', pos: 0.8 },    // Orange
-    { color: '#EF4444', pos: 1 },      // Red
+    { color: '#EF4444', pos: 0 },      // Red
+    { color: '#F97316', pos: 0.2 },    // Orange
+    { color: '#FACC15', pos: 0.4 },    // Yellow
+    { color: '#22C55E', pos: 0.6 },    // Green
+    { color: '#3B82F6', pos: 0.8 },    // Blue
+    { color: '#9333EA', pos: 1 },      // Purple
   ],
   'section-chorus': [
     { color: '#be123c', pos: 0 },
@@ -232,12 +232,12 @@ export function useAudioVisualizer() {
       // Pride flag gradient for "Majorité de Minorité" refrain
       audioMotion.registerGradient('section-refrain-pride', {
         colorStops: [
-          { color: '#9333EA', pos: 0 },    // Purple
-          { color: '#3B82F6', pos: 0.2 },  // Blue
-          { color: '#22C55E', pos: 0.4 },  // Green
-          { color: '#FACC15', pos: 0.6 },  // Yellow
-          { color: '#F97316', pos: 0.8 },  // Orange
-          { color: '#EF4444', pos: 1 },    // Red
+          { color: '#EF4444', pos: 0 },    // Red
+          { color: '#F97316', pos: 0.2 },  // Orange
+          { color: '#FACC15', pos: 0.4 },  // Yellow
+          { color: '#22C55E', pos: 0.6 },  // Green
+          { color: '#3B82F6', pos: 0.8 },  // Blue
+          { color: '#9333EA', pos: 1 },    // Purple
         ],
       })
 

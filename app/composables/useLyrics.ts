@@ -190,7 +190,7 @@ const localLyricsData: Record<number, LyricLine[]> = {
     { time: 95, text: 'Mais déjà ça, on discerne quelque chose de pas trop réglo', type: 'COUPLET', number: 2 },
     { time: 99, text: 'Pour eux, ils séparent les noirs, les arabes et les gens normaux', type: 'COUPLET', number: 2 },
     { time: 102, text: 'Alors excusez-moi, bande de gros gauchos, bande d\'enculés', type: 'COUPLET', number: 2 },
-    { time: 106, text: 'Pendant que vous vous battez pour assembler les gens différents', type: 'COUPLET', number: 2 },
+    { time: 106, text: 'Pendant que vous vous battez pour rassembler les gens différents', type: 'COUPLET', number: 2 },
     { time: 109, text: 'Nous les fachos, on se bat pour mettre en lumière cette multiculturalité', type: 'COUPLET', number: 2 },
     { time: 113, text: 'Alors que vous vous cachez souillés, brutalisez la culture des gens', type: 'COUPLET', number: 2 },
     { time: 118, text: 'Les LGBTQIA+, ces grands fous', type: 'REFRAIN', number: 2 },
