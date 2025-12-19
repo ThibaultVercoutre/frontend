@@ -3,9 +3,9 @@ import type { Track, TrackType } from '~/types'
 // Local data - will be replaced by API calls later
 const localTracks: Track[] = [
   // Album: Gabrielle
-  { id: 1, albumId: 'gabrielle', title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '3:45', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va', cover: 'De_nos_jour_plus_rien_ne_va.png' },
-  { id: 2, albumId: 'gabrielle', title: "Parangon d'une Soldate", subtitle: 'Hymne héroïque', duration: '4:12', type: 'military', filename: "Parangon_d'une_soldate", cover: 'Parangon_dune_soldate' },
-  { id: 3, albumId: 'gabrielle', title: 'Majorité de Minorité', subtitle: 'Chant contestataire', duration: '3:30', type: 'epic', filename: 'Majorite_de_minorite', cover: 'Majorite_de_minorite.png' },
+  { id: 1, albumId: 'gabrielle', title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '3:45', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va', cover: 'De_nos_jour_plus_rien_ne_va.png', background: '001.png' },
+  { id: 2, albumId: 'gabrielle', title: "Parangon d'une Soldate", subtitle: 'Hymne héroïque', duration: '4:12', type: 'military', filename: "Parangon_d'une_soldate", cover: 'Parangon_dune_soldate', background: '002.png' },
+  { id: 3, albumId: 'gabrielle', title: 'Majorité de Minorité', subtitle: 'Chant contestataire', duration: '3:30', type: 'epic', filename: 'Majorite_de_minorite', cover: 'Majorite_de_minorite.png', background: '003.png' },
 
   // Album: Noël 2024
   { id: 101, albumId: 'noel-2024', title: "C'est la belle nuit de Noël", subtitle: 'Cantique traditionnel', duration: '0:00', type: 'festive', filename: 'Cest_la_belle_nuit_de_Noel', cover: 'Cest_la_belle_nuit_de_noel' },
@@ -85,6 +85,14 @@ export function useTracks() {
     return `/covers/${track.albumId}/${cleanName}${hasExtension ? '' : '.jpeg'}`
   }
 
+  // Get background image URL for a track (custom backgrounds per track)
+  const getBackgroundSrc = (track: Track | undefined): string | null => {
+    if (!track?.background) return null
+    // Check if background already has an extension
+    const hasExtension = /\.(png|jpg|jpeg|webp)$/i.test(track.background)
+    return `/backgrounds/${track.albumId}/${track.background}${hasExtension ? '' : '.jpeg'}`
+  }
+
   // Type styling helpers
   const getTypeColor = (type: TrackType): string => {
     const colors: Record<TrackType, string> = {
@@ -135,6 +143,7 @@ export function useTracks() {
     getAlbumTrackCount,
     getAudioSrc,
     getCoverSrc,
+    getBackgroundSrc,
     getTypeColor,
     getTypeIcon,
     getTypeTextColor,

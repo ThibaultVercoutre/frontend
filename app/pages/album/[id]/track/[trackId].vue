@@ -3,7 +3,7 @@
 const route = useRoute()
 const router = useRouter()
 const { getAlbumById } = useAlbums()
-const { getTrackById, getTracksByAlbum, getAudioSrc, getCoverSrc, getTrackIndexInAlbum } = useTracks()
+const { getTrackById, getTracksByAlbum, getAudioSrc, getCoverSrc, getBackgroundSrc, getTrackIndexInAlbum } = useTracks()
 const {
   isAutoPlay,
   isShuffleMode,
@@ -36,6 +36,7 @@ const currentTheme = computed(() => {
 // Audio source
 const audioSrc = computed(() => getAudioSrc(track.value))
 const coverSrc = computed(() => getCoverSrc(track.value))
+const backgroundSrc = computed(() => getBackgroundSrc(track.value))
 
 // Template ref for audio element (defined here for proper SSR hydration)
 const audioRef = useTemplateRef<HTMLAudioElement>('audioElement')
@@ -248,11 +249,39 @@ onUnmounted(() => {
   <div
     :class="[
       'min-h-screen relative overflow-hidden flex flex-col',
-      isCeltic ? 'bg-pattern' : '',
-      isFestive ? 'bg-winter bg-winter-pattern' : '',
-      !isCeltic && !isFestive ? 'bg-neutral bg-neutral-pattern' : ''
+      !backgroundSrc && isCeltic ? 'bg-pattern' : '',
+      !backgroundSrc && isFestive ? 'bg-winter bg-winter-pattern' : '',
+      !backgroundSrc && !isCeltic && !isFestive ? 'bg-neutral bg-neutral-pattern' : '',
+      backgroundSrc ? 'bg-zinc-950' : ''
     ]"
   >
+    <!-- Custom Track Background -->
+    <div
+      v-if="backgroundSrc"
+      class="absolute inset-0 z-0"
+    >
+      <!-- Background Image -->
+      <NuxtImg
+        :src="backgroundSrc"
+        alt=""
+        class="absolute inset-0 w-full h-full object-cover"
+        format="webp"
+        quality="80"
+        loading="eager"
+      />
+      <!-- Dark overlay for readability -->
+      <div class="absolute inset-0 bg-black/50"></div>
+      <!-- Pattern overlay (fleur-de-lys etc.) -->
+      <div
+        :class="[
+          'absolute inset-0 opacity-30',
+          isCeltic ? 'bg-pattern' : '',
+          isFestive ? 'bg-winter-pattern' : '',
+          !isCeltic && !isFestive ? 'bg-neutral-pattern' : ''
+        ]"
+      ></div>
+    </div>
+
     <!-- Winter Snowfall -->
     <template v-if="isFestive">
       <Snowfall />

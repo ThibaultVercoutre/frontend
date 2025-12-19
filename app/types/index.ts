@@ -21,6 +21,7 @@ export interface Track {
   type: TrackType
   filename?: string
   cover?: string
+  background?: string // Custom background image for track page
 }
 
 export type TrackType = 'epic' | 'celtic' | 'military' | 'festive' | 'parody'
