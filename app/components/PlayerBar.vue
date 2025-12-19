@@ -362,11 +362,13 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
           <!-- Shuffle -->
           <button
             :class="[
-              'p-1.5 sm:p-2 transition-colors duration-500 relative',
+              'p-1.5 sm:p-2 transition-colors duration-500 relative focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-lg',
               isShuffleMode
                 ? sectionActiveColor
                 : [sectionTextMuted, sectionTextHover]
             ]"
+            :aria-label="isShuffleMode ? 'Désactiver la lecture aléatoire' : 'Activer la lecture aléatoire'"
+            :aria-pressed="isShuffleMode"
             title="Lecture aléatoire"
             @click="emit('toggleShuffle')"
           >
@@ -380,13 +382,15 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
           <NuxtLink
             :to="prevTrackUrl"
             :class="[
-              'p-1 sm:p-2 transition-colors duration-500',
+              'p-1 sm:p-2 transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-lg',
               hasPrevTrack
                 ? [sectionTextMuted, sectionTextHover]
                 : 'text-zinc-600 cursor-not-allowed pointer-events-none'
             ]"
+            aria-label="Piste précédente"
+            :aria-disabled="!hasPrevTrack"
           >
-            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
             </svg>
           </NuxtLink>
@@ -394,15 +398,16 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
           <!-- Play/Pause -->
           <button
             :class="[
-              'w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-lg hover:scale-105 border-2 bg-gradient-to-br',
+              'w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-lg hover:scale-105 border-2 bg-gradient-to-br focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900',
               sectionPlayButton
             ]"
+            :aria-label="isPlaying ? 'Pause' : 'Lecture'"
             @click="emit('togglePlay')"
           >
-            <svg v-if="!isPlaying" class="w-5 h-5 sm:w-7 sm:h-7 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+            <svg v-if="!isPlaying" class="w-5 h-5 sm:w-7 sm:h-7 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M8 5v14l11-7z" />
             </svg>
-            <svg v-else class="w-5 h-5 sm:w-7 sm:h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <svg v-else class="w-5 h-5 sm:w-7 sm:h-7 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
             </svg>
           </button>
@@ -411,13 +416,15 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
           <NuxtLink
             :to="nextTrackUrl"
             :class="[
-              'p-1 sm:p-2 transition-colors duration-500',
+              'p-1 sm:p-2 transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-lg',
               hasNextTrack
                 ? [sectionTextMuted, sectionTextHover]
                 : 'text-zinc-600 cursor-not-allowed pointer-events-none'
             ]"
+            aria-label="Piste suivante"
+            :aria-disabled="!hasNextTrack"
           >
-            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
             </svg>
           </NuxtLink>
@@ -425,15 +432,17 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
           <!-- Auto-play -->
           <button
             :class="[
-              'p-1.5 sm:p-2 transition-colors duration-500 relative',
+              'p-1.5 sm:p-2 transition-colors duration-500 relative focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-lg',
               isAutoPlay
                 ? sectionActiveColor
                 : [sectionTextMuted, sectionTextHover]
             ]"
+            :aria-label="isAutoPlay ? 'Désactiver la lecture automatique' : 'Activer la lecture automatique'"
+            :aria-pressed="isAutoPlay"
             title="Lecture automatique"
             @click="emit('toggleAutoPlay')"
           >
-            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
             </svg>
             <span v-if="isAutoPlay" class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-current"></span>
@@ -447,10 +456,12 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
             <!-- Mute button (visible on mobile and desktop) -->
             <button
               :class="[
-                'transition-colors duration-500',
+                'transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-lg p-1',
                 sectionTextMuted,
                 sectionTextHover
               ]"
+              :aria-label="isMutedOrSilent ? 'Activer le son' : 'Couper le son'"
+              :aria-pressed="isMutedOrSilent"
               @click="handleToggleMute"
             >
               <svg v-if="isMutedOrSilent" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

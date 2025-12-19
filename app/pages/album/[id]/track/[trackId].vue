@@ -14,6 +14,29 @@ const {
   goToNextTrack,
 } = usePlayerQueue()
 
+// Media Session API for lock screen controls
+const {
+  updateMetadata: updateMediaMetadata,
+  updatePlaybackState,
+  updatePositionState,
+  setActionHandlers: setMediaSessionHandlers,
+  clearActionHandlers: clearMediaSessionHandlers,
+} = useMediaSession()
+
+// Player storage for persistence
+const {
+  saveVolume,
+  loadVolume,
+  saveMuted,
+  loadMuted,
+  saveLastTrack,
+  saveShuffleMode,
+  saveAutoPlay,
+} = usePlayerStorage()
+
+// Fullscreen for karaoke mode
+const { isFullscreen, toggleFullscreen } = useFullscreen()
+
 // Route params
 const albumId = computed(() => route.params.id as string)
 const trackId = computed(() => Number(route.params.trackId))
@@ -167,9 +190,17 @@ const sectionTextMutedClass = computed(() => {
 // Refs
 const visualizerRef = ref<HTMLElement | null>(null)
 const karaokeHeaderRef = ref<InstanceType<typeof import('~/components/KaraokeHeader.vue').default> | null>(null)
+const mainContainerRef = ref<HTMLElement | null>(null)
+const preloadAudioRef = ref<HTMLAudioElement | null>(null)
 
 // Karaoke mode
 const isKaraokeMode = ref(false)
+
+// Preload next track audio
+const nextTrackAudioSrc = computed(() => {
+  const next = nextTrack.value
+  return next ? getAudioSrc(next) : null
+})
 
 // Navigation - previous/next track in album
 const prevTrack = computed(() => {
@@ -212,9 +243,10 @@ const handleTrackEnded = () => {
   }
 }
 
-// Toggle shuffle with current context
+// Toggle shuffle with current context and persistence
 const handleToggleShuffle = () => {
   toggleShuffleMode(albumTracks.value, trackId.value)
+  saveShuffleMode(isShuffleMode.value)
 }
 
 // Toggle karaoke mode
@@ -249,11 +281,63 @@ const handleSeek = (time: number) => {
 // Handle volume change from player bar
 const handleVolumeChange = (newVolume: number) => {
   setVolume(newVolume)
+  saveVolume(newVolume)
 }
 
-// Sync lyrics with audio time
+// Handle mute toggle with persistence
+const handleToggleMute = () => {
+  toggleMute()
+  saveMuted(!isMuted.value)
+}
+
+// Handle shuffle toggle with persistence
+const handleToggleAutoPlay = () => {
+  toggleAutoPlay()
+  saveAutoPlay(isAutoPlay.value)
+}
+
+// Navigate to previous track
+const goToPrevTrack = () => {
+  if (prevTrackUrl.value) {
+    router.push(prevTrackUrl.value)
+  }
+}
+
+// Navigate to next track
+const goToNextTrackManual = () => {
+  if (nextTrackUrl.value) {
+    router.push(nextTrackUrl.value)
+  }
+}
+
+// Sync lyrics with audio time and update media session position
 watch(currentTime, (time) => {
   updateLyricsTime(time)
+  // Update media session position every 5 seconds to avoid too many calls
+  if (Math.floor(time) % 5 === 0) {
+    updatePositionState(duration.value, time)
+  }
+})
+
+// Save playback position periodically for resume
+watch(currentTime, (time) => {
+  // Save every 10 seconds
+  if (Math.floor(time) % 10 === 0 && time > 0) {
+    saveLastTrack(albumId.value, trackId.value, time)
+  }
+})
+
+// Update media session when track changes (client-side only)
+watch(track, (newTrack) => {
+  if (newTrack && import.meta.client) {
+    const fullCoverUrl = coverSrc.value ? new URL(coverSrc.value, window.location.origin).href : undefined
+    updateMediaMetadata(newTrack, fullCoverUrl)
+  }
+}, { immediate: true })
+
+// Update media session playback state
+watch(isPlaying, (playing) => {
+  updatePlaybackState(playing ? 'playing' : 'paused')
 })
 
 // Move visualizer when karaoke mode changes
@@ -377,6 +461,26 @@ onMounted(() => {
 
   // Add keyboard event listener
   window.addEventListener('keydown', handleKeydown)
+
+  // Load saved volume from localStorage
+  const savedVolume = loadVolume()
+  setVolume(savedVolume)
+
+  // Load saved mute state
+  const savedMuted = loadMuted()
+  if (savedMuted) {
+    toggleMute()
+  }
+
+  // Setup Media Session action handlers
+  setMediaSessionHandlers({
+    onPlay: () => handleTogglePlay(),
+    onPause: () => handleTogglePlay(),
+    onSeekBackward: () => seek(Math.max(0, currentTime.value - SEEK_STEP)),
+    onSeekForward: () => seek(Math.min(duration.value, currentTime.value + SEEK_STEP)),
+    onPreviousTrack: goToPrevTrack,
+    onNextTrack: goToNextTrackManual,
+  })
 })
 
 onUnmounted(() => {
@@ -386,13 +490,29 @@ onUnmounted(() => {
 
   // Remove keyboard event listener
   window.removeEventListener('keydown', handleKeydown)
+
+  // Clear media session handlers
+  clearMediaSessionHandlers()
+
+  // Save final position
+  if (currentTime.value > 0) {
+    saveLastTrack(albumId.value, trackId.value, currentTime.value)
+  }
+})
+
+// Swipe gestures for mobile track navigation
+useSwipeGesture(mainContainerRef, {
+  threshold: 80,
+  onSwipeLeft: goToNextTrackManual,
+  onSwipeRight: goToPrevTrack,
 })
 </script>
 
 <template>
   <div
+    ref="mainContainerRef"
     :class="[
-      'min-h-screen relative overflow-hidden flex flex-col',
+      'min-h-screen relative overflow-hidden flex flex-col touch-pan-y',
       !backgroundSrc && isCeltic ? 'bg-pattern' : '',
       !backgroundSrc && isFestive ? 'bg-winter bg-winter-pattern' : '',
       !backgroundSrc && !isCeltic && !isFestive ? 'bg-neutral bg-neutral-pattern' : '',
@@ -412,6 +532,7 @@ onUnmounted(() => {
         format="webp"
         quality="80"
         loading="eager"
+        fetchpriority="high"
       />
       <!-- Dark overlay for readability -->
       <div class="absolute inset-0 bg-black/50"></div>
@@ -444,6 +565,13 @@ onUnmounted(() => {
         @ended="handleTrackEnded"
         @play="onPlay(); resumeVisualizer()"
         @pause="onPause"
+      ></audio>
+      <!-- Preload next track audio for seamless transition -->
+      <audio
+        v-if="nextTrackAudioSrc"
+        ref="preloadAudioRef"
+        :src="nextTrackAudioSrc"
+        preload="metadata"
       ></audio>
     </ClientOnly>
 
@@ -550,8 +678,44 @@ onUnmounted(() => {
         :current-index="currentLyricIndex"
       />
 
-      <!-- Exit karaoke mode hint -->
-      <div class="text-center pb-4">
+      <!-- Karaoke controls: Section indicator + Fullscreen + Exit hint -->
+      <div class="flex items-center justify-center gap-4 pb-4">
+        <!-- Section indicator -->
+        <span
+          v-if="currentSectionType !== 'INSTRUMENTAL'"
+          :class="[
+            'text-xs font-medium uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-sm transition-colors duration-500',
+            usePrideColors ? 'bg-gradient-to-r from-red-500/20 via-green-500/20 to-purple-500/20 text-pink-300' : 'bg-zinc-800/50',
+            !usePrideColors && currentSectionType === 'INTRO' ? 'text-blue-400' : '',
+            !usePrideColors && currentSectionType === 'COUPLET' ? 'text-green-400' : '',
+            !usePrideColors && currentSectionType === 'REFRAIN' ? 'text-orange-400' : '',
+            !usePrideColors && currentSectionType === 'CHORUS' ? 'text-rose-400' : '',
+            !usePrideColors && currentSectionType === 'VERSE' ? 'text-teal-400' : '',
+            !usePrideColors && currentSectionType === 'BRIDGE' ? 'text-purple-400' : '',
+            !usePrideColors && currentSectionType === 'OUTRO' ? 'text-gray-400' : '',
+          ]"
+        >
+          {{ currentSectionType }} {{ currentSectionNumber }}
+        </span>
+
+        <!-- Fullscreen button -->
+        <button
+          :class="[
+            'p-2 rounded-full backdrop-blur-sm transition-colors duration-500 bg-zinc-800/50',
+            sectionTextMutedClass
+          ]"
+          :title="isFullscreen ? 'Quitter le plein écran' : 'Plein écran'"
+          @click="toggleFullscreen()"
+        >
+          <svg v-if="!isFullscreen" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+          </svg>
+          <svg v-else class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+          </svg>
+        </button>
+
+        <!-- Exit karaoke hint -->
         <button
           :class="[
             'text-xs uppercase tracking-wider transition-colors duration-500',
@@ -559,7 +723,7 @@ onUnmounted(() => {
           ]"
           @click="toggleKaraokeMode"
         >
-          Cliquer sur le vinyle pour quitter
+          Quitter
         </button>
       </div>
     </div>
@@ -588,9 +752,9 @@ onUnmounted(() => {
       @toggle-play="handleTogglePlay"
       @seek="handleSeek"
       @volume-change="handleVolumeChange"
-      @toggle-mute="toggleMute"
+      @toggle-mute="handleToggleMute"
       @toggle-shuffle="handleToggleShuffle"
-      @toggle-auto-play="toggleAutoPlay"
+      @toggle-auto-play="handleToggleAutoPlay"
     />
 
     <!-- Floating decorations (Celtic theme only) -->

@@ -504,3 +504,66 @@ body {
 .sword-icon {
   filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));
 }
+
+/* ===== REDUCED MOTION ===== */
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable specific animations */
+  .animate-float,
+  .animate-float-reverse,
+  .animate-pulse-glow,
+  .animate-swing,
+  .animate-border-glow,
+  .triskell-spin,
+  .triskell-spin-reverse,
+  .animate-snowfall,
+  .animate-snow-slow,
+  .animate-snow-fast,
+  .animate-snow-slow-1,
+  .animate-snow-slow-2,
+  .animate-snow-slow-3,
+  .animate-snow-fast-1,
+  .animate-snow-fast-2,
+  .animate-snow-fast-3,
+  .cabin-glow {
+    animation: none !important;
+  }
+
+  /* Keep fade-in-up but make it instant */
+  .animate-fade-in-up {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* Disable hover transforms */
+  .album-card:hover,
+  .track-card:hover,
+  .track-card-winter:hover {
+    transform: none !important;
+  }
+
+  /* Disable vinyl spinning animation */
+  .vinyl-record {
+    transition: none !important;
+  }
+
+  /* Keep text shimmer static */
+  .text-epic,
+  .text-tag,
+  .text-festive,
+  .text-winter,
+  .text-ice {
+    animation: none !important;
+    background-position: center !important;
+  }
+}

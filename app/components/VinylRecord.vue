@@ -193,6 +193,7 @@ const labelName = computed(() => {
           quality="80"
           :loading="size === 'lg' ? 'eager' : 'lazy'"
           :fetchpriority="size === 'lg' ? 'high' : undefined"
+          :preload="size === 'lg'"
           class="absolute inset-0 w-full h-full object-cover"
         />
 
