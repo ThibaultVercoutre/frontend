@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import type { LyricLine } from '~/types'
+
+type SectionType = LyricLine['type']
+
 interface Props {
   isPlaying: boolean
   currentTime: number
@@ -16,6 +20,7 @@ interface Props {
   hasNextTrack?: boolean
   trackIndex: number
   totalTracks: number
+  sectionType?: SectionType
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,6 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
   isAutoPlay: false,
   hasPrevTrack: false,
   hasNextTrack: false,
+  sectionType: 'INSTRUMENTAL',
 })
 
 const emit = defineEmits<{
@@ -34,9 +40,140 @@ const emit = defineEmits<{
   toggleAutoPlay: []
 }>()
 
-// Theme computed helpers
-const isCeltic = computed(() => props.theme === 'celtic')
-const isFestive = computed(() => props.theme === 'winter')
+// Section-based progress bar gradient (CSS style)
+const sectionGradientStyle = computed(() => {
+  const gradients: Record<SectionType, string> = {
+    INTRO: 'linear-gradient(to right, #2563eb, #60a5fa)',
+    COUPLET: 'linear-gradient(to right, #16a34a, #4ade80)',
+    REFRAIN: 'linear-gradient(to right, #f97316, #facc15)',
+    CHORUS: 'linear-gradient(to right, #f43f5e, #f472b6)',
+    VERSE: 'linear-gradient(to right, #0d9488, #2dd4bf)',
+    BRIDGE: 'linear-gradient(to right, #9333ea, #e879f9)',
+    OUTRO: 'linear-gradient(to right, #6b7280, #9ca3af)',
+    INSTRUMENTAL: 'linear-gradient(to right, #d97706, #06b6d4)',
+  }
+  return gradients[props.sectionType] || gradients.INSTRUMENTAL
+})
+
+// Section-based thumb color
+const sectionThumbColor = computed(() => {
+  const colors: Record<SectionType, string> = {
+    INTRO: 'bg-blue-400',
+    COUPLET: 'bg-green-400',
+    REFRAIN: 'bg-yellow-400',
+    CHORUS: 'bg-pink-400',
+    VERSE: 'bg-teal-400',
+    BRIDGE: 'bg-fuchsia-400',
+    OUTRO: 'bg-gray-400',
+    INSTRUMENTAL: 'bg-cyan-400',
+  }
+  return colors[props.sectionType] || colors.INSTRUMENTAL
+})
+
+// Section-based play button gradient
+const sectionPlayButton = computed(() => {
+  const gradients: Record<SectionType, string> = {
+    INTRO: 'from-blue-600 to-blue-800 border-blue-500/30 hover:from-blue-500 hover:to-blue-700',
+    COUPLET: 'from-green-600 to-green-800 border-green-500/30 hover:from-green-500 hover:to-green-700',
+    REFRAIN: 'from-orange-500 to-amber-700 border-orange-400/30 hover:from-orange-400 hover:to-amber-600',
+    CHORUS: 'from-rose-500 to-rose-700 border-rose-400/30 hover:from-rose-400 hover:to-rose-600',
+    VERSE: 'from-teal-600 to-teal-800 border-teal-500/30 hover:from-teal-500 hover:to-teal-700',
+    BRIDGE: 'from-purple-600 to-purple-800 border-purple-500/30 hover:from-fuchsia-500 hover:to-fuchsia-700',
+    OUTRO: 'from-gray-500 to-gray-700 border-gray-400/30 hover:from-gray-400 hover:to-gray-600',
+    INSTRUMENTAL: 'from-amber-600 to-amber-800 border-amber-500/30 hover:from-cyan-500 hover:to-cyan-700',
+  }
+  return gradients[props.sectionType] || gradients.INSTRUMENTAL
+})
+
+// Section-based text color for secondary elements
+const sectionTextColor = computed(() => {
+  const colors: Record<SectionType, string> = {
+    INTRO: 'text-blue-400',
+    COUPLET: 'text-green-400',
+    REFRAIN: 'text-orange-400',
+    CHORUS: 'text-rose-400',
+    VERSE: 'text-teal-400',
+    BRIDGE: 'text-purple-400',
+    OUTRO: 'text-gray-400',
+    INSTRUMENTAL: 'text-amber-400',
+  }
+  return colors[props.sectionType] || colors.INSTRUMENTAL
+})
+
+// Section-based muted text color
+const sectionTextMuted = computed(() => {
+  const colors: Record<SectionType, string> = {
+    INTRO: 'text-blue-400/60',
+    COUPLET: 'text-green-400/60',
+    REFRAIN: 'text-orange-400/60',
+    CHORUS: 'text-rose-400/60',
+    VERSE: 'text-teal-400/60',
+    BRIDGE: 'text-purple-400/60',
+    OUTRO: 'text-gray-400/60',
+    INSTRUMENTAL: 'text-amber-400/60',
+  }
+  return colors[props.sectionType] || colors.INSTRUMENTAL
+})
+
+// Section-based hover text color
+const sectionTextHover = computed(() => {
+  const colors: Record<SectionType, string> = {
+    INTRO: 'hover:text-blue-300',
+    COUPLET: 'hover:text-green-300',
+    REFRAIN: 'hover:text-yellow-300',
+    CHORUS: 'hover:text-pink-300',
+    VERSE: 'hover:text-teal-300',
+    BRIDGE: 'hover:text-fuchsia-300',
+    OUTRO: 'hover:text-gray-300',
+    INSTRUMENTAL: 'hover:text-cyan-300',
+  }
+  return colors[props.sectionType] || colors.INSTRUMENTAL
+})
+
+// Section-based border color
+const sectionBorder = computed(() => {
+  const colors: Record<SectionType, string> = {
+    INTRO: 'border-blue-800/30',
+    COUPLET: 'border-green-800/30',
+    REFRAIN: 'border-orange-800/30',
+    CHORUS: 'border-rose-800/30',
+    VERSE: 'border-teal-800/30',
+    BRIDGE: 'border-purple-800/30',
+    OUTRO: 'border-gray-700/30',
+    INSTRUMENTAL: 'border-amber-800/30',
+  }
+  return colors[props.sectionType] || colors.INSTRUMENTAL
+})
+
+// Section-based volume bar color
+const sectionVolumeBar = computed(() => {
+  const colors: Record<SectionType, string> = {
+    INTRO: 'bg-blue-500',
+    COUPLET: 'bg-green-500',
+    REFRAIN: 'bg-orange-500',
+    CHORUS: 'bg-rose-500',
+    VERSE: 'bg-teal-500',
+    BRIDGE: 'bg-purple-500',
+    OUTRO: 'bg-gray-500',
+    INSTRUMENTAL: 'bg-amber-500',
+  }
+  return colors[props.sectionType] || colors.INSTRUMENTAL
+})
+
+// Section-based active button color (for shuffle/autoplay when active)
+const sectionActiveColor = computed(() => {
+  const colors: Record<SectionType, string> = {
+    INTRO: 'text-blue-300',
+    COUPLET: 'text-green-300',
+    REFRAIN: 'text-yellow-300',
+    CHORUS: 'text-pink-300',
+    VERSE: 'text-teal-300',
+    BRIDGE: 'text-fuchsia-300',
+    OUTRO: 'text-gray-300',
+    INSTRUMENTAL: 'text-cyan-300',
+  }
+  return colors[props.sectionType] || colors.INSTRUMENTAL
+})
 
 // Progress bar hover state for timecode tooltip
 const progressBarRef = ref<HTMLElement | null>(null)
@@ -49,16 +186,48 @@ const hoverTime = computed(() => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 })
 
+// Local dragging state for immediate visual feedback
+const isDragging = ref(false)
+const dragProgress = ref(0)
+
+// Use local progress when dragging, otherwise use prop
+const displayProgress = computed(() => {
+  return isDragging.value ? dragProgress.value : props.progress
+})
+
 const onProgressHover = (event: MouseEvent) => {
   if (!progressBarRef.value) return
   const rect = progressBarRef.value.getBoundingClientRect()
   hoverProgress.value = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100))
 }
 
+// Handle click on progress bar for immediate seek
+const onProgressClick = (event: MouseEvent) => {
+  if (!progressBarRef.value || props.duration <= 0) return
+  const rect = progressBarRef.value.getBoundingClientRect()
+  const clickProgress = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100))
+  const newTime = (clickProgress / 100) * props.duration
+  dragProgress.value = clickProgress
+  isDragging.value = true
+  emit('seek', newTime)
+  // Reset dragging state after a short delay to let parent update
+  setTimeout(() => {
+    isDragging.value = false
+  }, 50)
+}
+
 // Handle seek from range input
 const onSeek = (event: Event) => {
   const target = event.target as HTMLInputElement
-  emit('seek', parseFloat(target.value))
+  const newTime = parseFloat(target.value)
+  // Update local state immediately for visual feedback
+  dragProgress.value = (newTime / props.duration) * 100
+  isDragging.value = true
+  emit('seek', newTime)
+  // Reset dragging state after parent updates
+  setTimeout(() => {
+    isDragging.value = false
+  }, 50)
 }
 
 // Handle volume change
@@ -76,29 +245,26 @@ const toggleMute = () => {
 <template>
   <div
     :class="[
-      'fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-zinc-950 via-zinc-900/95 to-zinc-900/90 backdrop-blur-lg border-t',
-      isCeltic ? 'border-emerald-800/30' : '',
-      isFestive ? 'border-sky-800/30' : '',
-      !isCeltic && !isFestive ? 'border-purple-800/30' : ''
+      'fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-zinc-950 via-zinc-900/95 to-zinc-900/90 backdrop-blur-lg border-t transition-colors duration-500',
+      sectionBorder
     ]"
   >
     <div class="container mx-auto px-3 py-3 sm:px-6 sm:py-4">
       <!-- Progress Bar -->
       <div
         ref="progressBarRef"
-        class="relative w-full h-6 mb-2 group"
+        class="relative w-full h-6 mb-2 group cursor-pointer"
         @mouseenter="isHoveringProgress = true"
         @mouseleave="isHoveringProgress = false"
         @mousemove="onProgressHover"
+        @click="onProgressClick"
       >
         <!-- Hover timecode tooltip -->
         <div
           v-if="isHoveringProgress && duration > 0"
           :class="[
-            'absolute -top-8 px-2 py-1 text-xs font-mono rounded shadow-lg pointer-events-none transform -translate-x-1/2 z-20',
-            isCeltic ? 'bg-emerald-900/90 text-amber-400' : '',
-            isFestive ? 'bg-sky-900/90 text-amber-400' : '',
-            !isCeltic && !isFestive ? 'bg-purple-900/90 text-pink-400' : ''
+            'absolute -top-8 px-2 py-1 text-xs font-mono rounded shadow-lg pointer-events-none transform -translate-x-1/2 z-20 bg-zinc-900/90 transition-colors duration-500',
+            sectionTextColor
           ]"
           :style="{ left: `${hoverProgress}%` }"
         >
@@ -109,17 +275,15 @@ const toggleMute = () => {
         <div class="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 bg-zinc-700 rounded-full overflow-hidden">
           <!-- Progress fill -->
           <div
-            :class="[
-              'absolute inset-0 h-full origin-left will-change-transform bg-gradient-to-r',
-              isCeltic ? 'from-emerald-500 to-amber-500' : '',
-              isFestive ? 'from-sky-500 to-amber-500' : '',
-              !isCeltic && !isFestive ? 'from-purple-500 to-pink-500' : ''
-            ]"
-            :style="{ transform: `scaleX(${progress / 100})` }"
+            class="h-full transition-[background-image] duration-500"
+            :style="{
+              width: `${displayProgress}%`,
+              backgroundImage: sectionGradientStyle,
+            }"
           ></div>
         </div>
 
-        <!-- Native range input -->
+        <!-- Native range input (hidden but functional) -->
         <input
           type="range"
           min="0"
@@ -132,8 +296,11 @@ const toggleMute = () => {
 
         <!-- Custom thumb -->
         <div
-          class="absolute top-1/2 w-4 h-4 bg-amber-400 rounded-full shadow-lg pointer-events-none will-change-transform transition-transform duration-75 group-hover:scale-110"
-          :style="{ left: `${progress}%`, transform: 'translate(-50%, -50%)' }"
+          :class="[
+            'absolute top-1/2 w-4 h-4 rounded-full shadow-lg pointer-events-none will-change-transform group-hover:scale-110',
+            sectionThumbColor
+          ]"
+          :style="{ left: `${displayProgress}%`, transform: 'translate(-50%, -50%)', transition: isDragging ? 'none' : 'all 0.1s ease-out' }"
         ></div>
       </div>
 
@@ -141,10 +308,8 @@ const toggleMute = () => {
         <!-- Time -->
         <div
           :class="[
-            'text-xs sm:text-sm font-mono',
-            isCeltic ? 'text-emerald-400/60' : '',
-            isFestive ? 'text-sky-400/60' : '',
-            !isCeltic && !isFestive ? 'text-purple-400/60' : ''
+            'text-xs sm:text-sm font-mono transition-colors duration-500',
+            sectionTextMuted
           ]"
         >
           <span>{{ formattedCurrentTime }}</span>
@@ -156,10 +321,10 @@ const toggleMute = () => {
           <!-- Shuffle (hidden on mobile) -->
           <button
             :class="[
-              'p-2 transition-colors relative hidden sm:block',
+              'p-2 transition-colors duration-500 relative hidden sm:block',
               isShuffleMode
-                ? (isCeltic ? 'text-amber-400' : isFestive ? 'text-amber-400' : 'text-pink-400')
-                : (isCeltic ? 'text-emerald-400/50 hover:text-emerald-400' : isFestive ? 'text-sky-400/50 hover:text-sky-400' : 'text-purple-400/50 hover:text-purple-400')
+                ? sectionActiveColor
+                : [sectionTextMuted, sectionTextHover]
             ]"
             title="Lecture aléatoire"
             @click="emit('toggleShuffle')"
@@ -174,9 +339,9 @@ const toggleMute = () => {
           <NuxtLink
             :to="prevTrackUrl"
             :class="[
-              'p-1 sm:p-2 transition-colors',
+              'p-1 sm:p-2 transition-colors duration-500',
               hasPrevTrack
-                ? (isCeltic ? 'text-emerald-400/70 hover:text-amber-400' : isFestive ? 'text-sky-400/70 hover:text-amber-400' : 'text-purple-400/70 hover:text-pink-400')
+                ? [sectionTextMuted, sectionTextHover]
                 : 'text-zinc-600 cursor-not-allowed pointer-events-none'
             ]"
           >
@@ -188,10 +353,8 @@ const toggleMute = () => {
           <!-- Play/Pause -->
           <button
             :class="[
-              'w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:scale-105 border-2 bg-gradient-to-br',
-              isCeltic ? 'from-emerald-600 to-emerald-800 border-emerald-500/30 hover:from-amber-600 hover:to-amber-800 hover:border-amber-500/30' : '',
-              isFestive ? 'from-sky-600 to-sky-800 border-sky-500/30 hover:from-amber-600 hover:to-amber-800 hover:border-amber-500/30' : '',
-              !isCeltic && !isFestive ? 'from-purple-600 to-purple-800 border-purple-500/30 hover:from-pink-600 hover:to-pink-800 hover:border-pink-500/30' : ''
+              'w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-lg hover:scale-105 border-2 bg-gradient-to-br',
+              sectionPlayButton
             ]"
             @click="emit('togglePlay')"
           >
@@ -207,9 +370,9 @@ const toggleMute = () => {
           <NuxtLink
             :to="nextTrackUrl"
             :class="[
-              'p-1 sm:p-2 transition-colors',
+              'p-1 sm:p-2 transition-colors duration-500',
               hasNextTrack
-                ? (isCeltic ? 'text-emerald-400/70 hover:text-amber-400' : isFestive ? 'text-sky-400/70 hover:text-amber-400' : 'text-purple-400/70 hover:text-pink-400')
+                ? [sectionTextMuted, sectionTextHover]
                 : 'text-zinc-600 cursor-not-allowed pointer-events-none'
             ]"
           >
@@ -221,10 +384,10 @@ const toggleMute = () => {
           <!-- Auto-play (hidden on mobile) -->
           <button
             :class="[
-              'p-2 transition-colors relative hidden sm:block',
+              'p-2 transition-colors duration-500 relative hidden sm:block',
               isAutoPlay
-                ? (isCeltic ? 'text-amber-400' : isFestive ? 'text-amber-400' : 'text-pink-400')
-                : (isCeltic ? 'text-emerald-400/50 hover:text-emerald-400' : isFestive ? 'text-sky-400/50 hover:text-sky-400' : 'text-purple-400/50 hover:text-purple-400')
+                ? sectionActiveColor
+                : [sectionTextMuted, sectionTextHover]
             ]"
             title="Lecture automatique"
             @click="emit('toggleAutoPlay')"
@@ -242,10 +405,9 @@ const toggleMute = () => {
           <div class="flex items-center gap-2 group hidden sm:flex">
             <button
               :class="[
-                'transition-colors',
-                isCeltic ? 'text-emerald-400/60 hover:text-amber-400' : '',
-                isFestive ? 'text-sky-400/60 hover:text-amber-400' : '',
-                !isCeltic && !isFestive ? 'text-purple-400/60 hover:text-pink-400' : ''
+                'transition-colors duration-500',
+                sectionTextMuted,
+                sectionTextHover
               ]"
               @click="toggleMute"
             >
@@ -272,10 +434,8 @@ const toggleMute = () => {
               <div class="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1 bg-zinc-700 rounded-full overflow-hidden">
                 <div
                   :class="[
-                    'h-full transition-colors',
-                    isCeltic ? 'bg-emerald-500 group-hover:bg-amber-500' : '',
-                    isFestive ? 'bg-sky-500 group-hover:bg-amber-500' : '',
-                    !isCeltic && !isFestive ? 'bg-purple-500 group-hover:bg-pink-500' : ''
+                    'h-full transition-colors duration-500',
+                    sectionVolumeBar
                   ]"
                   :style="{ width: `${volume * 100}%` }"
                 ></div>
@@ -286,10 +446,8 @@ const toggleMute = () => {
           <!-- Track info (hidden on mobile) -->
           <div
             :class="[
-              'text-sm text-right hidden sm:block',
-              isCeltic ? 'text-emerald-500/60' : '',
-              isFestive ? 'text-sky-500/60' : '',
-              !isCeltic && !isFestive ? 'text-purple-500/60' : ''
+              'text-sm text-right hidden sm:block transition-colors duration-500',
+              sectionTextMuted
             ]"
           >
             {{ trackIndex }} / {{ totalTracks }}

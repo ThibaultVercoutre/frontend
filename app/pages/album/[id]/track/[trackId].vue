@@ -82,6 +82,57 @@ const visualizerGradient = computed(() => {
   return 'default'
 })
 
+// Section-based glow colors for vinyl
+const sectionGlowClass = computed(() => {
+  const sectionType = currentSectionType.value
+  const defaultColors = { playing: 'bg-amber-500', idle: 'bg-cyan-500' }
+  const colors: Record<string, { playing: string, idle: string }> = {
+    INTRO: { playing: 'bg-blue-500', idle: 'bg-blue-600' },
+    COUPLET: { playing: 'bg-green-500', idle: 'bg-green-600' },
+    REFRAIN: { playing: 'bg-orange-500', idle: 'bg-yellow-500' },
+    CHORUS: { playing: 'bg-rose-500', idle: 'bg-pink-500' },
+    VERSE: { playing: 'bg-teal-500', idle: 'bg-teal-600' },
+    BRIDGE: { playing: 'bg-purple-500', idle: 'bg-fuchsia-500' },
+    OUTRO: { playing: 'bg-gray-400', idle: 'bg-gray-500' },
+    INSTRUMENTAL: defaultColors,
+  }
+  return colors[sectionType] ?? defaultColors
+})
+
+// Section-based play button colors
+const sectionPlayButtonClass = computed(() => {
+  const sectionType = currentSectionType.value
+  const defaultClass = 'bg-amber-900/80 border-amber-500/30 group-hover:border-cyan-400/50 group-hover:bg-amber-800/80'
+  const colors: Record<string, string> = {
+    INTRO: 'bg-blue-900/80 border-blue-500/30 group-hover:border-blue-400/50 group-hover:bg-blue-800/80',
+    COUPLET: 'bg-green-900/80 border-green-500/30 group-hover:border-green-400/50 group-hover:bg-green-800/80',
+    REFRAIN: 'bg-orange-900/80 border-orange-500/30 group-hover:border-yellow-400/50 group-hover:bg-orange-800/80',
+    CHORUS: 'bg-rose-900/80 border-rose-500/30 group-hover:border-pink-400/50 group-hover:bg-rose-800/80',
+    VERSE: 'bg-teal-900/80 border-teal-500/30 group-hover:border-teal-400/50 group-hover:bg-teal-800/80',
+    BRIDGE: 'bg-purple-900/80 border-purple-500/30 group-hover:border-fuchsia-400/50 group-hover:bg-purple-800/80',
+    OUTRO: 'bg-gray-800/80 border-gray-500/30 group-hover:border-gray-400/50 group-hover:bg-gray-700/80',
+    INSTRUMENTAL: defaultClass,
+  }
+  return colors[sectionType] ?? defaultClass
+})
+
+// Section-based muted text color for hints
+const sectionTextMutedClass = computed(() => {
+  const sectionType = currentSectionType.value
+  const defaultClass = 'text-amber-500/40 hover:text-cyan-500/60'
+  const colors: Record<string, string> = {
+    INTRO: 'text-blue-500/40 hover:text-blue-400/60',
+    COUPLET: 'text-green-500/40 hover:text-green-400/60',
+    REFRAIN: 'text-orange-500/40 hover:text-yellow-400/60',
+    CHORUS: 'text-rose-500/40 hover:text-pink-400/60',
+    VERSE: 'text-teal-500/40 hover:text-teal-400/60',
+    BRIDGE: 'text-purple-500/40 hover:text-fuchsia-400/60',
+    OUTRO: 'text-gray-500/40 hover:text-gray-400/60',
+    INSTRUMENTAL: defaultClass,
+  }
+  return colors[sectionType] ?? defaultClass
+})
+
 // Lyrics
 const {
   previousLyric,
@@ -156,7 +207,12 @@ const toggleKaraokeMode = () => {
 const handleTogglePlay = async () => {
   if (!isVisualizerInitialized.value && visualizerRef.value && audioRef.value) {
     initVisualizer(visualizerRef.value, audioRef.value)
-    setVisualizerGradient(visualizerGradient.value)
+    // Set initial section style if lyrics are available
+    if (hasLyrics.value) {
+      setVisualizerSectionStyle(currentSectionType.value, currentSectionNumber.value)
+    } else {
+      setVisualizerGradient(visualizerGradient.value)
+    }
   }
 
   const isNowPlaying = await togglePlay()
@@ -214,7 +270,12 @@ const autoStartPlayback = async () => {
     // Initialize visualizer if needed
     if (!isVisualizerInitialized.value && visualizerRef.value) {
       initVisualizer(visualizerRef.value, audioRef.value)
-      setVisualizerGradient(visualizerGradient.value)
+      // Set initial section style if lyrics are available
+      if (hasLyrics.value) {
+        setVisualizerSectionStyle(currentSectionType.value, currentSectionNumber.value)
+      } else {
+        setVisualizerGradient(visualizerGradient.value)
+      }
     }
 
     try {
@@ -315,7 +376,7 @@ onUnmounted(() => {
 
     <!-- Back Button - goes to album -->
     <div class="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
-      <BackButton :to="`/album/${albumId}`" :label="album?.title || 'Album'" :theme="currentTheme" />
+      <BackButton :to="`/album/${albumId}`" :label="album?.title || 'Album'" :theme="currentTheme" :section-type="currentSectionType" />
     </div>
 
     <!-- Audio Visualizer Background (hidden in karaoke mode) -->
@@ -340,12 +401,10 @@ onUnmounted(() => {
       <div class="relative">
         <!-- Vinyl Glow -->
         <div
-          class="absolute inset-0 rounded-full blur-3xl transition-opacity duration-500"
+          class="absolute inset-0 rounded-full blur-3xl transition-all duration-500"
           :class="[
             isPlaying ? 'opacity-30' : 'opacity-10',
-            isCeltic ? (isPlaying ? 'bg-amber-500' : 'bg-emerald-500') : '',
-            isFestive ? (isPlaying ? 'bg-amber-500' : 'bg-sky-500') : '',
-            !isCeltic && !isFestive ? (isPlaying ? 'bg-pink-500' : 'bg-purple-500') : ''
+            isPlaying ? sectionGlowClass.playing : sectionGlowClass.idle
           ]"
         ></div>
 
@@ -367,11 +426,9 @@ onUnmounted(() => {
               <div
                 :class="[
                   'w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full backdrop-blur-sm flex items-center justify-center',
-                  'border-2 transition-all duration-300 group-hover:scale-110 shadow-xl',
+                  'border-2 transition-all duration-500 group-hover:scale-110 shadow-xl',
                   { 'opacity-0 group-hover:opacity-100': isPlaying },
-                  isCeltic ? 'bg-emerald-900/80 border-emerald-500/30 group-hover:border-amber-500/50 group-hover:bg-emerald-800/80' : '',
-                  isFestive ? 'bg-sky-900/80 border-sky-500/30 group-hover:border-amber-500/50 group-hover:bg-sky-800/80' : '',
-                  !isCeltic && !isFestive ? 'bg-purple-900/80 border-purple-500/30 group-hover:border-pink-500/50 group-hover:bg-purple-800/80' : ''
+                  sectionPlayButtonClass
                 ]"
               >
                 <svg v-if="!isPlaying" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
@@ -424,10 +481,8 @@ onUnmounted(() => {
       <div class="text-center pb-4">
         <button
           :class="[
-            'text-xs uppercase tracking-wider transition-colors',
-            isCeltic ? 'text-emerald-500/40 hover:text-amber-500/60' : '',
-            isFestive ? 'text-sky-500/40 hover:text-amber-500/60' : '',
-            !isCeltic && !isFestive ? 'text-purple-500/40 hover:text-pink-500/60' : ''
+            'text-xs uppercase tracking-wider transition-colors duration-500',
+            sectionTextMutedClass
           ]"
           @click="toggleKaraokeMode"
         >
@@ -454,6 +509,7 @@ onUnmounted(() => {
       :has-next-track="hasNextTrack"
       :track-index="trackIndexInAlbum"
       :total-tracks="albumTracks.length"
+      :section-type="currentSectionType"
       @toggle-play="handleTogglePlay"
       @seek="handleSeek"
       @volume-change="handleVolumeChange"
