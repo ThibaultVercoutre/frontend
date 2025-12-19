@@ -56,10 +56,14 @@ export default defineNuxtConfig({
       ],
     },
     workbox: {
-      globPatterns: ['**/*.{js,css,html,png,svg,ico,woff,woff2}'],
+      // Exclude large background images from precaching (they'll use runtime caching)
+      globPatterns: ['**/*.{js,css,html,svg,ico,woff,woff2}'],
+      globIgnores: ['**/backgrounds/**'],
+      navigateFallback: null,
       runtimeCaching: [
         {
-          urlPattern: /^https:\/\/.*\.(mp3|wav|ogg)$/,
+          // Audio files (local and remote)
+          urlPattern: /\.(mp3|wav|ogg)$/i,
           handler: 'CacheFirst',
           options: {
             cacheName: 'audio-cache',
@@ -73,13 +77,17 @@ export default defineNuxtConfig({
           },
         },
         {
-          urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|webp|gif)$/,
+          // Images (local and remote) - including large backgrounds
+          urlPattern: /\.(png|jpg|jpeg|webp|gif)$/i,
           handler: 'CacheFirst',
           options: {
             cacheName: 'image-cache',
             expiration: {
               maxEntries: 100,
               maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+            },
+            cacheableResponse: {
+              statuses: [0, 200],
             },
           },
         },
