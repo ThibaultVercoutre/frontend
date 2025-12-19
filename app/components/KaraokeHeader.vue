@@ -24,7 +24,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="flex items-center gap-6 pt-20 pb-8">
+  <div class="flex items-center gap-3 sm:gap-6 pt-16 sm:pt-20 pb-4 sm:pb-8">
     <!-- Mini Vinyl -->
     <VinylRecord
       :is-spinning="isPlaying"
@@ -41,7 +41,7 @@ defineExpose({
       <!-- Mini Visualizer Container -->
       <div
         ref="visualizerRef"
-        class="h-12 md:h-16 w-full rounded-lg overflow-hidden bg-zinc-900/30 mb-2"
+        class="h-10 sm:h-12 md:h-16 w-full rounded-lg overflow-hidden bg-zinc-900/30 mb-1 sm:mb-2"
       ></div>
       <!-- Track Info -->
       <TrackInfo :track="track" size="sm" :theme="props.theme" />

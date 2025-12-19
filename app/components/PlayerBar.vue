@@ -359,10 +359,10 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
 
         <!-- Center Controls -->
         <div class="flex items-center gap-1 sm:gap-4">
-          <!-- Shuffle (hidden on mobile) -->
+          <!-- Shuffle -->
           <button
             :class="[
-              'p-2 transition-colors duration-500 relative hidden sm:block',
+              'p-1.5 sm:p-2 transition-colors duration-500 relative',
               isShuffleMode
                 ? sectionActiveColor
                 : [sectionTextMuted, sectionTextHover]
@@ -370,10 +370,10 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
             title="Lecture aléatoire"
             @click="emit('toggleShuffle')"
           >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
             </svg>
-            <span v-if="isShuffleMode" class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-current"></span>
+            <span v-if="isShuffleMode" class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-current"></span>
           </button>
 
           <!-- Previous -->
@@ -422,10 +422,10 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
             </svg>
           </NuxtLink>
 
-          <!-- Auto-play (hidden on mobile) -->
+          <!-- Auto-play -->
           <button
             :class="[
-              'p-2 transition-colors duration-500 relative hidden sm:block',
+              'p-1.5 sm:p-2 transition-colors duration-500 relative',
               isAutoPlay
                 ? sectionActiveColor
                 : [sectionTextMuted, sectionTextHover]
@@ -433,17 +433,18 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
             title="Lecture automatique"
             @click="emit('toggleAutoPlay')"
           >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
             </svg>
-            <span v-if="isAutoPlay" class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-current"></span>
+            <span v-if="isAutoPlay" class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-current"></span>
           </button>
         </div>
 
         <!-- Volume + Track info -->
         <div class="flex items-center gap-2 sm:gap-4">
           <!-- Volume Control -->
-          <div class="flex items-center gap-2 group hidden sm:flex">
+          <div class="flex items-center gap-2 group">
+            <!-- Mute button (visible on mobile and desktop) -->
             <button
               :class="[
                 'transition-colors duration-500',
@@ -462,6 +463,7 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
                 <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
               </svg>
             </button>
+            <!-- Volume slider (desktop only) -->
             <div class="relative w-20 h-6 hidden sm:block">
               <input
                 type="range"

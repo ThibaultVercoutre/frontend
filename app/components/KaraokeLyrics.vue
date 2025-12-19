@@ -17,7 +17,7 @@ defineProps<Props>()
         <Transition name="lyric-up">
           <p
             :key="'prev-' + currentIndex"
-            class="text-xl md:text-2xl text-emerald-600/30 leading-relaxed py-2"
+            class="text-base sm:text-xl md:text-2xl text-emerald-600/30 leading-relaxed py-1 sm:py-2"
           >
             {{ previousLyric }}
           </p>
@@ -29,7 +29,7 @@ defineProps<Props>()
         <Transition name="lyric-up">
           <p
             :key="'current-' + currentIndex"
-            class="text-4xl md:text-6xl font-bold text-epic karaoke-current leading-normal py-4"
+            class="text-2xl sm:text-4xl md:text-6xl font-bold text-epic karaoke-current leading-normal py-2 sm:py-4"
           >
             {{ currentLyric }}
           </p>
@@ -41,7 +41,7 @@ defineProps<Props>()
         <Transition name="lyric-up">
           <p
             :key="'next-' + currentIndex"
-            class="text-xl md:text-2xl text-emerald-600/40 leading-relaxed py-2"
+            class="text-base sm:text-xl md:text-2xl text-emerald-600/40 leading-relaxed py-1 sm:py-2"
           >
             {{ nextLyric }}
           </p>
