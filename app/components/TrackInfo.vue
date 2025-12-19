@@ -37,16 +37,16 @@ const subtitleClasses = computed(() => {
 </script>
 
 <template>
-  <div :class="['text-center', size === 'lg' ? 'mb-12 animate-fade-in-up' : '']">
+  <div :class="['text-center', size === 'lg' ? 'mb-6 sm:mb-12 animate-fade-in-up' : '']">
     <p
       v-if="track"
-      :class="['uppercase tracking-widest mb-2', getTypeTextColor(track.type), size === 'lg' ? 'text-sm' : 'text-xs']"
+      :class="['uppercase tracking-widest mb-1 sm:mb-2', getTypeTextColor(track.type), size === 'lg' ? 'text-xs sm:text-sm' : 'text-xs']"
     >
       {{ track.type }}
     </p>
     <h1
       v-if="size === 'lg'"
-      :class="['text-4xl md:text-6xl mb-3', titleClasses]"
+      :class="['text-2xl sm:text-4xl md:text-6xl mb-2 sm:mb-3', titleClasses]"
     >
       {{ track?.title }}
     </h1>
@@ -56,7 +56,7 @@ const subtitleClasses = computed(() => {
     >
       {{ track?.title }}
     </h2>
-    <p :class="[subtitleClasses, size === 'lg' ? 'text-lg' : 'text-sm']">
+    <p :class="[subtitleClasses, size === 'lg' ? 'text-sm sm:text-lg' : 'text-sm']">
       {{ track?.subtitle }}
     </p>
   </div>

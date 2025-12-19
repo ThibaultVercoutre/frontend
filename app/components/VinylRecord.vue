@@ -60,7 +60,7 @@ const sizeClasses = computed(() => {
   const sizes = {
     sm: 'w-24 h-24 md:w-32 md:h-32',
     md: 'w-48 h-48 md:w-64 md:h-64',
-    lg: 'w-72 h-72 md:w-96 md:h-96',
+    lg: 'w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96',
   }
   return sizes[props.size]
 })
@@ -69,7 +69,7 @@ const labelSizeClasses = computed(() => {
   const sizes = {
     sm: 'w-8 h-8 md:w-10 md:h-10',
     md: 'w-14 h-14 md:w-18 md:h-18',
-    lg: 'w-20 h-20 md:w-24 md:h-24',
+    lg: 'w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24',
   }
   return sizes[props.size]
 })
@@ -78,7 +78,7 @@ const iconSizeClasses = computed(() => {
   const sizes = {
     sm: 'w-3 h-3 md:w-4 md:h-4',
     md: 'w-5 h-5 md:w-6 md:h-6',
-    lg: 'w-6 h-6 md:w-7 md:h-7',
+    lg: 'w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7',
   }
   return sizes[props.size]
 })

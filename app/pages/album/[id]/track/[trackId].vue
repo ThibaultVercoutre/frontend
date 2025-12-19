@@ -275,7 +275,7 @@ onUnmounted(() => {
     </ClientOnly>
 
     <!-- Back Button - goes to album -->
-    <div class="absolute top-6 left-6 z-20">
+    <div class="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
       <BackButton :to="`/album/${albumId}`" :label="album?.title || 'Album'" :theme="currentTheme" />
     </div>
 
@@ -292,7 +292,7 @@ onUnmounted(() => {
     <!-- Main Content - Normal Mode -->
     <div
       v-if="!isKaraokeMode"
-      class="flex-1 flex flex-col items-center justify-center px-6 pb-32 relative z-10"
+      class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-28 sm:pb-32 pt-16 sm:pt-0 relative z-10"
     >
       <!-- Track Info -->
       <TrackInfo :track="track" size="lg" :theme="currentTheme" />
@@ -327,7 +327,7 @@ onUnmounted(() => {
             >
               <div
                 :class="[
-                  'w-20 h-20 md:w-24 md:h-24 rounded-full backdrop-blur-sm flex items-center justify-center',
+                  'w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full backdrop-blur-sm flex items-center justify-center',
                   'border-2 transition-all duration-300 group-hover:scale-110 shadow-xl',
                   { 'opacity-0 group-hover:opacity-100': isPlaying },
                   isCeltic ? 'bg-emerald-900/80 border-emerald-500/30 group-hover:border-amber-500/50 group-hover:bg-emerald-800/80' : '',
@@ -335,10 +335,10 @@ onUnmounted(() => {
                   !isCeltic && !isFestive ? 'bg-purple-900/80 border-purple-500/30 group-hover:border-pink-500/50 group-hover:bg-purple-800/80' : ''
                 ]"
               >
-                <svg v-if="!isPlaying" class="w-10 h-10 md:w-12 md:h-12 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                <svg v-if="!isPlaying" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
-                <svg v-else class="w-10 h-10 md:w-12 md:h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <svg v-else class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                 </svg>
               </div>
@@ -361,7 +361,7 @@ onUnmounted(() => {
     <!-- Main Content - Karaoke Mode -->
     <div
       v-else
-      class="flex-1 flex flex-col px-6 pb-32 relative z-10 karaoke-mode"
+      class="flex-1 flex flex-col px-4 sm:px-6 pb-28 sm:pb-32 relative z-10 karaoke-mode"
     >
       <!-- Karaoke Header with Mini Vinyl + Visualizer -->
       <KaraokeHeader

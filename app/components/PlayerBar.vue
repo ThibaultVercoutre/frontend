@@ -82,7 +82,7 @@ const toggleMute = () => {
       !isCeltic && !isFestive ? 'border-purple-800/30' : ''
     ]"
   >
-    <div class="container mx-auto px-6 py-4">
+    <div class="container mx-auto px-3 py-3 sm:px-6 sm:py-4">
       <!-- Progress Bar -->
       <div
         ref="progressBarRef"
@@ -141,21 +141,22 @@ const toggleMute = () => {
         <!-- Time -->
         <div
           :class="[
-            'text-sm font-mono w-24',
+            'text-xs sm:text-sm font-mono',
             isCeltic ? 'text-emerald-400/60' : '',
             isFestive ? 'text-sky-400/60' : '',
             !isCeltic && !isFestive ? 'text-purple-400/60' : ''
           ]"
         >
-          {{ formattedCurrentTime }} / {{ formattedDuration }}
+          <span>{{ formattedCurrentTime }}</span>
+          <span class="hidden sm:inline"> / {{ formattedDuration }}</span>
         </div>
 
         <!-- Center Controls -->
-        <div class="flex items-center gap-2 sm:gap-4">
-          <!-- Shuffle -->
+        <div class="flex items-center gap-1 sm:gap-4">
+          <!-- Shuffle (hidden on mobile) -->
           <button
             :class="[
-              'p-2 transition-colors relative',
+              'p-2 transition-colors relative hidden sm:block',
               isShuffleMode
                 ? (isCeltic ? 'text-amber-400' : isFestive ? 'text-amber-400' : 'text-pink-400')
                 : (isCeltic ? 'text-emerald-400/50 hover:text-emerald-400' : isFestive ? 'text-sky-400/50 hover:text-sky-400' : 'text-purple-400/50 hover:text-purple-400')
@@ -173,13 +174,13 @@ const toggleMute = () => {
           <NuxtLink
             :to="prevTrackUrl"
             :class="[
-              'p-2 transition-colors',
+              'p-1 sm:p-2 transition-colors',
               hasPrevTrack
                 ? (isCeltic ? 'text-emerald-400/70 hover:text-amber-400' : isFestive ? 'text-sky-400/70 hover:text-amber-400' : 'text-purple-400/70 hover:text-pink-400')
                 : 'text-zinc-600 cursor-not-allowed pointer-events-none'
             ]"
           >
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
             </svg>
           </NuxtLink>
@@ -187,17 +188,17 @@ const toggleMute = () => {
           <!-- Play/Pause -->
           <button
             :class="[
-              'w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:scale-105 border-2 bg-gradient-to-br',
+              'w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:scale-105 border-2 bg-gradient-to-br',
               isCeltic ? 'from-emerald-600 to-emerald-800 border-emerald-500/30 hover:from-amber-600 hover:to-amber-800 hover:border-amber-500/30' : '',
               isFestive ? 'from-sky-600 to-sky-800 border-sky-500/30 hover:from-amber-600 hover:to-amber-800 hover:border-amber-500/30' : '',
               !isCeltic && !isFestive ? 'from-purple-600 to-purple-800 border-purple-500/30 hover:from-pink-600 hover:to-pink-800 hover:border-pink-500/30' : ''
             ]"
             @click="emit('togglePlay')"
           >
-            <svg v-if="!isPlaying" class="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+            <svg v-if="!isPlaying" class="w-5 h-5 sm:w-7 sm:h-7 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
-            <svg v-else class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <svg v-else class="w-5 h-5 sm:w-7 sm:h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
             </svg>
           </button>
@@ -206,21 +207,21 @@ const toggleMute = () => {
           <NuxtLink
             :to="nextTrackUrl"
             :class="[
-              'p-2 transition-colors',
+              'p-1 sm:p-2 transition-colors',
               hasNextTrack
                 ? (isCeltic ? 'text-emerald-400/70 hover:text-amber-400' : isFestive ? 'text-sky-400/70 hover:text-amber-400' : 'text-purple-400/70 hover:text-pink-400')
                 : 'text-zinc-600 cursor-not-allowed pointer-events-none'
             ]"
           >
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
             </svg>
           </NuxtLink>
 
-          <!-- Auto-play -->
+          <!-- Auto-play (hidden on mobile) -->
           <button
             :class="[
-              'p-2 transition-colors relative',
+              'p-2 transition-colors relative hidden sm:block',
               isAutoPlay
                 ? (isCeltic ? 'text-amber-400' : isFestive ? 'text-amber-400' : 'text-pink-400')
                 : (isCeltic ? 'text-emerald-400/50 hover:text-emerald-400' : isFestive ? 'text-sky-400/50 hover:text-sky-400' : 'text-purple-400/50 hover:text-purple-400')
@@ -236,9 +237,9 @@ const toggleMute = () => {
         </div>
 
         <!-- Volume + Track info -->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 sm:gap-4">
           <!-- Volume Control -->
-          <div class="flex items-center gap-2 group">
+          <div class="flex items-center gap-2 group hidden sm:flex">
             <button
               :class="[
                 'transition-colors',
@@ -282,10 +283,10 @@ const toggleMute = () => {
             </div>
           </div>
 
-          <!-- Track info -->
+          <!-- Track info (hidden on mobile) -->
           <div
             :class="[
-              'text-sm w-16 text-right',
+              'text-sm text-right hidden sm:block',
               isCeltic ? 'text-emerald-500/60' : '',
               isFestive ? 'text-sky-500/60' : '',
               !isCeltic && !isFestive ? 'text-purple-500/60' : ''
