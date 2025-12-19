@@ -30,6 +30,8 @@ export type TrackType = 'epic' | 'celtic' | 'military' | 'festive' | 'parody'
 export interface LyricLine {
   time: number // in seconds
   text: string
+  type: 'INTRO' | 'COUPLET' | 'REFRAIN' | 'CHORUS' | 'VERSE' | 'BRIDGE' | 'OUTRO' | 'INSTRUMENTAL'
+  number: number
 }
 
 export interface LyricsData {
