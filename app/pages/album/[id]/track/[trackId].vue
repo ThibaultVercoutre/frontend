@@ -47,12 +47,14 @@ const {
   currentTime,
   duration,
   volume,
+  isMuted,
   progress,
   formattedCurrentTime,
   formattedDuration,
   togglePlay,
   seek,
   setVolume,
+  toggleMute,
   initAudio,
   onTimeUpdate,
   onLoadedMetadata,
@@ -325,6 +327,45 @@ watch(audioRef, (audio) => {
   }
 }, { immediate: true })
 
+// Keyboard controls
+const SEEK_STEP = 5 // seconds
+const VOLUME_STEP = 0.1
+
+const handleKeydown = (event: KeyboardEvent) => {
+  // Ignore if user is typing in an input
+  if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+    return
+  }
+
+  switch (event.key) {
+    case 'ArrowLeft':
+      event.preventDefault()
+      seek(Math.max(0, currentTime.value - SEEK_STEP))
+      break
+    case 'ArrowRight':
+      event.preventDefault()
+      seek(Math.min(duration.value, currentTime.value + SEEK_STEP))
+      break
+    case 'ArrowUp':
+      event.preventDefault()
+      setVolume(Math.min(1, volume.value + VOLUME_STEP))
+      break
+    case 'ArrowDown':
+      event.preventDefault()
+      setVolume(Math.max(0, volume.value - VOLUME_STEP))
+      break
+    case ' ':
+      event.preventDefault()
+      handleTogglePlay()
+      break
+    case 'm':
+    case 'M':
+      event.preventDefault()
+      toggleMute()
+      break
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   startLoop()
@@ -333,12 +374,18 @@ onMounted(() => {
 
   // Initial sync of lyrics time (handles SSR hydration)
   updateLyricsTime(currentTime.value)
+
+  // Add keyboard event listener
+  window.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
   stopLoop()
   destroyVisualizer()
   cleanupAudio()
+
+  // Remove keyboard event listener
+  window.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
@@ -523,6 +570,7 @@ onUnmounted(() => {
       :current-time="currentTime"
       :duration="duration"
       :volume="volume"
+      :is-muted="isMuted"
       :formatted-current-time="formattedCurrentTime"
       :formatted-duration="formattedDuration"
       :progress="progress"
@@ -540,6 +588,7 @@ onUnmounted(() => {
       @toggle-play="handleTogglePlay"
       @seek="handleSeek"
       @volume-change="handleVolumeChange"
+      @toggle-mute="toggleMute"
       @toggle-shuffle="handleToggleShuffle"
       @toggle-auto-play="toggleAutoPlay"
     />
