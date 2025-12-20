@@ -8,7 +8,7 @@ const localAlbums: Album[] = [
     subtitle: 'L\'album fondateur',
     year: 2024,
     coverImage: '/albums/gabrielle.jpeg',
-    trackCount: 8,
+    trackCount: 7,
     type: 'album',
   },
   {

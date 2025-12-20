@@ -6,6 +6,10 @@ const localTracks: Track[] = [
   { id: 1, albumId: 'gabrielle', title: 'De nos jours plus rien ne va', subtitle: 'Chant de révolte', duration: '3:45', type: 'epic', filename: 'De_nos_jours_plus_rien_de_va', cover: 'De_nos_jour_plus_rien_ne_va.png', background: '001.png' },
   { id: 2, albumId: 'gabrielle', title: "Parangon d'une Soldate", subtitle: 'Hymne héroïque', duration: '4:12', type: 'military', filename: "Parangon_d'une_soldate", cover: 'Parangon_dune_soldate', background: '002.png' },
   { id: 3, albumId: 'gabrielle', title: 'Majorité de Minorité', subtitle: 'Chant contestataire', duration: '3:30', type: 'epic', filename: 'Majorite_de_minorite', cover: 'Majorite_de_minorite.png', background: '003.png' },
+  { id: 4, albumId: 'gabrielle', title: 'Croisade de Lille', subtitle: 'Chant de croisade', duration: '0:00', type: 'military', filename: 'Croisade_de_Lille' },
+  { id: 5, albumId: 'gabrielle', title: 'Je roule sur les routes et les cœurs', subtitle: 'Ballade routière', duration: '0:00', type: 'epic', filename: 'Je_roule_sur_les_routes_et_les_coeurs' },
+  { id: 6, albumId: 'gabrielle', title: 'Parcours de collaboration', subtitle: 'Chant de solidarité', duration: '0:00', type: 'celtic', filename: 'Parcours_de_collaboration' },
+  { id: 7, albumId: 'gabrielle', title: 'Si vos uniformes tombaient', subtitle: 'Chant provocateur', duration: '0:00', type: 'military', filename: 'Si_vos_uniformes_tombaient' },
 
   // Album: Noël 2024
   { id: 101, albumId: 'noel-2024', title: "C'est la belle nuit de Noël", subtitle: 'Cantique traditionnel', duration: '0:00', type: 'festive', filename: 'Cest_la_belle_nuit_de_Noel', cover: 'Cest_la_belle_nuit_de_noel' },
