@@ -47,18 +47,16 @@ useHead({
     <!-- Main Content -->
     <div class="relative z-10 container mx-auto px-6 py-12 pb-32">
       <!-- Album Header -->
-      <div class="flex flex-col md:flex-row items-center gap-12 mb-12 pt-8">
+      <div class="flex flex-col items-center gap-8 mb-12 pt-8">
         <!-- Album Cover - Vinyl Style -->
-        <div class="flex-shrink-0">
-          <VinylCover
-            :cover-src="getAlbumCover(album)"
-            :alt="album?.title || 'Album cover'"
-            size="xl"
-          />
-        </div>
+        <VinylCover
+          :cover-src="getAlbumCover(album)"
+          :alt="album?.title || 'Album cover'"
+          size="xl"
+        />
 
-        <!-- Album Info -->
-        <div class="text-center md:text-left">
+        <!-- Album Info - Centered -->
+        <div class="text-center">
           <span
             v-if="album"
             :class="['inline-block px-4 py-1 rounded-full text-sm font-semibold uppercase tracking-wider mb-4', getAlbumTypeColor(album.type)]"
@@ -66,12 +64,12 @@ useHead({
             {{ getAlbumTypeIcon(album.type) }} {{ album.type }}
           </span>
 
-          <h1 class="text-4xl md:text-6xl font-medieval text-epic mb-2">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-medieval text-epic mb-2">
             {{ album?.title }}
           </h1>
-          <p class="text-emerald-400/70 text-xl mb-4">{{ album?.subtitle }}</p>
+          <p class="text-emerald-400/70 text-lg md:text-xl mb-4">{{ album?.subtitle }}</p>
 
-          <div class="flex items-center justify-center md:justify-start gap-4 text-emerald-500/60">
+          <div class="flex items-center justify-center gap-4 text-emerald-500/60">
             <span>{{ album?.year }}</span>
             <span>•</span>
             <span>{{ tracks.length }} {{ tracks.length > 1 ? 'pistes' : 'piste' }}</span>
@@ -120,18 +118,16 @@ useHead({
     <!-- Main Content -->
     <div class="relative z-10 container mx-auto px-6 py-12 pb-32">
       <!-- Album Header -->
-      <div class="flex flex-col md:flex-row items-center gap-12 mb-12 pt-12">
+      <div class="flex flex-col items-center gap-8 mb-12 pt-12">
         <!-- Album Cover - Vinyl Style -->
-        <div class="flex-shrink-0">
-          <VinylCover
-            :cover-src="getAlbumCover(album)"
-            :alt="album?.title || 'Album cover'"
-            size="xl"
-          />
-        </div>
+        <VinylCover
+          :cover-src="getAlbumCover(album)"
+          :alt="album?.title || 'Album cover'"
+          size="xl"
+        />
 
-        <!-- Album Info -->
-        <div class="text-center md:text-left">
+        <!-- Album Info - Centered -->
+        <div class="text-center">
           <span
             v-if="album"
             class="inline-block px-4 py-1 rounded-full text-sm font-semibold uppercase tracking-wider mb-4 bg-sky-500/20 text-sky-300 border border-sky-500/30"
@@ -139,12 +135,12 @@ useHead({
             🏔️ {{ album.type }}
           </span>
 
-          <h1 class="text-4xl md:text-6xl font-winter text-winter mb-2">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-winter text-winter mb-2">
             {{ album?.title }}
           </h1>
-          <p class="text-sky-300/70 text-xl mb-4">{{ album?.subtitle }}</p>
+          <p class="text-sky-300/70 text-lg md:text-xl mb-4">{{ album?.subtitle }}</p>
 
-          <div class="flex items-center justify-center md:justify-start gap-4 text-sky-400/60">
+          <div class="flex items-center justify-center gap-4 text-sky-400/60">
             <span>{{ album?.year }}</span>
             <span class="text-amber-400">•</span>
             <span>{{ tracks.length }} {{ tracks.length > 1 ? 'pistes' : 'piste' }}</span>
@@ -198,17 +194,16 @@ useHead({
     <!-- Main Content -->
     <div class="relative z-10 container mx-auto px-6 py-12 pb-32">
       <!-- Album Header -->
-      <div class="flex flex-col md:flex-row items-center gap-12 mb-12 pt-8">
+      <div class="flex flex-col items-center gap-8 mb-12 pt-8">
         <!-- Album Cover - Vinyl Style -->
-        <div class="flex-shrink-0">
-          <VinylCover
-            :cover-src="getAlbumCover(album)"
-            :alt="album?.title || 'Album cover'"
-            size="xl"
-          />
-        </div>
+        <VinylCover
+          :cover-src="getAlbumCover(album)"
+          :alt="album?.title || 'Album cover'"
+          size="xl"
+        />
 
-        <div class="text-center md:text-left">
+        <!-- Album Info - Centered -->
+        <div class="text-center">
           <span
             v-if="album"
             :class="['inline-block px-4 py-1 rounded-full text-sm font-semibold uppercase tracking-wider mb-4', getAlbumTypeColor(album.type)]"
@@ -216,12 +211,12 @@ useHead({
             {{ getAlbumTypeIcon(album.type) }} {{ album.type }}
           </span>
 
-          <h1 class="text-4xl md:text-6xl font-bold text-tag mb-2">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-tag mb-2">
             {{ album?.title }}
           </h1>
-          <p class="text-zinc-400 text-xl mb-4">{{ album?.subtitle }}</p>
+          <p class="text-zinc-400 text-lg md:text-xl mb-4">{{ album?.subtitle }}</p>
 
-          <div class="flex items-center justify-center md:justify-start gap-4 text-zinc-500">
+          <div class="flex items-center justify-center gap-4 text-zinc-500">
             <span>{{ album?.year }}</span>
             <span>•</span>
             <span>{{ tracks.length }} {{ tracks.length > 1 ? 'pistes' : 'piste' }}</span>

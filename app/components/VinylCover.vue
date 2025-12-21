@@ -12,11 +12,12 @@ const props = withDefaults(defineProps<Props>(), {
   animated: true,
 })
 
-// Size mappings
+// Size mappings - wrapper includes extra space for vinyl offset
 const sizeClasses = computed(() => {
   switch (props.size) {
     case 'sm':
       return {
+        wrapper: 'w-52', // 40 + 30% = ~52
         container: 'w-40 h-40',
         vinyl: 'w-40 h-40',
         vinylOffset: 'translate-x-[30%]',
@@ -24,6 +25,7 @@ const sizeClasses = computed(() => {
       }
     case 'md':
       return {
+        wrapper: 'w-72', // 56 + 30% = ~72
         container: 'w-56 h-56',
         vinyl: 'w-56 h-56',
         vinylOffset: 'translate-x-[30%]',
@@ -31,6 +33,7 @@ const sizeClasses = computed(() => {
       }
     case 'lg':
       return {
+        wrapper: 'w-[22rem]', // 72 + 30% = ~94
         container: 'w-72 h-72',
         vinyl: 'w-72 h-72',
         vinylOffset: 'translate-x-[30%]',
@@ -38,6 +41,7 @@ const sizeClasses = computed(() => {
       }
     case 'xl':
       return {
+        wrapper: 'w-[26rem] md:w-[30rem]', // 80/96 + 30%
         container: 'w-80 h-80 md:w-96 md:h-96',
         vinyl: 'w-80 h-80 md:w-96 md:h-96',
         vinylOffset: 'translate-x-[30%]',
@@ -45,6 +49,7 @@ const sizeClasses = computed(() => {
       }
     default:
       return {
+        wrapper: 'w-[22rem]',
         container: 'w-72 h-72',
         vinyl: 'w-72 h-72',
         vinylOffset: 'translate-x-[30%]',
@@ -55,10 +60,12 @@ const sizeClasses = computed(() => {
 </script>
 
 <template>
-  <div
-    class="vinyl-cover-container relative"
-    :class="[sizeClasses.container, { 'group': animated }]"
-  >
+  <!-- Outer wrapper to contain vinyl overflow -->
+  <div :class="[sizeClasses.wrapper, 'flex-shrink-0']">
+    <div
+      class="vinyl-cover-container relative"
+      :class="[sizeClasses.container, { 'group': animated }]"
+    >
     <!-- Vinyl Record (behind the sleeve) -->
     <div
       class="vinyl-record absolute top-0 right-0 z-0 transition-transform duration-500 ease-out"
@@ -142,6 +149,7 @@ const sizeClasses = computed(() => {
 
     <!-- Sleeve shadow -->
     <div class="absolute -inset-2 rounded-xl bg-black/20 blur-xl -z-10"></div>
+    </div>
   </div>
 </template>
 
