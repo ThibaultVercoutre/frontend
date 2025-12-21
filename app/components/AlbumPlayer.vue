@@ -132,15 +132,10 @@ const playTrack = async (track: Track) => {
   }
 }
 
-// Open lyrics panel for a track
+// Open lyrics panel for a track (without starting playback)
 const openLyrics = (track: Track) => {
   lyricsPanelTrack.value = track
   isLyricsPanelOpen.value = true
-
-  // If not currently playing this track, start playing it
-  if (currentTrack.value?.id !== track.id) {
-    playTrack(track)
-  }
 }
 
 // Close lyrics panel
@@ -339,11 +334,12 @@ defineExpose({
       @close="closeLyricsPanel"
     />
 
-    <!-- Mini Player Bar (when track is playing) -->
+    <!-- Mini Player Bar (always visible when track is playing) -->
     <Transition name="slide-up">
       <div
-        v-if="currentTrack && !isLyricsPanelOpen"
-        class="mini-player fixed bottom-0 left-0 right-0 bg-emerald-950/95 backdrop-blur-lg border-t border-emerald-800/50 p-4 z-40"
+        v-if="currentTrack"
+        class="mini-player fixed bottom-0 left-0 bg-emerald-950/95 backdrop-blur-lg border-t border-emerald-800/50 p-4 z-40 transition-all duration-300"
+        :class="isLyricsPanelOpen ? 'right-0 sm:right-96' : 'right-0'"
       >
         <div class="container mx-auto flex items-center gap-4">
           <!-- Cover -->
@@ -415,9 +411,10 @@ defineExpose({
 
             <!-- Lyrics Button -->
             <button
-              class="w-10 h-10 rounded-full bg-emerald-700/50 text-emerald-300 hover:bg-emerald-600/50 hover:text-amber-400 transition-colors flex items-center justify-center"
+              class="w-10 h-10 rounded-full transition-colors flex items-center justify-center"
+              :class="isLyricsPanelOpen ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-700/50 text-emerald-300 hover:bg-emerald-600/50 hover:text-amber-400'"
               title="Paroles"
-              @click="openLyrics(currentTrack)"
+              @click="isLyricsPanelOpen ? closeLyricsPanel() : openLyrics(currentTrack)"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
