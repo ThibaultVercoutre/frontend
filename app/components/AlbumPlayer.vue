@@ -34,6 +34,14 @@ const {
 const currentTrack = ref<Track | null>(null)
 const currentTrackIndex = ref(-1)
 
+// Shuffle and repeat modes
+const isShuffleOn = ref(false)
+const repeatMode = ref<'none' | 'all' | 'one'>('none') // none, all (infinite), one (single track)
+
+// Shuffled track order
+const shuffledIndices = ref<number[]>([])
+const currentShufflePosition = ref(-1)
+
 // Lyrics panel state
 const isLyricsPanelOpen = ref(false)
 const lyricsPanelTrack = ref<Track | null>(null)
@@ -41,11 +49,57 @@ const lyricsPanelTrack = ref<Track | null>(null)
 // Audio element ref
 const audioElement = ref<HTMLAudioElement | null>(null)
 
+
 // Current audio source
 const audioSrc = computed(() => {
   if (!currentTrack.value) return ''
   return getAudioSrc(currentTrack.value)
 })
+
+// Generate shuffled indices
+const generateShuffledIndices = () => {
+  const playableTracks = props.tracks
+    .map((t, i) => ({ track: t, index: i }))
+    .filter(item => item.track.filename)
+
+  const indices = playableTracks.map(item => item.index)
+
+  // Fisher-Yates shuffle
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const temp = indices[i]!
+    indices[i] = indices[j]!
+    indices[j] = temp
+  }
+
+  shuffledIndices.value = indices
+}
+
+// Toggle shuffle mode
+const toggleShuffle = () => {
+  isShuffleOn.value = !isShuffleOn.value
+  if (isShuffleOn.value) {
+    generateShuffledIndices()
+    // Find current track in shuffled order
+    if (currentTrackIndex.value >= 0) {
+      currentShufflePosition.value = shuffledIndices.value.indexOf(currentTrackIndex.value)
+      if (currentShufflePosition.value === -1) {
+        currentShufflePosition.value = 0
+      }
+    }
+  }
+}
+
+// Cycle through repeat modes
+const cycleRepeatMode = () => {
+  if (repeatMode.value === 'none') {
+    repeatMode.value = 'all'
+  } else if (repeatMode.value === 'all') {
+    repeatMode.value = 'one'
+  } else {
+    repeatMode.value = 'none'
+  }
+}
 
 // Initialize audio when element is available
 watch(audioElement, (el) => {
@@ -99,18 +153,124 @@ const openKaraoke = (track: Track) => {
   navigateTo(`/album/${track.albumId}/track/${track.id}`)
 }
 
-// Handle track ended - play next
+// Get next track index based on shuffle/repeat mode
+const getNextTrackIndex = (): number | null => {
+  const playableTracks = props.tracks
+    .map((t, i) => ({ track: t, index: i }))
+    .filter(item => item.track.filename)
+
+  if (playableTracks.length === 0) return null
+
+  if (isShuffleOn.value) {
+    // Shuffle mode
+    const nextShufflePos = currentShufflePosition.value + 1
+    if (nextShufflePos < shuffledIndices.value.length) {
+      return shuffledIndices.value[nextShufflePos] ?? null
+    } else if (repeatMode.value === 'all') {
+      // Regenerate shuffle and start over
+      generateShuffledIndices()
+      currentShufflePosition.value = -1
+      return shuffledIndices.value[0] ?? null
+    }
+    return null
+  } else {
+    // Sequential mode
+    const currentIdx = currentTrackIndex.value
+    const nextPlayableIdx = playableTracks.findIndex(item => item.index > currentIdx)
+
+    if (nextPlayableIdx !== -1) {
+      return playableTracks[nextPlayableIdx]?.index ?? null
+    } else if (repeatMode.value === 'all') {
+      // Loop back to first playable track
+      return playableTracks[0]?.index ?? null
+    }
+    return null
+  }
+}
+
+// Handle track ended - play next based on mode
 const handleEnded = () => {
   onEnded()
 
-  // Play next track if available
-  if (currentTrackIndex.value < props.tracks.length - 1) {
-    const nextTrack = props.tracks[currentTrackIndex.value + 1]
+  // Repeat one mode - replay same track
+  if (repeatMode.value === 'one' && currentTrack.value) {
+    if (audioElement.value) {
+      audioElement.value.currentTime = 0
+      play()
+    }
+    return
+  }
+
+  // Get next track
+  const nextIndex = getNextTrackIndex()
+  if (nextIndex !== null) {
+    const nextTrack = props.tracks[nextIndex]
     if (nextTrack?.filename) {
+      if (isShuffleOn.value) {
+        currentShufflePosition.value++
+      }
       playTrack(nextTrack)
     }
   }
 }
+
+// Progress bar dragging state
+const isDragging = ref(false)
+const progressBarElement = ref<HTMLElement | null>(null)
+
+// Calculate percentage from mouse/touch position
+const getPercentageFromEvent = (event: MouseEvent | TouchEvent, element: HTMLElement): number => {
+  const rect = element.getBoundingClientRect()
+  const clientX = 'touches' in event ? event.touches[0]!.clientX : event.clientX
+  const clickX = clientX - rect.left
+  return Math.max(0, Math.min(100, (clickX / rect.width) * 100))
+}
+
+// Start dragging (also handles click)
+const startDrag = (event: MouseEvent | TouchEvent) => {
+  isDragging.value = true
+  progressBarElement.value = event.currentTarget as HTMLElement
+
+  // Prevent text selection during drag
+  event.preventDefault()
+
+  // Add document listeners
+  document.addEventListener('mousemove', onDrag)
+  document.addEventListener('mouseup', stopDrag)
+  document.addEventListener('touchmove', onDrag)
+  document.addEventListener('touchend', stopDrag)
+
+  // Seek to initial position
+  if (progressBarElement.value) {
+    const percentage = getPercentageFromEvent(event, progressBarElement.value)
+    seekByPercent(percentage)
+  }
+}
+
+// During drag
+const onDrag = (event: MouseEvent | TouchEvent) => {
+  if (!isDragging.value || !progressBarElement.value) return
+
+  const percentage = getPercentageFromEvent(event, progressBarElement.value)
+  seekByPercent(percentage)
+}
+
+// Stop dragging
+const stopDrag = () => {
+  isDragging.value = false
+  progressBarElement.value = null
+
+  // Remove document listeners
+  document.removeEventListener('mousemove', onDrag)
+  document.removeEventListener('mouseup', stopDrag)
+  document.removeEventListener('touchmove', onDrag)
+  document.removeEventListener('touchend', stopDrag)
+}
+
+// Cleanup on unmount
+onUnmounted(() => {
+  stopDrag()
+})
 
 // Get progress for a specific track
 const getTrackProgress = (track: Track): number => {
@@ -212,6 +372,18 @@ defineExpose({
 
           <!-- Controls -->
           <div class="flex items-center gap-2">
+            <!-- Shuffle Button -->
+            <button
+              class="w-10 h-10 rounded-full transition-colors flex items-center justify-center"
+              :class="isShuffleOn ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-700/50 text-emerald-300 hover:bg-emerald-600/50 hover:text-amber-400'"
+              title="Lecture aléatoire"
+              @click="toggleShuffle"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
+              </svg>
+            </button>
+
             <!-- Play/Pause -->
             <button
               class="w-12 h-12 rounded-full bg-amber-500 text-emerald-950 hover:bg-amber-400 transition-colors flex items-center justify-center"
@@ -225,9 +397,26 @@ defineExpose({
               </svg>
             </button>
 
+            <!-- Repeat Button -->
+            <button
+              class="w-10 h-10 rounded-full transition-colors flex items-center justify-center relative"
+              :class="repeatMode !== 'none' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-700/50 text-emerald-300 hover:bg-emerald-600/50 hover:text-amber-400'"
+              :title="repeatMode === 'none' ? 'Répétition désactivée' : repeatMode === 'all' ? 'Répéter tout' : 'Répéter une piste'"
+              @click="cycleRepeatMode"
+            >
+              <svg v-if="repeatMode !== 'one'" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+              </svg>
+              <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+              </svg>
+              <span v-if="repeatMode === 'one'" class="absolute -bottom-0.5 -right-0.5 text-[10px] font-bold bg-amber-500 text-emerald-950 rounded-full w-4 h-4 flex items-center justify-center">1</span>
+            </button>
+
             <!-- Lyrics Button -->
             <button
               class="w-10 h-10 rounded-full bg-emerald-700/50 text-emerald-300 hover:bg-emerald-600/50 hover:text-amber-400 transition-colors flex items-center justify-center"
+              title="Paroles"
               @click="openLyrics(currentTrack)"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,6 +427,7 @@ defineExpose({
             <!-- Karaoke Button -->
             <button
               class="w-10 h-10 rounded-full bg-emerald-700/50 text-emerald-300 hover:bg-emerald-600/50 hover:text-amber-400 transition-colors flex items-center justify-center"
+              title="Mode Karaoké"
               @click="openKaraoke(currentTrack)"
             >
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -247,15 +437,24 @@ defineExpose({
           </div>
         </div>
 
-        <!-- Progress Bar -->
+        <!-- Progress Bar (interactive with drag support) -->
         <div
-          class="absolute top-0 left-0 right-0 h-1 bg-emerald-800/50 cursor-pointer"
-          @click="(e) => seekByPercent((e.offsetX / (e.target as HTMLElement).offsetWidth) * 100)"
+          class="absolute top-0 left-0 right-0 h-2 bg-emerald-800/50 cursor-pointer group/progress transition-all"
+          :class="{ 'h-3': isDragging }"
+          @mousedown="startDrag"
+          @touchstart="startDrag"
+          @click.stop
         >
           <div
-            class="h-full bg-gradient-to-r from-amber-500 to-amber-400"
+            class="h-full bg-gradient-to-r from-amber-500 to-amber-400 relative pointer-events-none"
             :style="{ width: `${progress}%` }"
-          ></div>
+          >
+            <!-- Drag handle -->
+            <div
+              class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-amber-400 rounded-full shadow-lg transition-transform"
+              :class="isDragging ? 'scale-125 opacity-100' : 'opacity-0 group-hover/progress:opacity-100'"
+            ></div>
+          </div>
         </div>
       </div>
     </Transition>
