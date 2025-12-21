@@ -10,8 +10,14 @@ const {
   toggleAutoPlay,
   toggleShuffleMode,
   initializeQueue,
-  getNextTrack,
+  peekNextTrack,
+  peekPrevTrack,
+  getNextTrackUrl,
+  getPrevTrackUrl,
+  hasNextTrack: checkHasNextTrack,
+  hasPrevTrack: checkHasPrevTrack,
   goToNextTrack,
+  goToPrevTrack: goToPrevTrackQueue,
 } = usePlayerQueue()
 
 // Media Session API for lock screen controls
@@ -30,8 +36,11 @@ const {
   saveMuted,
   loadMuted,
   saveLastTrack,
+  loadLastTrack,
   saveShuffleMode,
   saveAutoPlay,
+  saveKaraokeMode,
+  loadKaraokeMode,
 } = usePlayerStorage()
 
 // Fullscreen for karaoke mode
@@ -212,40 +221,38 @@ const nextTrackAudioSrc = computed(() => {
   return next ? getAudioSrc(next) : null
 })
 
-// Navigation - previous/next track in album
+// Navigation - previous/next track in album (using peek for UI, no side effects)
 const prevTrack = computed(() => {
-  const idx = albumTracks.value.findIndex(t => t.id === trackId.value)
-  return idx > 0 ? albumTracks.value[idx - 1] : null
+  return peekPrevTrack(albumTracks.value, trackId.value)
 })
 
 const nextTrack = computed(() => {
-  if (isShuffleMode.value) {
-    return getNextTrack(albumTracks.value, trackId.value)
-  }
-  const idx = albumTracks.value.findIndex(t => t.id === trackId.value)
-  return idx < albumTracks.value.length - 1 ? albumTracks.value[idx + 1] : null
+  return peekNextTrack(albumTracks.value, trackId.value)
 })
 
-// Check if there's a next track available (for UI state)
-const hasNextTrack = computed(() => {
-  if (isShuffleMode.value || isAutoPlay.value) return true
-  const idx = albumTracks.value.findIndex(t => t.id === trackId.value)
-  return idx < albumTracks.value.length - 1
+// Check if there's a next/prev track available (for UI state)
+const hasNextTrackComputed = computed(() => {
+  return checkHasNextTrack(albumTracks.value, trackId.value)
 })
 
-const prevTrackUrl = computed(() =>
-  prevTrack.value ? `/album/${albumId.value}/track/${prevTrack.value.id}` : undefined
-)
+const hasPrevTrackComputed = computed(() => {
+  return checkHasPrevTrack(albumTracks.value, trackId.value)
+})
+
+const prevTrackUrl = computed(() => {
+  return getPrevTrackUrl(albumId.value, albumTracks.value, trackId.value)
+})
 
 const nextTrackUrl = computed(() => {
-  const next = nextTrack.value
-  return next ? `/album/${albumId.value}/track/${next.id}` : undefined
+  return getNextTrackUrl(albumId.value, albumTracks.value, trackId.value)
 })
 
-// Handle track end - autoplay next
+// Handle track end - autoplay next (only when autoplay is enabled)
 const handleTrackEnded = () => {
   onEnded()
-  if (isAutoPlay.value || isShuffleMode.value) {
+  // Only auto-advance if autoplay is on
+  // Shuffle just changes the ORDER, it doesn't enable auto-advance
+  if (isAutoPlay.value) {
     const nextUrl = goToNextTrack(albumId.value, albumTracks.value, trackId.value)
     if (nextUrl) {
       router.push(nextUrl)
@@ -259,20 +266,28 @@ const handleToggleShuffle = () => {
   saveShuffleMode(isShuffleMode.value)
 }
 
-// Toggle karaoke mode
+// Toggle karaoke mode with persistence
 const toggleKaraokeMode = () => {
   isKaraokeMode.value = !isKaraokeMode.value
+  saveKaraokeMode(isKaraokeMode.value)
 }
 
 // Handle play toggle with visualizer initialization
 const handleTogglePlay = async () => {
-  if (!isVisualizerInitialized.value && visualizerRef.value && audioRef.value) {
-    initVisualizer(visualizerRef.value, audioRef.value)
-    // Set initial section style if lyrics are available
-    if (hasLyrics.value) {
-      setVisualizerSectionStyle(currentSectionType.value, currentSectionNumber.value, trackId.value)
-    } else {
-      setVisualizerGradient(visualizerGradient.value)
+  if (!isVisualizerInitialized.value && audioRef.value) {
+    // Use the correct container based on karaoke mode
+    const container = isKaraokeMode.value
+      ? karaokeHeaderRef.value?.visualizerRef
+      : visualizerRef.value
+
+    if (container) {
+      initVisualizer(container, audioRef.value)
+      // Set initial section style if lyrics are available
+      if (hasLyrics.value) {
+        setVisualizerSectionStyle(currentSectionType.value, currentSectionNumber.value, trackId.value)
+      } else {
+        setVisualizerGradient(visualizerGradient.value)
+      }
     }
   }
 
@@ -306,17 +321,19 @@ const handleToggleAutoPlay = () => {
   saveAutoPlay(isAutoPlay.value)
 }
 
-// Navigate to previous track
+// Navigate to previous track (uses queue history in shuffle mode)
 const goToPrevTrack = () => {
-  if (prevTrackUrl.value) {
-    router.push(prevTrackUrl.value)
+  const prevUrl = goToPrevTrackQueue(albumId.value, albumTracks.value, trackId.value)
+  if (prevUrl) {
+    router.push(prevUrl)
   }
 }
 
-// Navigate to next track
+// Navigate to next track (consumes from shuffle queue if enabled)
 const goToNextTrackManual = () => {
-  if (nextTrackUrl.value) {
-    router.push(nextTrackUrl.value)
+  const nextUrl = goToNextTrack(albumId.value, albumTracks.value, trackId.value)
+  if (nextUrl) {
+    router.push(nextUrl)
   }
 }
 
@@ -331,8 +348,8 @@ watch(currentTime, (time) => {
 
 // Save playback position periodically for resume
 watch(currentTime, (time) => {
-  // Save every 10 seconds
-  if (Math.floor(time) % 10 === 0 && time > 0) {
+  // Save every 3 seconds for better resume accuracy
+  if (Math.floor(time) % 3 === 0 && time > 0) {
     saveLastTrack(albumId.value, trackId.value, time)
   }
 })
@@ -380,14 +397,20 @@ watch([currentSectionType, currentSectionNumber], ([sectionType, sectionNumber])
 // Auto-start playback when autoplay/shuffle is active
 const autoStartPlayback = async () => {
   if ((isAutoPlay.value || isShuffleMode.value) && audioRef.value) {
-    // Initialize visualizer if needed
-    if (!isVisualizerInitialized.value && visualizerRef.value) {
-      initVisualizer(visualizerRef.value, audioRef.value)
-      // Set initial section style if lyrics are available
-      if (hasLyrics.value) {
-        setVisualizerSectionStyle(currentSectionType.value, currentSectionNumber.value, trackId.value)
-      } else {
-        setVisualizerGradient(visualizerGradient.value)
+    // Initialize visualizer if needed - use correct container based on karaoke mode
+    if (!isVisualizerInitialized.value) {
+      const container = isKaraokeMode.value
+        ? karaokeHeaderRef.value?.visualizerRef
+        : visualizerRef.value
+
+      if (container) {
+        initVisualizer(container, audioRef.value)
+        // Set initial section style if lyrics are available
+        if (hasLyrics.value) {
+          setVisualizerSectionStyle(currentSectionType.value, currentSectionNumber.value, trackId.value)
+        } else {
+          setVisualizerGradient(visualizerGradient.value)
+        }
       }
     }
 
@@ -480,6 +503,30 @@ onMounted(() => {
   const savedMuted = loadMuted()
   if (savedMuted) {
     toggleMute()
+  }
+
+  // Load saved karaoke mode
+  const savedKaraokeMode = loadKaraokeMode()
+  if (savedKaraokeMode) {
+    isKaraokeMode.value = true
+  }
+
+  // Restore playback position if same track
+  const lastTrack = loadLastTrack()
+  if (lastTrack && lastTrack.trackId === trackId.value && lastTrack.position > 0) {
+    // Wait for audio to be ready before seeking
+    const audio = audioRef.value
+    if (audio) {
+      const seekToSavedPosition = () => {
+        seek(lastTrack.position)
+        audio.removeEventListener('loadedmetadata', seekToSavedPosition)
+      }
+      if (audio.readyState >= 1) {
+        seek(lastTrack.position)
+      } else {
+        audio.addEventListener('loadedmetadata', seekToSavedPosition)
+      }
+    }
   }
 
   // Setup Media Session action handlers
@@ -753,8 +800,8 @@ useSwipeGesture(mainContainerRef, {
       :is-auto-play="isAutoPlay"
       :prev-track-url="prevTrackUrl"
       :next-track-url="nextTrackUrl"
-      :has-prev-track="!!prevTrack"
-      :has-next-track="hasNextTrack"
+      :has-prev-track="hasPrevTrackComputed"
+      :has-next-track="hasNextTrackComputed"
       :track-index="trackIndexInAlbum"
       :total-tracks="albumTracks.length"
       :section-type="currentSectionType"

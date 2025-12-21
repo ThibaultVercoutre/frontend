@@ -5,6 +5,7 @@ const STORAGE_KEYS = {
   LAST_POSITION: 'gabrielle-last-position',
   SHUFFLE_MODE: 'gabrielle-shuffle-mode',
   AUTO_PLAY: 'gabrielle-auto-play',
+  KARAOKE_MODE: 'gabrielle-karaoke-mode',
 } as const
 
 interface LastTrackData {
@@ -114,6 +115,20 @@ export function usePlayerStorage() {
     return false
   }
 
+  // Karaoke mode
+  const saveKaraokeMode = (enabled: boolean) => {
+    if (import.meta.client) {
+      localStorage.setItem(STORAGE_KEYS.KARAOKE_MODE, String(enabled))
+    }
+  }
+
+  const loadKaraokeMode = (): boolean => {
+    if (import.meta.client) {
+      return localStorage.getItem(STORAGE_KEYS.KARAOKE_MODE) === 'true'
+    }
+    return false
+  }
+
   return {
     // Volume
     saveVolume,
@@ -135,5 +150,9 @@ export function usePlayerStorage() {
     // Auto-play
     saveAutoPlay,
     loadAutoPlay,
+
+    // Karaoke
+    saveKaraokeMode,
+    loadKaraokeMode,
   }
 }

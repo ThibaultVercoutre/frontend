@@ -10,6 +10,7 @@ const localTracks: Track[] = [
   { id: 5, albumId: 'gabrielle', title: 'Je roule sur les routes et les cœurs', subtitle: 'Ballade routière', duration: '0:00', type: 'epic', filename: 'Je_roule_sur_les_routes_et_les_coeurs' },
   { id: 6, albumId: 'gabrielle', title: 'Parcours de collaboration', subtitle: 'Chant de solidarité', duration: '0:00', type: 'celtic', filename: 'Parcours_de_collaboration' },
   { id: 7, albumId: 'gabrielle', title: 'Si vos uniformes tombaient', subtitle: 'Chant provocateur', duration: '0:00', type: 'military', filename: 'Si_vos_uniformes_tombaient' },
+  { id: 8, albumId: 'gabrielle', title: 'Bon anniversaire la grosse cochonne', subtitle: 'Chanson d\'anniversaire', duration: '0:00', type: 'parody', filename: 'Bon_anniversaire_la_grosse_cochonne' },
 
   // Album: Noël 2024
   { id: 101, albumId: 'noel-2024', title: "C'est la belle nuit de Noël", subtitle: 'Cantique traditionnel', duration: '0:00', type: 'festive', filename: 'Cest_la_belle_nuit_de_Noel', cover: 'Cest_la_belle_nuit_de_noel' },
