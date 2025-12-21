@@ -45,7 +45,7 @@ useHead({
     </div>
 
     <!-- Main Content -->
-    <div class="relative z-10 container mx-auto px-6 py-12">
+    <div class="relative z-10 container mx-auto px-6 py-12 pb-32">
       <!-- Album Header -->
       <div class="flex flex-col md:flex-row items-center gap-8 mb-12 pt-8">
         <!-- Album Cover -->
@@ -89,12 +89,10 @@ useHead({
       <HomeDivider />
 
       <!-- Tracks List -->
-      <div v-if="tracks.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <TrackCard
-          v-for="(track, index) in tracks"
-          :key="track.id"
-          :track="track"
-          :index="index"
+      <div v-if="tracks.length > 0" class="max-w-4xl mx-auto bg-emerald-900/20 rounded-2xl border border-emerald-800/30 overflow-hidden">
+        <AlbumPlayer
+          :tracks="tracks"
+          :album-id="albumId"
         />
       </div>
 
@@ -127,7 +125,7 @@ useHead({
     </div>
 
     <!-- Main Content -->
-    <div class="relative z-10 container mx-auto px-6 py-12">
+    <div class="relative z-10 container mx-auto px-6 py-12 pb-32">
       <!-- Album Header -->
       <div class="flex flex-col md:flex-row items-center gap-8 mb-12 pt-12">
         <!-- Album Cover -->
@@ -179,12 +177,10 @@ useHead({
       </div>
 
       <!-- Tracks List -->
-      <div v-if="tracks.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <TrackCardWinter
-          v-for="(track, index) in tracks"
-          :key="track.id"
-          :track="track"
-          :index="index"
+      <div v-if="tracks.length > 0" class="max-w-4xl mx-auto bg-sky-900/20 rounded-2xl border border-sky-800/30 overflow-hidden">
+        <AlbumPlayer
+          :tracks="tracks"
+          :album-id="albumId"
         />
       </div>
 
@@ -214,7 +210,7 @@ useHead({
     </div>
 
     <!-- Main Content -->
-    <div class="relative z-10 container mx-auto px-6 py-12">
+    <div class="relative z-10 container mx-auto px-6 py-12 pb-32">
       <!-- Album Header -->
       <div class="flex flex-col md:flex-row items-center gap-8 mb-12 pt-8">
         <div class="relative w-64 h-64 md:w-80 md:h-80 flex-shrink-0">
@@ -261,12 +257,10 @@ useHead({
       </div>
 
       <!-- Tracks List -->
-      <div v-if="tracks.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <TrackCard
-          v-for="(track, index) in tracks"
-          :key="track.id"
-          :track="track"
-          :index="index"
+      <div v-if="tracks.length > 0" class="max-w-4xl mx-auto bg-zinc-800/50 rounded-2xl border border-zinc-700/30 overflow-hidden">
+        <AlbumPlayer
+          :tracks="tracks"
+          :album-id="albumId"
         />
       </div>
 
