@@ -18,46 +18,37 @@ const isCeltic = computed(() => props.album.id === 'gabrielle')
 <template>
   <NuxtLink
     :to="`/album/${album.id}`"
-    class="album-card relative rounded-2xl overflow-hidden group cursor-pointer block aspect-square"
+    class="album-card relative group cursor-pointer block"
     :style="{ animationDelay: `${index * 100}ms` }"
   >
-    <!-- Album Cover Background -->
-    <div class="absolute inset-0">
-      <NuxtImg
-        :src="getAlbumCover(album)"
+    <!-- Vinyl Cover Container -->
+    <div class="relative mb-4">
+      <VinylCover
+        :cover-src="getAlbumCover(album)"
         :alt="album.title"
-        width="400"
-        height="400"
-        format="webp"
-        quality="80"
-        :loading="index === 0 ? 'eager' : 'lazy'"
-        :fetchpriority="index === 0 ? 'high' : undefined"
-        :preload="index === 0"
-        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        size="md"
       />
-      <!-- Overlay gradient -->
-      <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"></div>
+
+      <!-- Type Badge -->
+      <div class="absolute top-3 right-3 z-20">
+        <span :class="['px-2 py-1 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-sm', getAlbumTypeColor(album.type)]">
+          {{ getAlbumTypeIcon(album.type) }}
+        </span>
+      </div>
+
+      <!-- Year Badge -->
+      <div class="absolute top-3 left-3 z-20">
+        <span class="px-2 py-1 rounded-full text-xs font-semibold bg-zinc-900/70 text-zinc-300 backdrop-blur-sm">
+          {{ album.year }}
+        </span>
+      </div>
     </div>
 
-    <!-- Type Badge -->
-    <div class="absolute top-4 right-4 z-10">
-      <span :class="['px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-sm', getAlbumTypeColor(album.type)]">
-        {{ getAlbumTypeIcon(album.type) }} {{ album.type }}
-      </span>
-    </div>
-
-    <!-- Year Badge -->
-    <div class="absolute top-4 left-4 z-10">
-      <span class="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-900/70 text-zinc-300 backdrop-blur-sm">
-        {{ album.year }}
-      </span>
-    </div>
-
-    <!-- Album Info -->
-    <div class="absolute bottom-0 left-0 right-0 p-6 z-10">
+    <!-- Album Info (below the vinyl) -->
+    <div class="px-2">
       <h3
         :class="[
-          'text-2xl mb-1 transition-colors duration-300',
+          'text-lg mb-1 transition-colors duration-300 truncate',
           isCeltic ? 'font-medieval text-epic group-hover:text-amber-400' : '',
           isFestive ? 'font-winter text-winter group-hover:text-amber-400' : '',
           !isCeltic && !isFestive ? 'font-bold text-white group-hover:text-purple-400' : ''
@@ -65,9 +56,9 @@ const isCeltic = computed(() => props.album.id === 'gabrielle')
       >
         {{ album.title }}
       </h3>
-      <p :class="['text-sm mb-3', isFestive ? 'text-sky-300/70' : 'text-zinc-400']">{{ album.subtitle }}</p>
+      <p :class="['text-sm mb-2 truncate', isFestive ? 'text-sky-300/70' : 'text-zinc-400']">{{ album.subtitle }}</p>
 
-      <!-- Track count -->
+      <!-- Track count & Play hint -->
       <div class="flex items-center justify-between">
         <span class="text-zinc-500 text-sm">
           <template v-if="album.trackCount > 0">
@@ -81,28 +72,18 @@ const isCeltic = computed(() => props.album.id === 'gabrielle')
         <!-- Play hint -->
         <div
           :class="[
-            'flex items-center gap-2 transition-colors',
+            'flex items-center gap-1 transition-colors text-xs',
             isCeltic ? 'text-emerald-500/60 group-hover:text-amber-400' : '',
             isFestive ? 'text-sky-400/60 group-hover:text-amber-400' : '',
             !isCeltic && !isFestive ? 'text-zinc-500 group-hover:text-purple-400' : ''
           ]"
         >
-          <span class="text-xs uppercase tracking-wider">Découvrir</span>
-          <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+          <span class="uppercase tracking-wider">Écouter</span>
+          <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 24 24">
             <path d="M8 5v14l11-7z" />
           </svg>
         </div>
       </div>
     </div>
-
-    <!-- Hover glow effect -->
-    <div
-      :class="[
-        'absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none',
-        isCeltic ? 'bg-gradient-to-t from-amber-500/10 via-transparent to-transparent' : '',
-        isFestive ? 'bg-gradient-to-t from-red-500/10 via-transparent to-transparent' : '',
-        !isCeltic && !isFestive ? 'bg-gradient-to-t from-purple-500/10 via-transparent to-transparent' : ''
-      ]"
-    ></div>
   </NuxtLink>
 </template>

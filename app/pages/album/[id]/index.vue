@@ -47,21 +47,14 @@ useHead({
     <!-- Main Content -->
     <div class="relative z-10 container mx-auto px-6 py-12 pb-32">
       <!-- Album Header -->
-      <div class="flex flex-col md:flex-row items-center gap-8 mb-12 pt-8">
-        <!-- Album Cover -->
-        <div class="relative w-64 h-64 md:w-80 md:h-80 flex-shrink-0">
-          <NuxtImg
-            :src="getAlbumCover(album)"
+      <div class="flex flex-col md:flex-row items-center gap-12 mb-12 pt-8">
+        <!-- Album Cover - Vinyl Style -->
+        <div class="flex-shrink-0">
+          <VinylCover
+            :cover-src="getAlbumCover(album)"
             :alt="album?.title || 'Album cover'"
-            width="320"
-            height="320"
-            format="webp"
-            quality="80"
-            loading="eager"
-            fetchpriority="high"
-            class="w-full h-full object-cover rounded-2xl shadow-2xl"
+            size="xl"
           />
-          <div class="absolute -inset-4 rounded-3xl bg-gradient-to-br from-amber-500/20 to-emerald-500/20 blur-2xl -z-10"></div>
         </div>
 
         <!-- Album Info -->
@@ -127,21 +120,14 @@ useHead({
     <!-- Main Content -->
     <div class="relative z-10 container mx-auto px-6 py-12 pb-32">
       <!-- Album Header -->
-      <div class="flex flex-col md:flex-row items-center gap-8 mb-12 pt-12">
-        <!-- Album Cover -->
-        <div class="relative w-64 h-64 md:w-80 md:h-80 flex-shrink-0">
-          <NuxtImg
-            :src="getAlbumCover(album)"
+      <div class="flex flex-col md:flex-row items-center gap-12 mb-12 pt-12">
+        <!-- Album Cover - Vinyl Style -->
+        <div class="flex-shrink-0">
+          <VinylCover
+            :cover-src="getAlbumCover(album)"
             :alt="album?.title || 'Album cover'"
-            width="320"
-            height="320"
-            format="webp"
-            quality="80"
-            loading="eager"
-            fetchpriority="high"
-            class="w-full h-full object-cover rounded-2xl shadow-2xl border-2 border-sky-300/20"
+            size="xl"
           />
-          <div class="absolute -inset-4 rounded-3xl bg-gradient-to-br from-sky-400/20 to-amber-500/20 blur-2xl -z-10"></div>
         </div>
 
         <!-- Album Info -->
@@ -212,20 +198,14 @@ useHead({
     <!-- Main Content -->
     <div class="relative z-10 container mx-auto px-6 py-12 pb-32">
       <!-- Album Header -->
-      <div class="flex flex-col md:flex-row items-center gap-8 mb-12 pt-8">
-        <div class="relative w-64 h-64 md:w-80 md:h-80 flex-shrink-0">
-          <NuxtImg
-            :src="getAlbumCover(album)"
+      <div class="flex flex-col md:flex-row items-center gap-12 mb-12 pt-8">
+        <!-- Album Cover - Vinyl Style -->
+        <div class="flex-shrink-0">
+          <VinylCover
+            :cover-src="getAlbumCover(album)"
             :alt="album?.title || 'Album cover'"
-            width="320"
-            height="320"
-            format="webp"
-            quality="80"
-            loading="eager"
-            fetchpriority="high"
-            class="w-full h-full object-cover rounded-2xl shadow-2xl"
+            size="xl"
           />
-          <div class="absolute -inset-4 rounded-3xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 blur-2xl -z-10"></div>
         </div>
 
         <div class="text-center md:text-left">
