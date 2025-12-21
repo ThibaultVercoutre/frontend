@@ -13,6 +13,10 @@ const emit = defineEmits<{
   close: []
 }>()
 
+// Get track cover
+const { getCoverSrc } = useTracks()
+const coverSrc = computed(() => props.track ? getCoverSrc(props.track) : '')
+
 // Get lyrics for current track
 const trackId = computed(() => props.track?.id ?? 0)
 const { lyrics, currentLyricIndex, fetchLyrics, hasLyrics, updateTime } = useLyrics(trackId)
@@ -65,16 +69,41 @@ const isNewSection = (index: number): boolean => {
   <Transition name="slide">
     <div
       v-if="isOpen && track"
-      class="lyrics-panel fixed right-0 top-0 h-full w-full sm:w-96 bg-emerald-950/95 backdrop-blur-lg border-l border-emerald-800/50 z-50 flex flex-col"
+      class="lyrics-panel fixed right-0 top-0 h-full w-full sm:w-96 border-l border-emerald-800/50 z-50 flex flex-col overflow-hidden"
     >
+      <!-- Background with blurred cover -->
+      <div class="absolute inset-0 -z-10">
+        <NuxtImg
+          v-if="coverSrc"
+          :src="coverSrc"
+          :alt="track.title"
+          class="w-full h-full object-cover blur-2xl scale-110 opacity-30"
+        />
+        <div class="absolute inset-0 bg-emerald-950/90"></div>
+      </div>
+
       <!-- Header -->
-      <div class="flex items-center justify-between p-4 border-b border-emerald-800/50">
+      <div class="flex items-center gap-4 p-4 border-b border-emerald-800/50 bg-emerald-950/50">
+        <!-- Cover -->
+        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 shadow-lg">
+          <NuxtImg
+            v-if="coverSrc"
+            :src="coverSrc"
+            :alt="track.title"
+            width="56"
+            height="56"
+            format="webp"
+            quality="80"
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <!-- Track info -->
         <div class="flex-1 min-w-0">
           <h3 class="text-amber-400 font-medieval text-lg truncate">{{ track.title }}</h3>
           <p class="text-emerald-500/60 text-sm truncate">{{ track.subtitle }}</p>
         </div>
         <button
-          class="w-10 h-10 rounded-full bg-emerald-800/50 text-emerald-300 hover:bg-emerald-700/50 hover:text-white transition-colors flex items-center justify-center flex-shrink-0 ml-4"
+          class="w-10 h-10 rounded-full bg-emerald-800/50 text-emerald-300 hover:bg-emerald-700/50 hover:text-white transition-colors flex items-center justify-center flex-shrink-0"
           @click="emit('close')"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

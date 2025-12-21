@@ -11,7 +11,7 @@ const localTracks: Track[] = [
   { id: 6, albumId: 'gabrielle', title: 'Parcours de collaboration', subtitle: 'Chant de solidarité', duration: '0:00', type: 'celtic', filename: 'Parcours_de_collaboration', cover: 'Parcours_de_collaboration_cover.jpeg', background: 'Parcours_de_collaboration.jpeg' },
   { id: 7, albumId: 'gabrielle', title: 'Si vos uniformes tombaient', subtitle: 'Chant provocateur', duration: '0:00', type: 'military', filename: 'Si_vos_uniformes_tombaient', cover: 'Si_vos_uniformes_tombaient_cover.jpeg', background: 'Si_vos_uniformes_tombaient.jpeg' },
   { id: 8, albumId: 'gabrielle', title: 'Bon anniversaire la grosse cochonne', subtitle: 'Chanson d\'anniversaire', duration: '0:00', type: 'parody', filename: 'Bon_anniversaire_la_grosse_cochonne', cover: 'Bon_anniversaire_la_grosse_cochonne.png', background: 'Bon_anniversaire_la_grosse_cochonne.png' },
-  { id: 9, albumId: 'gabrielle', title: 'Le vote', subtitle: 'Chant civique', duration: '0:00', type: 'epic', filename: 'Le_vote' },
+  { id: 9, albumId: 'gabrielle', title: 'Le vote', subtitle: 'Chant civique', duration: '0:00', type: 'epic', filename: 'Le_vote', cover: 'Le_vote_cover.png', background: 'Le_vote.png' },
 
   // Album: Noël 2024
   { id: 101, albumId: 'noel-2024', title: "C'est la belle nuit de Noël", subtitle: 'Cantique traditionnel', duration: '0:00', type: 'festive', filename: 'Cest_la_belle_nuit_de_Noel', cover: 'Cest_la_belle_nuit_de_noel' },
