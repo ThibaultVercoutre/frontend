@@ -12,7 +12,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   isSpinning: false,
-  coverSrc: '/vynile/Parangon_dune_soldate.jpeg',
+  coverSrc: '/vynile/Parangon_dune_soldate.png',
   size: 'lg',
   showPlayButton: true,
   theme: 'celtic',
