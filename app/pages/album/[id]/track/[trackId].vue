@@ -435,6 +435,24 @@ const handleLoadedMetadata = (event: Event) => {
 watch(audioRef, (audio) => {
   if (audio) {
     initAudio(audio)
+
+    // Restore playback position if same track
+    const lastTrack = loadLastTrack()
+    if (lastTrack && lastTrack.trackId === trackId.value && lastTrack.position > 0) {
+      const seekToSavedPosition = () => {
+        seek(lastTrack.position)
+        // Also sync lyrics time to the restored position
+        updateLyricsTime(lastTrack.position)
+        audio.removeEventListener('loadedmetadata', seekToSavedPosition)
+      }
+      if (audio.readyState >= 1) {
+        seek(lastTrack.position)
+        updateLyricsTime(lastTrack.position)
+      } else {
+        audio.addEventListener('loadedmetadata', seekToSavedPosition)
+      }
+    }
+
     // If audio already has metadata loaded (browser cache), sync duration/time immediately
     if (audio.readyState >= 1) {
       onLoadedMetadata()
@@ -509,24 +527,6 @@ onMounted(() => {
   const savedKaraokeMode = loadKaraokeMode()
   if (savedKaraokeMode) {
     isKaraokeMode.value = true
-  }
-
-  // Restore playback position if same track
-  const lastTrack = loadLastTrack()
-  if (lastTrack && lastTrack.trackId === trackId.value && lastTrack.position > 0) {
-    // Wait for audio to be ready before seeking
-    const audio = audioRef.value
-    if (audio) {
-      const seekToSavedPosition = () => {
-        seek(lastTrack.position)
-        audio.removeEventListener('loadedmetadata', seekToSavedPosition)
-      }
-      if (audio.readyState >= 1) {
-        seek(lastTrack.position)
-      } else {
-        audio.addEventListener('loadedmetadata', seekToSavedPosition)
-      }
-    }
   }
 
   // Setup Media Session action handlers
