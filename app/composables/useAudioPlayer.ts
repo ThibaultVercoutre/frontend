@@ -7,6 +7,7 @@ export function useAudioPlayer() {
   const isMuted = ref(false)
 
   let animationId: number | null = null
+  let lastSeekTime = 0
 
   // Progress percentage
   const progress = computed(() => {
@@ -27,7 +28,7 @@ export function useAudioPlayer() {
   // Timeline update loop - single source of truth for currentTime
   // Reads from audio element at ~60fps for smooth progress/lyrics
   const updateTimeline = () => {
-    if (audioRef.value) {
+    if (audioRef.value && Date.now() - lastSeekTime > 200) {
       currentTime.value = audioRef.value.currentTime
     }
     animationId = requestAnimationFrame(updateTimeline)
@@ -83,6 +84,7 @@ export function useAudioPlayer() {
   // Seek to time
   const seek = (time: number) => {
     if (!audioRef.value) return
+    lastSeekTime = Date.now()
     currentTime.value = time
     audioRef.value.currentTime = time
   }
@@ -115,6 +117,7 @@ export function useAudioPlayer() {
 
   // Event handlers
   const onTimeUpdate = (event?: Event) => {
+    if (Date.now() - lastSeekTime < 200) return
     const audio = (event?.target as HTMLAudioElement) || audioRef.value
     if (audio) {
       currentTime.value = audio.currentTime
