@@ -226,14 +226,8 @@ const hoverTime = computed(() => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 })
 
-// Local dragging state for immediate visual feedback
-const isDragging = ref(false)
-const dragProgress = ref(0)
-
-// Use local progress when dragging, otherwise use prop
-const displayProgress = computed(() => {
-  return isDragging.value ? dragProgress.value : props.progress
-})
+// Progress display directly from props (seek() updates currentTime synchronously)
+const displayProgress = computed(() => props.progress)
 
 const onProgressHover = (event: MouseEvent) => {
   if (!progressBarRef.value) return
@@ -254,15 +248,7 @@ const onProgressClick = (event: MouseEvent) => {
 const onSeek = (event: Event) => {
   const target = event.target as HTMLInputElement
   const newTime = parseFloat(target.value)
-  // Update local state immediately for visual feedback
-  dragProgress.value = (newTime / props.duration) * 100
-  isDragging.value = true
   emit('seek', newTime)
-}
-
-// Release drag when user stops interacting with progress bar
-const onSeekEnd = () => {
-  isDragging.value = false
 }
 
 // Handle volume change
@@ -293,10 +279,9 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
         ref="progressBarRef"
         class="relative w-full h-6 mb-2 group cursor-pointer"
         @mouseenter="isHoveringProgress = true"
-        @mouseleave="isHoveringProgress = false; onSeekEnd()"
+        @mouseleave="isHoveringProgress = false"
         @mousemove="onProgressHover"
         @click="onProgressClick"
-        @mouseup="onSeekEnd"
       >
         <!-- Hover timecode tooltip -->
         <div
@@ -331,8 +316,6 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
           step="0.1"
           class="absolute inset-0 w-full h-full cursor-pointer opacity-0 z-10"
           @input="onSeek"
-          @mouseup="onSeekEnd"
-          @touchend="onSeekEnd"
         />
 
         <!-- Custom thumb -->
@@ -341,7 +324,7 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
             'absolute top-1/2 w-4 h-4 rounded-full shadow-lg pointer-events-none will-change-transform group-hover:scale-110',
             sectionThumbColor
           ]"
-          :style="{ left: `${displayProgress}%`, transform: 'translate(-50%, -50%)', transition: isDragging ? 'none' : 'all 0.1s ease-out' }"
+          :style="{ left: `${displayProgress}%`, transform: 'translate(-50%, -50%)', transition: 'all 0.1s ease-out' }"
         ></div>
       </div>
 

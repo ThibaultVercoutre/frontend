@@ -83,10 +83,6 @@ export function useSwipeGesture(elementRef: Ref<HTMLElement | null>, options: Sw
     }
   }, { immediate: true })
 
-  onMounted(() => {
-    setupListeners()
-  })
-
   onUnmounted(() => {
     removeListeners()
   })

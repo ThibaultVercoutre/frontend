@@ -155,7 +155,7 @@ useHead({
           <path d="M12 2L2 22h20L12 2zm0 4l6.5 14h-13L12 6z" opacity="0.5"/>
           <path d="M12 6l4 8H8l4-8z"/>
         </svg>
-        <div class="h-px w-20 bg-gradient-to-l from-transparent to-pine-500/30"></div>
+        <div class="h-px w-20 bg-gradient-to-l from-transparent to-sky-500/30"></div>
       </div>
 
       <!-- Tracks List -->

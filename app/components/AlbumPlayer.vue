@@ -129,6 +129,11 @@ const playTrack = async (track: Track) => {
     currentTrack.value = track
     currentTrackIndex.value = trackIndex
 
+    // Keep lyrics panel in sync with the playing track
+    if (isLyricsPanelOpen.value) {
+      lyricsPanelTrack.value = track
+    }
+
     // Wait for audio source to update
     await nextTick()
 
