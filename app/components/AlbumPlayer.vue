@@ -108,6 +108,9 @@ watch(audioElement, (el) => {
   }
 })
 
+// Track the current canplay handler for cleanup
+let pendingCanPlayHandler: (() => void) | null = null
+
 // Play a specific track
 const playTrack = async (track: Track) => {
   const trackIndex = props.tracks.findIndex(t => t.id === track.id)
@@ -116,6 +119,12 @@ const playTrack = async (track: Track) => {
     // Same track - toggle play/pause
     await togglePlay()
   } else {
+    // Clean up any pending canplay listener from previous track switch
+    if (pendingCanPlayHandler && audioElement.value) {
+      audioElement.value.removeEventListener('canplay', pendingCanPlayHandler)
+      pendingCanPlayHandler = null
+    }
+
     // Different track - load and play
     currentTrack.value = track
     currentTrackIndex.value = trackIndex
@@ -125,9 +134,11 @@ const playTrack = async (track: Track) => {
 
     if (audioElement.value) {
       audioElement.value.load()
-      audioElement.value.addEventListener('canplay', async () => {
+      pendingCanPlayHandler = async () => {
+        pendingCanPlayHandler = null
         await play()
-      }, { once: true })
+      }
+      audioElement.value.addEventListener('canplay', pendingCanPlayHandler, { once: true })
     }
   }
 }
@@ -265,6 +276,11 @@ const stopDrag = () => {
 // Cleanup on unmount
 onUnmounted(() => {
   stopDrag()
+  // Clean up any pending canplay listener
+  if (pendingCanPlayHandler && audioElement.value) {
+    audioElement.value.removeEventListener('canplay', pendingCanPlayHandler)
+    pendingCanPlayHandler = null
+  }
 })
 
 // Get progress for a specific track
@@ -282,6 +298,13 @@ const isTrackPlaying = (track: Track): boolean => {
 const isCurrentTrack = (track: Track): boolean => {
   return currentTrack.value?.id === track.id
 }
+
+// Theme based on album
+const currentTheme = computed(() => {
+  if (props.albumId.includes('noel')) return 'winter'
+  if (props.albumId === 'gabrielle') return 'celtic'
+  return 'default'
+})
 
 // Expose for parent access
 defineExpose({
@@ -331,6 +354,7 @@ defineExpose({
       :track="lyricsPanelTrack"
       :current-time="currentTime"
       :is-open="isLyricsPanelOpen"
+      :theme="currentTheme"
       @close="closeLyricsPanel"
     />
 

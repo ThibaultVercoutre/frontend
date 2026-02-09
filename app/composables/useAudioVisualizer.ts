@@ -407,7 +407,8 @@ export function useAudioVisualizer() {
     // Animate transition over 500ms
     const duration = 500
     const startTime = performance.now()
-    let transitionGradientId = 0
+    // Reuse a single gradient name to avoid memory leak from accumulating registrations
+    const tempGradientName = 'transition-temp'
 
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime
@@ -419,8 +420,7 @@ export function useAudioVisualizer() {
       // Create interpolated gradient
       const interpolated = interpolateGradient(fromColors!, targetColors, eased)
 
-      // Register and apply the transitional gradient
-      const tempGradientName = `transition-${transitionGradientId++}`
+      // Register and apply the transitional gradient (reuses same name to avoid leak)
       audioMotion!.registerGradient(tempGradientName, {
         colorStops: interpolated,
       })

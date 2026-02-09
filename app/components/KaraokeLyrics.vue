@@ -4,9 +4,24 @@ interface Props {
   currentLyric: string
   nextLyric: string
   currentIndex: number
+  theme?: 'celtic' | 'winter' | 'default'
 }
 
-defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  theme: 'celtic'
+})
+
+const prevNextColor = computed(() => {
+  if (props.theme === 'winter') return 'text-sky-400/30'
+  if (props.theme === 'default') return 'text-purple-400/30'
+  return 'text-emerald-600/30'
+})
+
+const nextColor = computed(() => {
+  if (props.theme === 'winter') return 'text-sky-400/40'
+  if (props.theme === 'default') return 'text-purple-400/40'
+  return 'text-emerald-600/40'
+})
 </script>
 
 <template>
@@ -17,7 +32,7 @@ defineProps<Props>()
         <Transition name="lyric-up">
           <p
             :key="'prev-' + currentIndex"
-            class="text-base sm:text-xl md:text-2xl text-emerald-600/30 leading-relaxed py-1 sm:py-2"
+            :class="['text-base sm:text-xl md:text-2xl leading-relaxed py-1 sm:py-2', prevNextColor]"
           >
             {{ previousLyric }}
           </p>
@@ -41,7 +56,7 @@ defineProps<Props>()
         <Transition name="lyric-up">
           <p
             :key="'next-' + currentIndex"
-            class="text-base sm:text-xl md:text-2xl text-emerald-600/40 leading-relaxed py-1 sm:py-2"
+            :class="['text-base sm:text-xl md:text-2xl leading-relaxed py-1 sm:py-2', nextColor]"
           >
             {{ nextLyric }}
           </p>

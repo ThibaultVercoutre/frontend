@@ -10,12 +10,8 @@ interface MediaSessionOptions {
 }
 
 export function useMediaSession() {
-  const isSupported = ref(false)
-
-  // Check if Media Session API is supported
-  onMounted(() => {
-    isSupported.value = 'mediaSession' in navigator
-  })
+  // Check immediately (not in onMounted) so metadata can be set during setup
+  const isSupported = ref(import.meta.client ? 'mediaSession' in navigator : false)
 
   // Update media session metadata
   const updateMetadata = (track: Track | undefined, coverUrl?: string) => {

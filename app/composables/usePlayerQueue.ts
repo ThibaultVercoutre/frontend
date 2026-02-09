@@ -83,10 +83,8 @@ export function usePlayerQueue() {
   const consumeNextTrack = (albumTracks: Track[], currentTrackId: number): Track | null => {
     if (albumTracks.length === 0) return null
 
-    // Add current track to history
-    if (!playHistory.value.includes(currentTrackId)) {
-      playHistory.value.push(currentTrackId)
-    }
+    // Add current track to history (allow duplicates for proper linear back-navigation)
+    playHistory.value.push(currentTrackId)
     // Keep history limited to prevent memory issues
     if (playHistory.value.length > 50) {
       playHistory.value = playHistory.value.slice(-30)

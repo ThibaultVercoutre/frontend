@@ -24,9 +24,10 @@ export function useAudioPlayer() {
   const formattedCurrentTime = computed(() => formatTime(currentTime.value))
   const formattedDuration = computed(() => formatTime(duration.value))
 
-  // Timeline update loop
+  // Timeline update loop - single source of truth for currentTime
+  // Reads from audio element at ~60fps for smooth progress/lyrics
   const updateTimeline = () => {
-    if (audioRef.value && !audioRef.value.paused) {
+    if (audioRef.value) {
       currentTime.value = audioRef.value.currentTime
     }
     animationId = requestAnimationFrame(updateTimeline)
@@ -112,13 +113,10 @@ export function useAudioPlayer() {
     }
   }
 
-  // Event handlers - use event target for reliability after page refresh
-  const onTimeUpdate = (event?: Event) => {
-    const audio = (event?.target as HTMLAudioElement) || audioRef.value
-    if (audio) {
-      currentTime.value = audio.currentTime
-    }
-  }
+  // Event handlers
+  // onTimeUpdate is intentionally a no-op: rAF loop handles currentTime updates
+  // at 60fps for smooth progress bar and lyrics sync (avoids race condition)
+  const onTimeUpdate = (_event?: Event) => {}
 
   const onLoadedMetadata = (event?: Event) => {
     const audio = (event?.target as HTMLAudioElement) || audioRef.value

@@ -312,7 +312,7 @@ const handleVolumeChange = (newVolume: number) => {
 // Handle mute toggle with persistence
 const handleToggleMute = () => {
   toggleMute()
-  saveMuted(!isMuted.value)
+  saveMuted(isMuted.value)
 }
 
 // Handle shuffle toggle with persistence
@@ -337,20 +337,27 @@ const goToNextTrackManual = () => {
   }
 }
 
-// Sync lyrics with audio time and update media session position
-watch(currentTime, (time) => {
-  updateLyricsTime(time)
-  // Update media session position every 5 seconds to avoid too many calls
-  if (Math.floor(time) % 5 === 0) {
-    updatePositionState(duration.value, time)
-  }
-})
+// Throttle helpers for periodic saves (avoid spamming localStorage at 60fps)
+let lastSaveTime = 0
+let lastMediaSessionTime = 0
 
-// Save playback position periodically for resume
+// Sync lyrics + media session + save position in a single watcher
 watch(currentTime, (time) => {
-  // Save every 3 seconds for better resume accuracy
-  if (Math.floor(time) % 3 === 0 && time > 0) {
+  // Lyrics sync: always update (needs to be responsive)
+  updateLyricsTime(time)
+
+  const now = Date.now()
+
+  // Update media session position every 5 seconds
+  if (now - lastMediaSessionTime > 5000) {
+    updatePositionState(duration.value, time)
+    lastMediaSessionTime = now
+  }
+
+  // Save playback position every 3 seconds (throttled to avoid localStorage spam)
+  if (time > 0 && now - lastSaveTime > 3000) {
     saveLastTrack(albumId.value, trackId.value, time)
+    lastSaveTime = now
   }
 })
 
@@ -483,11 +490,11 @@ const handleKeydown = (event: KeyboardEvent) => {
       break
     case 'ArrowUp':
       event.preventDefault()
-      setVolume(Math.min(1, volume.value + VOLUME_STEP))
+      handleVolumeChange(Math.min(1, volume.value + VOLUME_STEP))
       break
     case 'ArrowDown':
       event.preventDefault()
-      setVolume(Math.max(0, volume.value - VOLUME_STEP))
+      handleVolumeChange(Math.max(0, volume.value - VOLUME_STEP))
       break
     case ' ':
       event.preventDefault()
@@ -496,7 +503,7 @@ const handleKeydown = (event: KeyboardEvent) => {
     case 'm':
     case 'M':
       event.preventDefault()
-      toggleMute()
+      handleToggleMute()
       break
   }
 }
@@ -707,6 +714,7 @@ useSwipeGesture(mainContainerRef, {
           :previous-lyric="previousLyric"
           :current-lyric="currentLyric"
           :next-lyric="nextLyric"
+          :theme="currentTheme"
           @click="toggleKaraokeMode"
         />
       </div>
@@ -733,6 +741,7 @@ useSwipeGesture(mainContainerRef, {
         :current-lyric="currentLyric"
         :next-lyric="nextLyric"
         :current-index="currentLyricIndex"
+        :theme="currentTheme"
       />
 
       <!-- Karaoke controls: Section indicator + Fullscreen + Exit hint -->
@@ -812,6 +821,8 @@ useSwipeGesture(mainContainerRef, {
       @toggle-mute="handleToggleMute"
       @toggle-shuffle="handleToggleShuffle"
       @toggle-auto-play="handleToggleAutoPlay"
+      @prev-track="goToPrevTrack"
+      @next-track="goToNextTrackManual"
     />
 
     <!-- Floating decorations (Celtic theme only) -->

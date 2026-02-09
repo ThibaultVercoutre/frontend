@@ -46,6 +46,8 @@ const emit = defineEmits<{
   toggleMute: []
   toggleShuffle: []
   toggleAutoPlay: []
+  prevTrack: []
+  nextTrack: []
 }>()
 
 // Pride flag gradient (for "Majorité de Minorité" REFRAIN)
@@ -248,10 +250,6 @@ const onProgressClick = (event: MouseEvent) => {
   dragProgress.value = clickProgress
   isDragging.value = true
   emit('seek', newTime)
-  // Reset dragging state after a short delay to let parent update
-  setTimeout(() => {
-    isDragging.value = false
-  }, 50)
 }
 
 // Handle seek from range input
@@ -262,10 +260,11 @@ const onSeek = (event: Event) => {
   dragProgress.value = (newTime / props.duration) * 100
   isDragging.value = true
   emit('seek', newTime)
-  // Reset dragging state after parent updates
-  setTimeout(() => {
-    isDragging.value = false
-  }, 50)
+}
+
+// Release drag when user stops interacting with progress bar
+const onSeekEnd = () => {
+  isDragging.value = false
 }
 
 // Handle volume change
@@ -296,9 +295,10 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
         ref="progressBarRef"
         class="relative w-full h-6 mb-2 group cursor-pointer"
         @mouseenter="isHoveringProgress = true"
-        @mouseleave="isHoveringProgress = false"
+        @mouseleave="isHoveringProgress = false; onSeekEnd()"
         @mousemove="onProgressHover"
         @click="onProgressClick"
+        @mouseup="onSeekEnd"
       >
         <!-- Hover timecode tooltip -->
         <div
@@ -333,6 +333,8 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
           step="0.1"
           class="absolute inset-0 w-full h-full cursor-pointer opacity-0 z-10"
           @input="onSeek"
+          @mouseup="onSeekEnd"
+          @touchend="onSeekEnd"
         />
 
         <!-- Custom thumb -->
@@ -379,21 +381,21 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
           </button>
 
           <!-- Previous -->
-          <NuxtLink
-            :to="prevTrackUrl"
+          <button
             :class="[
               'p-1 sm:p-2 transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-lg',
               hasPrevTrack
                 ? [sectionTextMuted, sectionTextHover]
-                : 'text-zinc-600 cursor-not-allowed pointer-events-none'
+                : 'text-zinc-600 cursor-not-allowed'
             ]"
             aria-label="Piste précédente"
-            :aria-disabled="!hasPrevTrack"
+            :disabled="!hasPrevTrack"
+            @click="emit('prevTrack')"
           >
             <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
             </svg>
-          </NuxtLink>
+          </button>
 
           <!-- Play/Pause -->
           <button
@@ -413,21 +415,21 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
           </button>
 
           <!-- Next -->
-          <NuxtLink
-            :to="nextTrackUrl"
+          <button
             :class="[
               'p-1 sm:p-2 transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-lg',
               hasNextTrack
                 ? [sectionTextMuted, sectionTextHover]
-                : 'text-zinc-600 cursor-not-allowed pointer-events-none'
+                : 'text-zinc-600 cursor-not-allowed'
             ]"
             aria-label="Piste suivante"
-            :aria-disabled="!hasNextTrack"
+            :disabled="!hasNextTrack"
+            @click="emit('nextTrack')"
           >
             <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
             </svg>
-          </NuxtLink>
+          </button>
 
           <!-- Auto-play -->
           <button
