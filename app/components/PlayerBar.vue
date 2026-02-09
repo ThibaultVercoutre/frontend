@@ -247,8 +247,6 @@ const onProgressClick = (event: MouseEvent) => {
   const rect = progressBarRef.value.getBoundingClientRect()
   const clickProgress = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100))
   const newTime = (clickProgress / 100) * props.duration
-  dragProgress.value = clickProgress
-  isDragging.value = true
   emit('seek', newTime)
 }
 
