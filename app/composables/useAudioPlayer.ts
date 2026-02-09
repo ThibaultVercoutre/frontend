@@ -114,9 +114,12 @@ export function useAudioPlayer() {
   }
 
   // Event handlers
-  // onTimeUpdate is intentionally a no-op: rAF loop handles currentTime updates
-  // at 60fps for smooth progress bar and lyrics sync (avoids race condition)
-  const onTimeUpdate = (_event?: Event) => {}
+  const onTimeUpdate = (event?: Event) => {
+    const audio = (event?.target as HTMLAudioElement) || audioRef.value
+    if (audio) {
+      currentTime.value = audio.currentTime
+    }
+  }
 
   const onLoadedMetadata = (event?: Event) => {
     const audio = (event?.target as HTMLAudioElement) || audioRef.value
