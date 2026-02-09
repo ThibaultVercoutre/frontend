@@ -99,6 +99,7 @@ const {
   toggleMute,
   initAudio,
   onTimeUpdate,
+  onSeeked,
   onLoadedMetadata,
   onEnded,
   onPlay,
@@ -626,6 +627,7 @@ useSwipeGesture(mainContainerRef, {
         preload="auto"
         @timeupdate="onTimeUpdate($event)"
         @loadedmetadata="handleLoadedMetadata($event)"
+        @seeked="onSeeked"
         @ended="handleTrackEnded"
         @play="onPlay(); resumeVisualizer()"
         @pause="onPause"

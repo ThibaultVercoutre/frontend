@@ -24,6 +24,7 @@ const {
   seek,
   seekByPercent,
   onTimeUpdate,
+  onSeeked,
   onLoadedMetadata,
   onEnded,
   onPlay,
@@ -332,6 +333,7 @@ defineExpose({
         preload="metadata"
         @timeupdate="onTimeUpdate"
         @loadedmetadata="onLoadedMetadata"
+        @seeked="onSeeked"
         @ended="handleEnded"
         @play="onPlay"
         @pause="onPause"

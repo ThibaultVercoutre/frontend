@@ -7,7 +7,8 @@ export function useAudioPlayer() {
   const isMuted = ref(false)
 
   let animationId: number | null = null
-  let lastSeekTime = 0
+  let isSeeking = false
+  let seekSafetyTimeout: ReturnType<typeof setTimeout> | null = null
 
   // Progress percentage
   const progress = computed(() => {
@@ -25,10 +26,10 @@ export function useAudioPlayer() {
   const formattedCurrentTime = computed(() => formatTime(currentTime.value))
   const formattedDuration = computed(() => formatTime(duration.value))
 
-  // Timeline update loop - single source of truth for currentTime
-  // Reads from audio element at ~60fps for smooth progress/lyrics
+  // Timeline update loop (rAF at ~60fps)
+  // Only updates currentTime when NOT seeking
   const updateTimeline = () => {
-    if (audioRef.value && Date.now() - lastSeekTime > 200) {
+    if (audioRef.value && !isSeeking) {
       currentTime.value = audioRef.value.currentTime
     }
     animationId = requestAnimationFrame(updateTimeline)
@@ -84,9 +85,16 @@ export function useAudioPlayer() {
   // Seek to time
   const seek = (time: number) => {
     if (!audioRef.value) return
-    lastSeekTime = Date.now()
+    isSeeking = true
     currentTime.value = time
     audioRef.value.currentTime = time
+
+    // Safety timeout: clear isSeeking after 1s in case 'seeked' event doesn't fire
+    if (seekSafetyTimeout) clearTimeout(seekSafetyTimeout)
+    seekSafetyTimeout = setTimeout(() => {
+      isSeeking = false
+      seekSafetyTimeout = null
+    }, 1000)
   }
 
   // Seek by percentage
@@ -116,11 +124,24 @@ export function useAudioPlayer() {
   }
 
   // Event handlers
+  // onTimeUpdate: only used when rAF loop is NOT running (e.g. AlbumPlayer)
   const onTimeUpdate = (event?: Event) => {
-    if (Date.now() - lastSeekTime < 200) return
+    // If rAF loop is active, it handles currentTime — skip to avoid dual writes
+    if (animationId !== null) return
+    if (isSeeking) return
+
     const audio = (event?.target as HTMLAudioElement) || audioRef.value
     if (audio) {
       currentTime.value = audio.currentTime
+    }
+  }
+
+  // Called when the browser finishes seeking — clears the isSeeking flag
+  const onSeeked = () => {
+    isSeeking = false
+    if (seekSafetyTimeout) {
+      clearTimeout(seekSafetyTimeout)
+      seekSafetyTimeout = null
     }
   }
 
@@ -163,6 +184,10 @@ export function useAudioPlayer() {
   // Cleanup
   const cleanup = () => {
     stopLoop()
+    if (seekSafetyTimeout) {
+      clearTimeout(seekSafetyTimeout)
+      seekSafetyTimeout = null
+    }
     audioRef.value = null
   }
 
@@ -193,6 +218,7 @@ export function useAudioPlayer() {
 
     // Event handlers
     onTimeUpdate,
+    onSeeked,
     onLoadedMetadata,
     onEnded,
     onPlay,
