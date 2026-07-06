@@ -53,6 +53,7 @@ useHead({
           :cover-src="getAlbumCover(album)"
           :alt="album?.title || 'Album cover'"
           size="xl"
+          priority
         />
 
         <!-- Album Info - Centered -->
@@ -124,6 +125,7 @@ useHead({
           :cover-src="getAlbumCover(album)"
           :alt="album?.title || 'Album cover'"
           size="xl"
+          priority
         />
 
         <!-- Album Info - Centered -->
@@ -200,6 +202,7 @@ useHead({
           :cover-src="getAlbumCover(album)"
           :alt="album?.title || 'Album cover'"
           size="xl"
+          priority
         />
 
         <!-- Album Info - Centered -->

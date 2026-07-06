@@ -62,8 +62,13 @@ export function useAudioPlayer() {
   }
 
   // Play
+  // NOTE: do not early-return when `isPlaying` is already true. When switching
+  // tracks, AlbumPlayer calls audioElement.load(), which pauses the element
+  // WITHOUT firing a 'pause' event — so `isPlaying` stays stale-true. Guarding on
+  // it here would silently skip playback of the freshly-loaded track. Calling
+  // play() on an already-playing element is a harmless no-op, so it's safe to drop.
   const play = async (): Promise<boolean> => {
-    if (!audioRef.value || isPlaying.value) return isPlaying.value
+    if (!audioRef.value) return false
 
     try {
       await audioRef.value.play()

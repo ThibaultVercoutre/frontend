@@ -27,6 +27,7 @@ const isCeltic = computed(() => props.album.id === 'gabrielle')
         :cover-src="getAlbumCover(album)"
         :alt="album.title"
         size="md"
+        :priority="index === 0"
       />
     </div>
 

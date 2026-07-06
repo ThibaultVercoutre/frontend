@@ -4,12 +4,14 @@ interface Props {
   alt?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
   animated?: boolean
+  priority?: boolean // Mark as above-the-fold LCP image (eager + high fetch priority)
 }
 
 const props = withDefaults(defineProps<Props>(), {
   alt: 'Album cover',
   size: 'lg',
   animated: true,
+  priority: false,
 })
 
 // Size mappings - wrapper includes extra space for vinyl offset
@@ -139,6 +141,9 @@ const sizeClasses = computed(() => {
         height="400"
         format="webp"
         quality="85"
+        :loading="priority ? 'eager' : 'lazy'"
+        :fetchpriority="priority ? 'high' : undefined"
+        :preload="priority"
         class="w-full h-full object-cover"
       />
 
