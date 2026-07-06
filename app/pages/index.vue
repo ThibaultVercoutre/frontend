@@ -40,9 +40,9 @@ useHead({
 
       <!-- Divider -->
       <div class="flex items-center justify-center gap-4 mb-12">
-        <div class="h-px w-24 bg-gradient-to-r from-transparent to-purple-500/30"></div>
-        <div class="w-2 h-2 rounded-full bg-purple-500/50"></div>
-        <div class="h-px w-24 bg-gradient-to-l from-transparent to-pink-500/30"></div>
+        <div class="h-px w-24 bg-gradient-to-r from-transparent to-purple-500/30"/>
+        <div class="w-2 h-2 rounded-full bg-purple-500/50"/>
+        <div class="h-px w-24 bg-gradient-to-l from-transparent to-pink-500/30"/>
       </div>
 
       <!-- Albums Grid -->

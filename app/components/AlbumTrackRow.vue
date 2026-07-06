@@ -56,9 +56,9 @@ const handleOpenKaraoke = () => {
         <span v-if="!isCurrentTrack || !isPlaying">{{ String(trackNumber).padStart(2, '0') }}</span>
         <!-- Playing indicator -->
         <div v-else class="flex items-center justify-center gap-0.5">
-          <span class="playing-bar"></span>
-          <span class="playing-bar"></span>
-          <span class="playing-bar"></span>
+          <span class="playing-bar"/>
+          <span class="playing-bar"/>
+          <span class="playing-bar"/>
         </div>
       </div>
 
@@ -140,7 +140,7 @@ const handleOpenKaraoke = () => {
       <div
         class="progress-bar h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-100"
         :style="{ width: isCurrentTrack ? `${progress}%` : '0%' }"
-      ></div>
+      />
     </div>
   </div>
 </template>

@@ -1,6 +1,5 @@
 import AudioMotionAnalyzer from 'audiomotion-analyzer'
-import type { VisualizerOptions } from '~/types'
-import type { LyricLine } from '~/types'
+import type { VisualizerOptions, LyricLine } from '~/types'
 
 type SectionType = LyricLine['type']
 

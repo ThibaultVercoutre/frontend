@@ -80,11 +80,13 @@ const sizeClasses = computed(() => {
         class="w-full h-full rounded-full bg-zinc-950 shadow-2xl relative overflow-hidden"
         :class="{ 'group-hover:animate-spin-slow': animated }"
       >
-        <!-- Album cover on the entire vinyl -->
+        <!-- Album cover on the entire vinyl (decorative duplicate — hidden from screen readers) -->
         <div class="absolute inset-1 rounded-full overflow-hidden">
           <NuxtImg
             :src="coverSrc"
-            :alt="alt"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
             width="400"
             height="400"
             format="webp"
@@ -95,15 +97,15 @@ const sizeClasses = computed(() => {
 
         <!-- Vinyl grooves overlay (subtle lines over the image) -->
         <div class="absolute inset-0 rounded-full">
-          <div class="absolute inset-4 rounded-full border border-black/20"></div>
-          <div class="absolute inset-8 rounded-full border border-black/15"></div>
-          <div class="absolute inset-12 rounded-full border border-black/20"></div>
-          <div class="absolute inset-16 rounded-full border border-black/15"></div>
-          <div class="absolute inset-20 rounded-full border border-black/20"></div>
+          <div class="absolute inset-4 rounded-full border border-black/20"/>
+          <div class="absolute inset-8 rounded-full border border-black/15"/>
+          <div class="absolute inset-12 rounded-full border border-black/20"/>
+          <div class="absolute inset-16 rounded-full border border-black/15"/>
+          <div class="absolute inset-20 rounded-full border border-black/20"/>
         </div>
 
         <!-- Vinyl edge (black rim) -->
-        <div class="absolute inset-0 rounded-full border-4 border-zinc-900"></div>
+        <div class="absolute inset-0 rounded-full border-4 border-zinc-900"/>
 
         <!-- Center label (emerald green) -->
         <div class="absolute inset-0 flex items-center justify-center">
@@ -114,14 +116,14 @@ const sizeClasses = computed(() => {
             <!-- Inner label ring -->
             <div class="w-3/4 h-3/4 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center border border-emerald-400/30">
               <!-- Center hole -->
-              <div class="w-2 h-2 rounded-full bg-zinc-900 shadow-inner"></div>
+              <div class="w-2 h-2 rounded-full bg-zinc-900 shadow-inner"/>
             </div>
           </div>
         </div>
 
         <!-- Vinyl shine/reflection effect -->
-        <div class="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 via-transparent to-black/20"></div>
-        <div class="absolute inset-0 rounded-full bg-gradient-to-tl from-white/5 via-transparent to-transparent"></div>
+        <div class="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 via-transparent to-black/20"/>
+        <div class="absolute inset-0 rounded-full bg-gradient-to-tl from-white/5 via-transparent to-transparent"/>
       </div>
     </div>
 
@@ -141,14 +143,14 @@ const sizeClasses = computed(() => {
       />
 
       <!-- Sleeve edge shadow -->
-      <div class="absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-black/30 to-transparent"></div>
+      <div class="absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-black/30 to-transparent"/>
 
       <!-- Sleeve worn effect -->
-      <div class="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 pointer-events-none"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 pointer-events-none"/>
     </div>
 
     <!-- Sleeve shadow -->
-    <div class="absolute -inset-2 rounded-xl bg-black/20 blur-xl -z-10"></div>
+    <div class="absolute -inset-2 rounded-xl bg-black/20 blur-xl -z-10"/>
     </div>
   </div>
 </template>

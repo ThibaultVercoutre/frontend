@@ -31,12 +31,12 @@ const localAlbums: Album[] = [
   },
 ]
 
-// Shared state
-const albums = ref<Album[]>(localAlbums)
-const isLoading = ref(false)
-const error = ref<string | null>(null)
-
 export function useAlbums() {
+  // Shared, SSR-safe state (per-request on the server, shared singleton on the client)
+  const albums = useState<Album[]>('albums', () => localAlbums)
+  const isLoading = useState<boolean>('albums-loading', () => false)
+  const error = useState<string | null>('albums-error', () => null)
+
   // Fetch all albums
   const fetchAlbums = async (): Promise<void> => {
     isLoading.value = true

@@ -1,13 +1,13 @@
 import type { Track } from '~/types'
 
-// Shared state across components (persists during navigation)
-const isAutoPlay = ref<boolean>(false)
-const isShuffleMode = ref<boolean>(false)
-const shuffledQueue = ref<number[]>([]) // Track IDs in shuffled order
-const playHistory = ref<number[]>([]) // History of played track IDs for back navigation
-const currentAlbumId = ref<string>('') // Track which album the queue is for
-
 export function usePlayerQueue() {
+  // Shared, SSR-safe player state (persists across client-side navigation)
+  const isAutoPlay = useState<boolean>('player-autoplay', () => false)
+  const isShuffleMode = useState<boolean>('player-shuffle-mode', () => false)
+  const shuffledQueue = useState<number[]>('player-shuffled-queue', () => []) // Track IDs in shuffled order
+  const playHistory = useState<number[]>('player-history', () => []) // Played track IDs for back navigation
+  const currentAlbumId = useState<string>('player-current-album', () => '') // Which album the queue is for
+
   // Fisher-Yates shuffle algorithm
   const shuffleArray = <T>(array: T[]): T[] => {
     const shuffled = [...array]

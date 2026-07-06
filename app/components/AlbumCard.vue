@@ -8,7 +8,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const { getAlbumTypeColor, getAlbumTypeIcon, getAlbumCover } = useAlbums()
+const { getAlbumCover } = useAlbums()
 
 // Theme based on album type
 const isFestive = computed(() => props.album.id.includes('noel'))

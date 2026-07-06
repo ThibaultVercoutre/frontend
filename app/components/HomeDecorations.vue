@@ -12,7 +12,7 @@ const triskellPath = "M 302.006 20.998 c 71.726 -7.26 134.733 40.484 140.982 106
 </script>
 
 <template>
-  <div v-if="isMounted" class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+  <div v-if="isMounted" class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
     <!-- Triskell top-left (spinning) -->
     <div class="absolute top-20 left-10 animate-float opacity-10" style="animation-delay: 0s">
       <svg class="w-24 h-24 text-amber-600 triskell-spin" viewBox="0 0 650 650" fill="currentColor">

@@ -30,6 +30,8 @@ const props = withDefaults(defineProps<Props>(), {
   isMuted: false,
   isShuffleMode: false,
   isAutoPlay: false,
+  prevTrackUrl: undefined,
+  nextTrackUrl: undefined,
   hasPrevTrack: false,
   hasNextTrack: false,
   sectionType: 'INSTRUMENTAL',
@@ -304,7 +306,7 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
               width: `${displayProgress}%`,
               backgroundImage: sectionGradientStyle,
             }"
-          ></div>
+          />
         </div>
 
         <!-- Native range input (hidden but functional) -->
@@ -316,7 +318,7 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
           step="0.1"
           class="absolute inset-0 w-full h-full cursor-pointer opacity-0 z-10"
           @input="onSeek"
-        />
+        >
 
         <!-- Custom thumb -->
         <div
@@ -325,7 +327,7 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
             sectionThumbColor
           ]"
           :style="{ left: `${displayProgress}%`, transform: 'translate(-50%, -50%)', transition: 'all 0.1s ease-out' }"
-        ></div>
+        />
       </div>
 
       <div class="flex items-center justify-between">
@@ -358,7 +360,7 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
             </svg>
-            <span v-if="isShuffleMode" class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-current"></span>
+            <span v-if="isShuffleMode" class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-current"/>
           </button>
 
           <!-- Previous -->
@@ -428,7 +430,7 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
             </svg>
-            <span v-if="isAutoPlay" class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-current"></span>
+            <span v-if="isAutoPlay" class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-current"/>
           </button>
         </div>
 
@@ -467,7 +469,7 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
                 :value="volume"
                 class="absolute inset-0 w-full h-full cursor-pointer opacity-0 z-10"
                 @input="onVolumeChange"
-              />
+              >
               <div class="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1 bg-zinc-700 rounded-full overflow-hidden">
                 <div
                   :class="[
@@ -475,7 +477,7 @@ const isMutedOrSilent = computed(() => props.isMuted || props.volume === 0)
                     sectionVolumeBar
                   ]"
                   :style="{ width: `${volume * 100}%` }"
-                ></div>
+                />
               </div>
             </div>
           </div>

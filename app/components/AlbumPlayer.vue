@@ -10,18 +10,14 @@ const props = defineProps<Props>()
 
 const { getAudioSrc, getCoverSrc } = useTracks()
 const {
-  audioRef,
   isPlaying,
   currentTime,
-  duration,
   progress,
   formattedCurrentTime,
   formattedDuration,
   initAudio,
   play,
-  pause,
   togglePlay,
-  seek,
   seekByPercent,
   onTimeUpdate,
   onSeeked,
@@ -434,10 +430,10 @@ defineExpose({
               <svg v-if="repeatMode !== 'one'" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
               </svg>
+              <!-- Repeat-one: standard "repeat" arrows with a "1" baked into the icon -->
               <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+                <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z"/>
               </svg>
-              <span v-if="repeatMode === 'one'" class="absolute -bottom-0.5 -right-0.5 text-[10px] font-bold bg-amber-500 text-emerald-950 rounded-full w-4 h-4 flex items-center justify-center">1</span>
             </button>
 
             <!-- Lyrics Button -->
@@ -481,7 +477,7 @@ defineExpose({
             <div
               class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-amber-400 rounded-full shadow-lg transition-transform"
               :class="isDragging ? 'scale-125 opacity-100' : 'opacity-0 group-hover/progress:opacity-100'"
-            ></div>
+            />
           </div>
         </div>
       </div>

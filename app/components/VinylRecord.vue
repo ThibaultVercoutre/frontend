@@ -178,11 +178,13 @@ const labelName = computed(() => {
     <div
       class="vinyl-record relative rounded-full"
       :class="[sizeClasses]"
-      :style="{ transform: vinylTransform }"
       @click="emit('click')"
     >
-      <!-- Vinyl Disc with Album Art -->
-      <div class="absolute inset-0 rounded-full shadow-2xl overflow-hidden">
+      <!-- Vinyl Disc with Album Art (rotates with playback; overlay slot stays static) -->
+      <div
+        class="absolute inset-0 rounded-full shadow-2xl overflow-hidden"
+        :style="{ transform: vinylTransform }"
+      >
         <!-- Album Art as full background -->
         <NuxtImg
           :src="coverSrc"
@@ -198,26 +200,26 @@ const labelName = computed(() => {
         />
 
         <!-- Dark overlay for vinyl effect -->
-        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="absolute inset-0 bg-black/40"/>
 
         <!-- Vinyl Grooves overlay -->
         <template v-if="size === 'lg'">
-          <div class="absolute inset-4 rounded-full border border-white/20"></div>
-          <div class="absolute inset-8 rounded-full border border-black/30"></div>
-          <div class="absolute inset-12 rounded-full border border-white/15"></div>
-          <div class="absolute inset-16 rounded-full border border-black/25"></div>
-          <div class="absolute inset-20 rounded-full border border-white/20"></div>
-          <div class="absolute inset-24 rounded-full border border-black/30"></div>
-          <div class="absolute inset-28 rounded-full border border-white/15"></div>
+          <div class="absolute inset-4 rounded-full border border-white/20"/>
+          <div class="absolute inset-8 rounded-full border border-black/30"/>
+          <div class="absolute inset-12 rounded-full border border-white/15"/>
+          <div class="absolute inset-16 rounded-full border border-black/25"/>
+          <div class="absolute inset-20 rounded-full border border-white/20"/>
+          <div class="absolute inset-24 rounded-full border border-black/30"/>
+          <div class="absolute inset-28 rounded-full border border-white/15"/>
         </template>
         <template v-else>
-          <div class="absolute inset-2 rounded-full border border-white/20"></div>
-          <div class="absolute inset-4 rounded-full border border-black/30"></div>
-          <div class="absolute inset-6 rounded-full border border-white/15"></div>
+          <div class="absolute inset-2 rounded-full border border-white/20"/>
+          <div class="absolute inset-4 rounded-full border border-black/30"/>
+          <div class="absolute inset-6 rounded-full border border-white/15"/>
         </template>
 
         <!-- Reflective shine -->
-        <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/10 to-transparent"></div>
+        <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/10 to-transparent"/>
 
         <!-- Center Label -->
         <div class="absolute inset-0 flex items-center justify-center">
@@ -258,7 +260,7 @@ const labelName = computed(() => {
               <div
                 class="rounded-full bg-zinc-900 border border-zinc-600 shadow-inner"
                 :class="size === 'lg' ? 'w-3 h-3 md:w-4 md:h-4' : 'w-2 h-2'"
-              ></div>
+              />
             </div>
           </div>
         </div>

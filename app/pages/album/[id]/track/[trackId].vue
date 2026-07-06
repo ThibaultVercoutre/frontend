@@ -11,7 +11,6 @@ const {
   toggleShuffleMode,
   initializeQueue,
   peekNextTrack,
-  peekPrevTrack,
   getNextTrackUrl,
   getPrevTrackUrl,
   hasNextTrack: checkHasNextTrack,
@@ -222,11 +221,7 @@ const nextTrackAudioSrc = computed(() => {
   return next ? getAudioSrc(next) : null
 })
 
-// Navigation - previous/next track in album (using peek for UI, no side effects)
-const prevTrack = computed(() => {
-  return peekPrevTrack(albumTracks.value, trackId.value)
-})
-
+// Navigation - next track in album (using peek for UI, no side effects)
 const nextTrack = computed(() => {
   return peekNextTrack(albumTracks.value, trackId.value)
 })
@@ -600,7 +595,7 @@ useSwipeGesture(mainContainerRef, {
         fetchpriority="high"
       />
       <!-- Dark overlay for readability -->
-      <div class="absolute inset-0 bg-black/50"></div>
+      <div class="absolute inset-0 bg-black/50"/>
       <!-- Pattern overlay (fleur-de-lys etc.) -->
       <div
         :class="[
@@ -609,13 +604,13 @@ useSwipeGesture(mainContainerRef, {
           isFestive ? 'bg-winter-pattern' : '',
           !isCeltic && !isFestive ? 'bg-neutral-pattern' : ''
         ]"
-      ></div>
+      />
     </div>
 
     <!-- Winter Snowfall -->
     <template v-if="isFestive">
       <Snowfall />
-      <div class="cabin-glow"></div>
+      <div class="cabin-glow"/>
     </template>
 
     <!-- Audio element (hidden, client-only to avoid SSR hydration issues) -->
@@ -631,14 +626,14 @@ useSwipeGesture(mainContainerRef, {
         @ended="handleTrackEnded"
         @play="onPlay(); resumeVisualizer()"
         @pause="onPause"
-      ></audio>
+      />
       <!-- Preload next track audio for seamless transition -->
       <audio
         v-if="nextTrackAudioSrc"
         ref="preloadAudioRef"
         :src="nextTrackAudioSrc"
         preload="metadata"
-      ></audio>
+      />
     </ClientOnly>
 
     <!-- Back Button - goes to album -->
@@ -653,7 +648,7 @@ useSwipeGesture(mainContainerRef, {
         ref="visualizerRef"
         class="fixed inset-0 pointer-events-none z-0 transition-opacity duration-300"
         :class="isPlaying ? 'opacity-70' : 'opacity-20'"
-      ></div>
+      />
     </ClientOnly>
 
     <!-- Main Content - Normal Mode -->
@@ -673,7 +668,7 @@ useSwipeGesture(mainContainerRef, {
             isPlaying ? 'opacity-30' : 'opacity-10',
             isPlaying ? sectionGlowClass.playing : sectionGlowClass.idle
           ]"
-        ></div>
+        />
 
         <!-- Vinyl Record -->
         <VinylRecord

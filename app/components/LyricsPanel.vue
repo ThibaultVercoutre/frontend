@@ -167,7 +167,7 @@ const isNewSection = (index: number): boolean => {
           :alt="track.title"
           class="w-full h-full object-cover blur-2xl scale-110 opacity-30"
         />
-        <div :class="['absolute inset-0', panelBg]"></div>
+        <div :class="['absolute inset-0', panelBg]"/>
       </div>
 
       <!-- Header -->
@@ -248,7 +248,7 @@ const isNewSection = (index: number): boolean => {
       v-if="isOpen && track"
       class="fixed inset-0 bg-black/50 z-40 sm:hidden"
       @click="emit('close')"
-    ></div>
+    />
   </Transition>
 </template>
 

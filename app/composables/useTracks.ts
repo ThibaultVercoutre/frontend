@@ -26,12 +26,12 @@ const localTracks: Track[] = [
   // (pas encore de pistes)
 ]
 
-// Shared state across components
-const tracks = ref<Track[]>(localTracks)
-const isLoading = ref(false)
-const error = ref<string | null>(null)
-
 export function useTracks() {
+  // Shared, SSR-safe state (per-request on the server, shared singleton on the client)
+  const tracks = useState<Track[]>('tracks', () => localTracks)
+  const isLoading = useState<boolean>('tracks-loading', () => false)
+  const error = useState<string | null>('tracks-error', () => null)
+
   // Get all tracks
   const fetchTracks = async (): Promise<void> => {
     // TODO: Replace with API call when backend is ready

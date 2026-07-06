@@ -7,13 +7,18 @@ export function useApi() {
   const error = ref<string | null>(null)
 
   const buildUrl = (endpoint: string, params?: Record<string, string | number>): string => {
-    const url = new URL(`${API_BASE_URL}${endpoint}`, window.location.origin)
+    // Build a relative URL with a query string. Avoid `new URL(..., window.location.origin)`
+    // because `window` is undefined during SSR; URLSearchParams works on both server and client.
+    let url = `${API_BASE_URL}${endpoint}`
     if (params) {
+      const search = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
-        url.searchParams.append(key, String(value))
+        search.append(key, String(value))
       })
+      const queryString = search.toString()
+      if (queryString) url += `?${queryString}`
     }
-    return url.toString()
+    return url
   }
 
   const handleResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {

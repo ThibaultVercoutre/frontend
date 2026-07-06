@@ -40,8 +40,10 @@ const hintColor = computed(() => {
 </script>
 
 <template>
-  <div
-    class="text-center cursor-pointer group"
+  <button
+    type="button"
+    class="w-full text-center cursor-pointer group"
+    aria-label="Ouvrir le mode karaoké"
     @click="emit('click')"
   >
     <div :class="['space-y-1 p-4 rounded-xl bg-zinc-900/50 backdrop-blur-sm border transition-all', borderClass]">
@@ -52,5 +54,5 @@ const hintColor = computed(() => {
     <p :class="['mt-2 text-xs uppercase tracking-wider transition-colors', hintColor]">
       Cliquer pour le mode karaoke
     </p>
-  </div>
+  </button>
 </template>

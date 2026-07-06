@@ -157,38 +157,6 @@ body {
   animation: shimmer 3s linear infinite;
 }
 
-.track-card {
-  background: linear-gradient(145deg, rgba(45, 74, 45, 0.6) 0%, rgba(26, 46, 26, 0.8) 100%);
-  border: 2px solid var(--forest-light);
-  backdrop-filter: blur(10px);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.track-card:hover {
-  transform: translateY(-10px) scale(1.02);
-  border-color: var(--gold-accent);
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(201, 162, 39, 0.2),
-    inset 0 0 30px rgba(201, 162, 39, 0.05);
-}
-
-.track-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--gold-accent), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.track-card:hover::before {
-  opacity: 1;
-}
-
 /* ===== FESTIVE THEME (Noel) ===== */
 .bg-festive {
   background: linear-gradient(180deg, var(--festive-dark) 0%, #0f0f1a 100%);
@@ -257,39 +225,6 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-/* Winter track card */
-.track-card-winter {
-  background: linear-gradient(145deg, rgba(30, 58, 95, 0.6) 0%, rgba(21, 34, 56, 0.8) 100%);
-  border: 2px solid rgba(125, 211, 252, 0.2);
-  backdrop-filter: blur(10px);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.track-card-winter:hover {
-  transform: translateY(-10px) scale(1.02);
-  border-color: var(--cabin-amber);
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(245, 158, 11, 0.15),
-    inset 0 0 30px rgba(245, 158, 11, 0.03);
-}
-
-.track-card-winter::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--cabin-amber), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.track-card-winter:hover::before {
-  opacity: 1;
 }
 
 /* Winter borders - pine tree pattern */
@@ -546,9 +481,7 @@ body {
   }
 
   /* Disable hover transforms */
-  .album-card:hover,
-  .track-card:hover,
-  .track-card-winter:hover {
+  .album-card:hover {
     transform: none !important;
   }
 

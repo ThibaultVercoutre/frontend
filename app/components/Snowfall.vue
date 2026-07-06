@@ -15,6 +15,9 @@ const fastAnimations = ['animate-snow-fast-1', 'animate-snow-fast-2', 'animate-s
 const slowSnowflakes = ref<Snowflake[]>([])
 const fastSnowflakes = ref<Snowflake[]>([])
 
+// Respect the user's reduced-motion preference
+const { prefersReducedMotion } = useReducedMotion()
+
 // Seeded random for consistent but varied results
 const seededRandom = (seed: number) => {
   const x = Math.sin(seed * 9999) * 10000
@@ -23,6 +26,9 @@ const seededRandom = (seed: number) => {
 
 // Generate snowflakes only on client
 onMounted(() => {
+  // Skip the animated snowfall entirely when the user prefers reduced motion
+  if (prefersReducedMotion.value) return
+
   // Generate large slow snowflakes
   slowSnowflakes.value = Array.from({ length: 20 }, (_, i) => ({
     id: `slow-${i}`,
@@ -46,7 +52,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
     <!-- Large slow snowflakes -->
     <div
       v-for="flake in slowSnowflakes"

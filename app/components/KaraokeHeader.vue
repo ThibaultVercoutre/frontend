@@ -42,7 +42,7 @@ defineExpose({
       <div
         ref="visualizerRef"
         class="h-10 sm:h-12 md:h-16 w-full rounded-lg overflow-hidden bg-zinc-900/30 mb-1 sm:mb-2"
-      ></div>
+      />
       <!-- Track Info -->
       <TrackInfo :track="track" size="sm" :theme="props.theme" />
     </div>

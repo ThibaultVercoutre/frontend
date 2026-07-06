@@ -1,4 +1,4 @@
-import type { LyricLine, LyricsData } from '~/types'
+import type { LyricLine } from '~/types'
 
 // Local lyrics data - will be replaced by API calls later
 const localLyricsData: Record<number, LyricLine[]> = {

@@ -29,10 +29,10 @@ useHead({
   <!-- Celtic Theme (Gabrielle) -->
   <div v-if="isCeltic" class="min-h-screen bg-pattern relative overflow-hidden">
     <!-- Celtic Border Frieze -->
-    <div class="celtic-border celtic-border-top"></div>
-    <div class="celtic-border celtic-border-bottom"></div>
-    <div class="celtic-border celtic-border-left"></div>
-    <div class="celtic-border celtic-border-right"></div>
+    <div class="celtic-border celtic-border-top"/>
+    <div class="celtic-border celtic-border-bottom"/>
+    <div class="celtic-border celtic-border-left"/>
+    <div class="celtic-border celtic-border-right"/>
 
     <!-- Floating Decorations -->
     <ClientOnly>
@@ -103,12 +103,12 @@ useHead({
   <!-- Winter Theme (Noël 2024) - Canadian Wilderness -->
   <div v-else-if="isFestive" class="min-h-screen bg-winter bg-winter-pattern relative overflow-hidden">
     <!-- Pine tree border -->
-    <div class="winter-border-top"></div>
+    <div class="winter-border-top"/>
 
     <!-- Snowfall -->
     <Snowfall />
     <!-- Cabin glow effect -->
-    <div class="cabin-glow"></div>
+    <div class="cabin-glow"/>
 
     <!-- Back Button -->
     <div class="absolute top-6 left-6 z-20">
@@ -150,12 +150,12 @@ useHead({
 
       <!-- Divider - Mountain silhouette style -->
       <div class="flex items-center justify-center gap-4 mb-12">
-        <div class="h-px w-20 bg-gradient-to-r from-transparent to-sky-500/30"></div>
+        <div class="h-px w-20 bg-gradient-to-r from-transparent to-sky-500/30"/>
         <svg class="w-8 h-8 text-amber-500/60" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2L2 22h20L12 2zm0 4l6.5 14h-13L12 6z" opacity="0.5"/>
           <path d="M12 6l4 8H8l4-8z"/>
         </svg>
-        <div class="h-px w-20 bg-gradient-to-l from-transparent to-sky-500/30"></div>
+        <div class="h-px w-20 bg-gradient-to-l from-transparent to-sky-500/30"/>
       </div>
 
       <!-- Tracks List -->
@@ -226,9 +226,9 @@ useHead({
 
       <!-- Divider -->
       <div class="flex items-center justify-center gap-4 mb-12">
-        <div class="h-px w-24 bg-gradient-to-r from-transparent to-purple-500/30"></div>
-        <div class="w-2 h-2 rounded-full bg-purple-500/50"></div>
-        <div class="h-px w-24 bg-gradient-to-l from-transparent to-pink-500/30"></div>
+        <div class="h-px w-24 bg-gradient-to-r from-transparent to-purple-500/30"/>
+        <div class="w-2 h-2 rounded-full bg-purple-500/50"/>
+        <div class="h-px w-24 bg-gradient-to-l from-transparent to-pink-500/30"/>
       </div>
 
       <!-- Tracks List -->
